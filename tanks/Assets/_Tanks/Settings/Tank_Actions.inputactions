@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "Tank_Actions",
     "maps": [
         {
@@ -9,6 +10,15 @@
                     "name": "Vertical",
                     "type": "Value",
                     "id": "7f634776-705e-4b54-8a3b-8fb86e2607fc",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "TurretTurn",
+                    "type": "Value",
+                    "id": "2f3b2975-0be1-4b82-8651-b27547812366",
                     "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
@@ -117,6 +127,83 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Vertical",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "KeyboardLeft",
+                    "id": "1a869ab2-d56e-475e-8770-59ccab7ee706",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TurretTurn",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "61f71899-db08-45ba-a4ec-e988e20bde48",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardLeft",
+                    "action": "TurretTurn",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "108784f3-e82e-490c-a260-faab57d7378a",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardLeft",
+                    "action": "TurretTurn",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "KeyboardRight",
+                    "id": "4b77b7a3-7073-48ff-973d-c40047ea2a15",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TurretTurn",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "1fb3df09-67e1-48a4-8574-82209cca701e",
+                    "path": "<Keyboard>/comma",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KeyboardRight",
+                    "action": "TurretTurn",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "2f1717ed-513e-448f-b7cd-e7ba8c4d342a",
+                    "path": "<Keyboard>/period",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardRight",
+                    "action": "TurretTurn",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "521b8208-a4c4-421a-a261-d9e249b6b9a2",
+                    "path": "<Gamepad>/leftStick/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "TurretTurn",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
