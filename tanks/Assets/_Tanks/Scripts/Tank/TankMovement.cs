@@ -43,6 +43,9 @@ namespace Tanks.Complete
         public Transform m_TurretTransform;             // 砲塔Transform参照
         private string m_TurretTurnActionName;          // Action名
         private InputAction m_TurretTurnAction;         // InputAction参照
+
+        // ▼ TurretHUD の Transform 参照
+        public Transform m_TurretHUDTransform;
         // ================================
 
         private void Awake()
@@ -69,24 +72,18 @@ namespace Tanks.Complete
             m_MovementInputValue = 0f;
             m_TurnInputValue = 0f;
             m_ExplosionForceValue = Vector3.zero;
-
-            // ▼ 砲塔入力値リセット
             m_TurretTurnInputValue = 0f;
 
             m_particleSystems = GetComponentsInChildren<ParticleSystem>();
             for (int i = 0; i < m_particleSystems.Length; ++i)
-            {
                 m_particleSystems[i].Play();
-            }
         }
 
         private void OnDisable()
         {
             m_Rigidbody.isKinematic = true;
             for (int i = 0; i < m_particleSystems.Length; ++i)
-            {
                 m_particleSystems[i].Stop();
-            }
         }
 
         private void Start()
@@ -122,17 +119,13 @@ namespace Tanks.Complete
             m_MoveAction.Enable();
             m_TurnAction.Enable();
 
-            // ▼ 砲塔回転用アクションの設定
+            // ▼ 砲塔回転用アクション設定
             m_TurretTurnActionName = "TurretTurn";
             m_TurretTurnAction = m_InputUser.ActionAsset.FindAction(m_TurretTurnActionName);
             if (m_TurretTurnAction != null)
-            {
                 m_TurretTurnAction.Enable();
-            }
             else
-            {
                 Debug.LogWarning($"[TankMovement] TurretTurn アクションが見つかりません（{name}）");
-            }
 
             if (m_MovementAudio)
                 m_OriginalPitch = m_MovementAudio.pitch;
@@ -145,7 +138,6 @@ namespace Tanks.Complete
                 m_MovementInputValue = m_MoveAction.ReadValue<float>();
                 m_TurnInputValue = m_TurnAction.ReadValue<float>();
 
-                // ▼ 砲塔回転の入力値取得
                 if (m_TurretTurnAction != null)
                     m_TurretTurnInputValue = m_TurretTurnAction.ReadValue<float>();
             }
@@ -173,8 +165,6 @@ namespace Tanks.Complete
 
             Move();
             Turn();
-
-            // ▼ TurretTurn 呼び出し
             TurretTurn();
         }
 
@@ -227,8 +217,12 @@ namespace Tanks.Complete
             // Quaternionを使ってY軸に回転
             Quaternion turretRotation = Quaternion.Euler(0f, turn, 0f);
 
-            // 既存ローカル回転に加算
+            // 砲塔を回転
             m_TurretTransform.localRotation *= turretRotation;
+
+            // TurretHUDも砲塔と同じ角度で回転
+            if (m_TurretHUDTransform != null)
+                m_TurretHUDTransform.localRotation *= turretRotation;
         }
         // ===================================
 

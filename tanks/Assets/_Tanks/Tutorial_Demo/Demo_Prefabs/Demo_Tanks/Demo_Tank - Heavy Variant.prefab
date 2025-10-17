@@ -155,6 +155,10 @@ PrefabInstance:
       propertyPath: m_TurretTransform
       value: 
       objectReference: {fileID: 4381007041745626013}
+    - target: {fileID: 11443146, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
+      propertyPath: m_TurretHUDTransform
+      value: 
+      objectReference: {fileID: 366342858086983303}
     - target: {fileID: 11488788, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
       propertyPath: m_Shell
       value: 
@@ -188,6 +192,11 @@ PrefabInstance:
       addedObject: {fileID: 2111292587909646999}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
+--- !u!4 &366342858086983303 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2016047469420559418, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
+  m_PrefabInstance: {fileID: 2229267103194913469}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2229267103194764367 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 446194, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
