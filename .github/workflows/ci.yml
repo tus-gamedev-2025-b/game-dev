@@ -26,30 +26,33 @@ jobs:
           unity-editor -nographics -logFile /dev/stdout -quit -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" -serial "$UNITY_SERIAL"
           unity-editor -nographics -logFile /dev/stdout -projectPath ./tanks -executeMethod Packages.Rider.Editor.RiderScriptEditor.SyncSolution -quit
 
-      # TODO: remove this after verifying .sln generation
-      - name: print .sln files
-        continue-on-error: true
-        run: ls -R tanks/*.sln
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
           cache: false
 
+      - name: Install ReSharper GlobalTools
+        run: dotnet tool install --global JetBrains.ReSharper.GlobalTools --version 2025.2.3
+
+      - name: Add dotnet tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
       - name: Annotate
-        uses: JetBrains/ReSharper-InspectCode@v0.11
-        with:
-          solution: ./tanks/tanks.sln
-          eXtensions: JetBrains.Unity
-          tool-version: 2025.2.3
-          output: results.sarif.json
-          sEverity: WARNING
+        run: |
+          jb inspectcode ./tanks/tanks.sln \
+            --format=Sarif \
+            --output=results.sarif.json \
+            --severity=WARNING \
+            --build \
+            --verbosity=INFO \
+            --eXtensions=JetBrains.Unity
 
       - name: Upload SARIF to Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: results.sarif.json
+          category: resharper-inspectcode
 
     permissions:
       contents: read
