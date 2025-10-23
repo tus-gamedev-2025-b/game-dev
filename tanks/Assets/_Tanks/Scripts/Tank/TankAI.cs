@@ -12,6 +12,8 @@ namespace Tanks.Complete
     public class TankAI : MonoBehaviour
     {
 
+        private readonly float m_TimeBetweenShot = 2.0f; // The AI Tank have a cooldown on shot to avoid spamming shot
+
         private GameObject[] m_AllTanks; // List of all the tanks in the scene.
         private int m_CurrentCorner;     // Which corner of the path the tank is currently going forward to 
 
@@ -34,8 +36,6 @@ namespace Tanks.Complete
         private TankShooting m_Shooting;     // Reference to the shooting script
         private float m_ShotCooldown;        // The remaining time until the next shot
         private float m_SinceLastFleeingMove;
-
-        private readonly float m_TimeBetweenShot = 2.0f; // The AI Tank have a cooldown on shot to avoid spamming shot
         private float m_TimeCloseToTarget;
         private float m_TimeSinceLastTargetMove; // Timer counting how long the target hasn't moved. This is used to trigger the flee state
 
