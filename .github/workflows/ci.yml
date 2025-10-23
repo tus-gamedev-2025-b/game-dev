@@ -10,26 +10,25 @@ on:
 jobs:
   inspect-code:
     runs-on: ubuntu-latest
+    container: unityci/editor:ubuntu-6000.2.7f2-linux-il2cpp-3
     steps:
       - uses: actions/checkout@v5
         with:
           submodules: recursive
 
+      # see https://github.com/game-ci/unity-builder/issues/497#issuecomment-1407712495
       - name: Generate .sln via Unity
-        uses: game-ci/unity-builder@v4
         env:
-          UNITY_LICENSE:  ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL:    ${{ secrets.UNITY_EMAIL }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: auto
-          projectPath: ./tanks
-          targetPlatform: StandaloneLinux64
-          buildMethod: CI.GenerateSolution
-          customParameters: -quit -batchmode -nographics
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        run: |
+          unity-editor -nographics -logFile /dev/stdout -quit -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" -serial "$UNITY_SERIAL"
+          unity-editor -nographics -logFile /dev/stdout -projectPath ./tanks -executeMethod Packages.Rider.Editor.RiderScriptEditor.SyncSolution -quit
 
       # TODO: remove this after verifying .sln generation
       - name: print .sln files
+        continue-on-error: true
         run: ls -R tanks/*.sln
 
       - name: Annotate
