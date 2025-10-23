@@ -23,9 +23,14 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: auto
+          projectPath: ./tanks
           targetPlatform: StandaloneLinux64
           buildMethod: CI.GenerateSolution
           customParameters: -quit -batchmode -nographics
+
+      # TODO: remove this after verifying .sln generation
+      - name: print .sln files
+        run: ls -R tanks/*.sln
 
       - name: Annotate
         uses: JetBrains/ReSharper-InspectCode@v0.11
