@@ -29,6 +29,13 @@ namespace Tanks.Complete
             "The radius of the explosion in Unity unit. Force decrease with distance to the center, and an tank further than this from the shell explosion won't be impacted by the explosion")]
         public float m_ExplosionRadius = 5f; // The maximum distance away from the explosion tanks can be and are still affected.
 
+        [Tooltip("The number of shells the tank starts with")]
+        public int m_StartingShells = 10;
+        [Tooltip("The maximum number of shells the tank can carry")]
+        public int m_MaxShells = 50;
+        [Tooltip("The number of shells added when a shell cartridge power-up is collected")]
+        public int m_ShellsPerCartridge = 10;
+
         [HideInInspector]
         public TankInputUser m_InputUser;   // The Input User component for that tanks. Contains the Input Actions.
         private InputAction fireAction;     // The Input Action for shooting, retrieve from TankInputUser
@@ -41,6 +48,8 @@ namespace Tanks.Complete
         private bool m_HasSpecialShell;         // has the tank a shell that makes extra damage?
         private float m_ShotCooldownTimer;      // The timer counting down before a shot is allowed again
         private float m_SpecialShellMultiplier; // The amount that the special shell will multiply the damage.
+
+        public int m_CurrentShells { get; private set; } // The current number of shells the tank has
 
         public float CurrentChargeRatio =>
             (m_CurrentLaunchForce - m_MinLaunchForce) / (m_MaxLaunchForce - m_MinLaunchForce); //The charging amount between 0-1
@@ -66,6 +75,9 @@ namespace Tanks.Complete
 
             // The rate that the launch force charges up is the range of possible forces by the max charge time.
             m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
+
+            // Initizialize current shells
+            m_CurrentShells = m_StartingShells;
         }
 
 
@@ -196,6 +208,14 @@ namespace Tanks.Complete
 
         private void Fire()
         {
+            // Check we have shells to fire
+            if (m_CurrentShells <= 0)
+            {
+                m_CurrentLaunchForce = m_MinLaunchForce;
+                m_ShotCooldownTimer = m_ShotCooldown;
+                return;
+            }
+
             // Set the fired flag so only Fire is only called once.
             m_Fired = true;
 
@@ -236,6 +256,9 @@ namespace Tanks.Complete
             m_CurrentLaunchForce = m_MinLaunchForce;
 
             m_ShotCooldownTimer = m_ShotCooldown;
+
+            // Consume a shell
+            m_CurrentShells = Mathf.Max(0, m_CurrentShells - 1);
         }
 
 
@@ -277,6 +300,11 @@ namespace Tanks.Complete
             position.y = 0;
 
             return position;
+        }
+
+        public void AddShells()
+        {
+            m_CurrentShells = Mathf.Min(m_CurrentShells + m_ShellsPerCartridge, m_MaxShells);
         }
     }
 }
