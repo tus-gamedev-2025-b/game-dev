@@ -10,7 +10,7 @@ on:
 jobs:
   inspect-code:
     runs-on: ubuntu-latest
-    container: unityci/editor:ubuntu-6000.2.7f2-linux-il2cpp-3
+    container: unityci/editor:ubuntu-6000.2.7f2-base-3.2.0
     steps:
       - uses: actions/checkout@v5
         with:
