@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -36,6 +37,8 @@ namespace Tanks.Complete
         [Tooltip("The number of shells added when a shell cartridge power-up is collected")]
         public int m_ShellsPerCartridge = 10;
 
+        public event Action<int> OnShellStockChanges;
+
         [HideInInspector]
         public TankInputUser m_InputUser;   // The Input User component for that tanks. Contains the Input Actions.
         private InputAction fireAction;     // The Input Action for shooting, retrieve from TankInputUser
@@ -49,7 +52,19 @@ namespace Tanks.Complete
         private float m_ShotCooldownTimer;      // The timer counting down before a shot is allowed again
         private float m_SpecialShellMultiplier; // The amount that the special shell will multiply the damage.
 
-        public int m_CurrentShells { get; private set; } // The current number of shells the tank has
+        // The current number of shells the tank has
+        private int currentShells;
+        public int m_CurrentShells
+        {
+            get => currentShells;
+            private set
+            {
+                if (value < 0 || value > m_MaxShells || value == currentShells)
+                    return;
+                currentShells = value;
+                OnShellStockChanges?.Invoke(m_CurrentShells);
+            }
+        }
 
         public float CurrentChargeRatio =>
             (m_CurrentLaunchForce - m_MinLaunchForce) / (m_MaxLaunchForce - m_MinLaunchForce); //The charging amount between 0-1
