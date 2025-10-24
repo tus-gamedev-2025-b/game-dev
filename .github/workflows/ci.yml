@@ -38,6 +38,17 @@ jobs:
       - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
+      - name: Cleanup code with ReSharper
+        run: |
+          jb cleanupcode ./tanks/tanks.sln \
+            --profile="Built-in: Full Cleanup" \
+            --verbosity=INFO \
+            --eXtensions=JetBrains.Unity \
+            --exclude="**/Library/**.*;**/Logs/**.*"
+
+      - name: Commit fixes to PR with autofix.ci
+        uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27
+
       - name: Annotate
         run: |
           jb inspectcode ./tanks/tanks.sln \
