@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -15,6 +16,13 @@ namespace Tanks.Complete
             Game
         }
 
+        public enum GameLoopState
+        {
+            RoundStarting,
+            RoundPlaying,
+            RoundEnding
+        }
+
         public int m_NumRoundsToWin = 5;      // The number of rounds a single player has to win to win the game.
         public float m_StartDelay = 3f;       // The delay between the start of RoundStarting and RoundPlaying phases.
         public float m_EndDelay = 3f;         // The delay between the end of RoundPlaying and RoundEnding phases.
@@ -30,6 +38,7 @@ namespace Tanks.Complete
         public TankManager[] m_SpawnPoints; // A collection of managers for enabling and disabling different aspects of the tanks.
 
         private GameState m_CurrentState;
+        private GameLoopState m_CurrentLoopState;
         private WaitForSeconds m_EndWait; // Used to have a delay whilst the round or game ends.
         private TankManager m_GameWinner; // Reference to the winner of the game.  Used to make an announcement of who won.
         private int m_PlayerCount;        // The number of players (2 to 4), decided from the number of PlayerData passed by the menu
@@ -40,6 +49,8 @@ namespace Tanks.Complete
 
         private PlayerData[] m_TankData;     // Data passed from the menu about each selected tank (at least 2, max 4)
         private TextMeshProUGUI m_TitleText; // The text used to display game message. Automatically found as part of the Menu prefab
+
+        public event Action<GameLoopState> OnGameLoopStateChanged;
 
         private void Start()
         {
@@ -150,6 +161,15 @@ namespace Tanks.Complete
             m_CameraControl.m_Targets = targets;
         }
 
+        public void SetGameLoopState(GameLoopState newState)
+        {
+            if (m_CurrentLoopState == newState)
+                return;
+
+            m_CurrentLoopState = newState;
+            OnGameLoopStateChanged?.Invoke(m_CurrentLoopState);
+        }
+
 
         // This is called from start and will run each phase of the game one after another.
         private IEnumerator GameLoop()
@@ -180,6 +200,8 @@ namespace Tanks.Complete
 
         private IEnumerator RoundStarting()
         {
+            SetGameLoopState(GameLoopState.RoundStarting);
+
             // As soon as the round starts reset the tanks and make sure they can't move.
             ResetAllTanks();
             DisableTankControl();
@@ -198,6 +220,8 @@ namespace Tanks.Complete
 
         private IEnumerator RoundPlaying()
         {
+            SetGameLoopState(GameLoopState.RoundPlaying);
+
             // As soon as the round begins playing let the players control the tanks.
             EnableTankControl();
 
@@ -215,6 +239,8 @@ namespace Tanks.Complete
 
         private IEnumerator RoundEnding()
         {
+            SetGameLoopState(GameLoopState.RoundEnding);
+
             // Stop tanks from moving.
             DisableTankControl();
 

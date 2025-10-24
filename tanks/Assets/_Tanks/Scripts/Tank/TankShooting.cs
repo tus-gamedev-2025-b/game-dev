@@ -75,9 +75,6 @@ namespace Tanks.Complete
 
             // The rate that the launch force charges up is the range of possible forces by the max charge time.
             m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
-
-            // Initizialize current shells
-            m_CurrentShells = m_StartingShells;
         }
 
 
@@ -105,6 +102,18 @@ namespace Tanks.Complete
 
             m_AimSlider.minValue = m_MinLaunchForce;
             m_AimSlider.maxValue = m_MaxLaunchForce;
+
+            m_CurrentShells = m_StartingShells;
+        }
+
+        public void OnCollisionEnter(Collision collision)
+        {
+            // If we collide with a shell cartridge, consume it and add shells
+            if (collision.gameObject.CompareTag("ShellCartridge"))
+            {
+                AddShells();
+                Destroy(collision.gameObject);
+            }
         }
 
         /// <summary>
