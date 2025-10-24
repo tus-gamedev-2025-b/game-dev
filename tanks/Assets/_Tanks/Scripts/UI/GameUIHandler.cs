@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -12,30 +11,30 @@ namespace Tanks.Complete
     // This handle both the start menu (selecting which tank each player use) and the pause menu if present
     public class GameUIHandler : MonoBehaviour
     {
-        public GameManager m_GameManager;               // Reference to the GameManager in the scene
+        public GameManager m_GameManager; // Reference to the GameManager in the scene
 
-        [Header("Start Menu")] 
-        public RectTransform m_StartMenuRoot;           // The GameObject root that is parent of the Start Menu
-        public Button m_StartButton;                    // The Button that will start the game
+        [Header("Start Menu")]
+        public RectTransform m_StartMenuRoot; // The GameObject root that is parent of the Start Menu
+        public Button m_StartButton;          // The Button that will start the game
 
         [Tooltip("The slot in the UI that can be taken by a player or computer tank")]
-        public StartMenuSlot[] m_PlayerSlots;           // The Slots in the Start Menu that display the available tanks and handle players selections
+        public StartMenuSlot[] m_PlayerSlots; // The Slots in the Start Menu that display the available tanks and handle players selections
 
-        public OnScreenButton m_PauseMenuButton;        // Reference to OnScreenButton that emulate pressing a Gamepad Start button
-        
-        private TextMeshProUGUI m_StartButtonText;      // Reference to the Text on the Start Button 
-        private int m_SlotUsed = 0;                     // How many slots are currently used, the game need at least 2 to start
+        public OnScreenButton m_PauseMenuButton; // Reference to OnScreenButton that emulate pressing a Gamepad Start button
 
-        private PauseMenu m_PauseMenu;                  // Reference to the pause menu (if present in the scene)
-        private InputAction m_PauseAction;              // The InputAction that will trigger the pause menu
-        
         private CanvasScaler m_CanvasScaler;
+        private InputAction m_PauseAction; // The InputAction that will trigger the pause menu
+
+        private PauseMenu m_PauseMenu; // Reference to the pause menu (if present in the scene)
+        private int m_SlotUsed;        // How many slots are currently used, the game need at least 2 to start
+
+        private TextMeshProUGUI m_StartButtonText; // Reference to the Text on the Start Button 
 
         private void Awake()
         {
             // URP require stacking camera to be explicitly added to the stack on the main camera
             // so this check if the main camera already have our parent camera in their stack and otherwise add it.
-            Camera cam = GetComponentInParent<Camera>();
+            var cam = GetComponentInParent<Camera>();
 
             m_CanvasScaler = GetComponentInParent<CanvasScaler>();
 
@@ -59,7 +58,7 @@ namespace Tanks.Complete
             m_StartButton.interactable = false;
             m_StartButtonText = m_StartButton.GetComponentInChildren<TextMeshProUGUI>();
             m_StartButtonText.text = "2 Tanks required";
-            
+
             // Disable the on screen pause button
             m_PauseMenuButton.gameObject.SetActive(false);
 
@@ -86,7 +85,7 @@ namespace Tanks.Complete
                 };
 
             // Go over all the player slots (4) and initialize them...
-            for (int i = 0; i < m_PlayerSlots.Length; ++i)
+            for (var i = 0; i < m_PlayerSlots.Length; ++i)
             {
                 var slot = m_PlayerSlots[i];
 
@@ -100,8 +99,8 @@ namespace Tanks.Complete
                     m_SlotUsed += 1;
 
                     //we check if they are player 1 already used
-                    bool player1Present = false;
-                    for (int j = 0; j < m_PlayerSlots.Length; ++j)
+                    var player1Present = false;
+                    for (var j = 0; j < m_PlayerSlots.Length; ++j)
                     {
                         if (i1 == j) continue;
 
@@ -134,7 +133,7 @@ namespace Tanks.Complete
                 {
                     slot.RemoveTank();
                     m_SlotUsed -= 1;
-                    
+
                     // If after removing that tank from the used tanks we have less than 2 slots open, disable the 
                     // Start button and reset the text to the required warning
                     if (m_SlotUsed < 2)
@@ -150,7 +149,7 @@ namespace Tanks.Complete
                     slot.SetPlayerControlling(1);
 
                     //check if any other slot are player 1 controlled and switch it to computer
-                    for (int j = 0; j < m_PlayerSlots.Length; ++j)
+                    for (var j = 0; j < m_PlayerSlots.Length; ++j)
                     {
                         var localSlot = m_PlayerSlots[j];
                         if (localSlot.IsOpen || localSlot == slot) continue;
@@ -168,7 +167,7 @@ namespace Tanks.Complete
                     slot.SetPlayerControlling(2);
 
                     //check if any other slot are player 2 controlled and switch it to computer
-                    for (int j = 0; j < m_PlayerSlots.Length; ++j)
+                    for (var j = 0; j < m_PlayerSlots.Length; ++j)
                     {
                         var localSlot = m_PlayerSlots[j];
                         if (localSlot.IsOpen || localSlot == slot) continue;
@@ -185,23 +184,31 @@ namespace Tanks.Complete
             }
         }
 
-        void StartGame()
+        private void Update()
+        {
+            // This help keeping the UI readable in both portrait and landscape mode (game should only be played in landscape
+            // but Unity Play cannot enforce an orientation so we need it to be readable even in portrait)
+            var ratio = Screen.width / (float)Screen.height;
+            m_CanvasScaler.matchWidthOrHeight = ratio > 1.0f ? 1.0f : 0.0f;
+        }
+
+        private void StartGame()
         {
             // When starting the game, we disable the Start Menu
             m_StartMenuRoot.gameObject.SetActive(false);
 
             // PlayerData is a structure that allow to pass info between the menu and the GameManager
-            List<GameManager.PlayerData> playerData = new List<GameManager.PlayerData>();
+            var playerData = new List<GameManager.PlayerData>();
             foreach (var slot in m_PlayerSlots)
             {
                 if (!slot.IsOpen)
                 {
-                    playerData.Add(new GameManager.PlayerData()
+                    playerData.Add(new GameManager.PlayerData
                     {
                         TankColor = slot.m_SlotColor,
                         IsComputer = slot.IsComputer,
                         ControlIndex = slot.PlayerControlling,
-                        UsedPrefab = slot.TankPrefab,
+                        UsedPrefab = slot.TankPrefab
                     });
                 }
             }
@@ -224,22 +231,14 @@ namespace Tanks.Complete
             {
                 m_PauseAction.performed += evt => { TogglePause(); };
                 m_PauseAction.Enable();
-                
+
                 m_PauseMenuButton.gameObject.SetActive(true);
             }
         }
-        
+
         private void TogglePause()
         {
             m_PauseMenu.TogglePause();
-        }
-
-        private void Update()
-        {
-            // This help keeping the UI readable in both portrait and landscape mode (game should only be played in landscape
-            // but Unity Play cannot enforce an orientation so we need it to be readable even in portrait)
-            float ratio = Screen.width / (float)Screen.height;
-            m_CanvasScaler.matchWidthOrHeight = ratio > 1.0f ? 1.0f : 0.0f;
         }
     }
 }
