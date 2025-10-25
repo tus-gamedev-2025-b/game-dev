@@ -1,0 +1,56 @@
+name: autofix.ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  autofix:
+    name: autofix
+    runs-on: ubuntu-24.04
+    container: unityci/editor:ubuntu-6000.2.7f2-base-3.2.0
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          submodules: recursive
+
+      # see https://github.com/game-ci/unity-builder/issues/497#issuecomment-1407712495
+      - name: Generate .sln via Unity
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        run: |
+          unity-editor -nographics -logFile /dev/stdout -quit -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" -serial "$UNITY_SERIAL"
+          unity-editor -nographics -logFile /dev/stdout -projectPath ./tanks -executeMethod Packages.Rider.Editor.RiderScriptEditor.SyncSolution -quit
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: "8.0.x"
+          cache: false
+
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+
+      - name: Lint with Roslynator
+        run: dotnet roslynator fix ./tanks/tanks.sln
+
+      - name: Format with dotnet format
+        run: dotnet format ./tanks/tanks.sln --verbosity normal
+
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory /__w/game-dev/game-dev
+
+      - name: autofix.ci
+        uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27
