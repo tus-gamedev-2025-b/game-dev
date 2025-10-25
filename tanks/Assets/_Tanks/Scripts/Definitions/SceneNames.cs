@@ -1,6 +1,6 @@
 public static class SceneNames
 {
-    public static readonly string TitleScene = "TitleScene";
-    public static readonly string HomeScene = "HomeScene";
-    public static readonly string Demo_Game_Moon = "Demo_Game_Moon";
+    public readonly static string TitleScene = "TitleScene";
+    public readonly static string HomeScene = "HomeScene";
+    public readonly static string Demo_Game_Moon = "Demo_Game_Moon";
 }

@@ -1,17 +1,17 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class VersusPlayerButton : MonoBehaviour
 {
     [SerializeField] private Button versusPlayerButton;
 
-    void Start()
+    private void Start()
     {
         versusPlayerButton.onClick.AddListener(OnClicked);
     }
 
-    void OnClicked()
+    private void OnClicked()
     {
         SceneManager.LoadScene(SceneNames.Demo_Game_Moon);
     }

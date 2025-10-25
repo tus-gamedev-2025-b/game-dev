@@ -1,17 +1,17 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class StartButton : MonoBehaviour
 {
     [SerializeField] private Button startButton;
 
-    void Start()
+    private void Start()
     {
         startButton.onClick.AddListener(OnClicked);
     }
 
-    void OnClicked()
+    private void OnClicked()
     {
         SceneManager.LoadScene(SceneNames.HomeScene);
     }
