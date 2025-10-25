@@ -45,6 +45,11 @@ public class HUDManager : MonoBehaviour
         {
             stockP1.gameObject.SetActive(true);
             if (DoesP2Exist()) stockP2.gameObject.SetActive(true);
+
+            foreach (var tank in gameManager.m_SpawnPoints)
+            {
+                HandleWeaponStockChanged(tank.ControlIndex, tank.ShellStock);
+            }
         }
         else
         {

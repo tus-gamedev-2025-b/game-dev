@@ -51,6 +51,7 @@ namespace Tanks.Complete
         private bool m_HasSpecialShell;         // has the tank a shell that makes extra damage?
         private float m_ShotCooldownTimer;      // The timer counting down before a shot is allowed again
         private float m_SpecialShellMultiplier; // The amount that the special shell will multiply the damage.
+        private bool m_IsChargingForward;
 
         // The current number of shells the tank has
         private int currentShells;
@@ -114,6 +115,7 @@ namespace Tanks.Complete
             m_AimSlider.value = m_BaseMinLaunchForce;
             m_HasSpecialShell = false;
             m_SpecialShellMultiplier = 1.0f;
+            m_IsChargingForward = true;
 
             m_AimSlider.minValue = m_MinLaunchForce;
             m_AimSlider.maxValue = m_MaxLaunchForce;
@@ -198,16 +200,23 @@ namespace Tanks.Complete
             // If the max force has been exceeded and the shell hasn't yet been launched...
             if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
             {
-                // ... use the max force and launch the shell.
                 m_CurrentLaunchForce = m_MaxLaunchForce;
-                Fire();
+                m_IsChargingForward = false;
             }
-            // Otherwise, if the fire button has just started being pressed...
-            else if (m_ShotCooldownTimer <= 0 && fireAction.WasPressedThisFrame())
+            // Otherwise, if the min force has been exceeded and the shell hasn't yet been launched...
+            else if (m_CurrentLaunchForce <= m_MinLaunchForce && !m_Fired)
+            {
+                m_CurrentLaunchForce = m_MinLaunchForce;
+                m_IsChargingForward = true;
+            }
+
+            // If the fire button has just started being pressed...
+            if (m_ShotCooldownTimer <= 0 && fireAction.WasPressedThisFrame())
             {
                 // ... reset the fired flag and reset the launch force.
                 m_Fired = false;
                 m_CurrentLaunchForce = m_MinLaunchForce;
+                m_IsChargingForward = true;
 
                 // Change the clip to the charging clip and start it playing.
                 m_ShootingAudio.clip = m_ChargingClip;
@@ -216,8 +225,8 @@ namespace Tanks.Complete
             // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
             else if (fireAction.IsPressed() && !m_Fired)
             {
-                // Increment the launch force and update the slider.
-                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+                // Increment of decrement the launch force and update the slider.
+                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime * (m_IsChargingForward ? 1 : -1);
 
                 m_AimSlider.value = m_CurrentLaunchForce;
             }
@@ -237,6 +246,7 @@ namespace Tanks.Complete
             {
                 m_CurrentLaunchForce = m_MinLaunchForce;
                 m_ShotCooldownTimer = m_ShotCooldown;
+                m_IsChargingForward = true;
                 return;
             }
 
@@ -280,6 +290,9 @@ namespace Tanks.Complete
             m_CurrentLaunchForce = m_MinLaunchForce;
 
             m_ShotCooldownTimer = m_ShotCooldown;
+
+            // Reset the charging direction for the next shot
+            m_IsChargingForward = true;
 
             // Consume a shell
             m_CurrentShells = Mathf.Max(0, m_CurrentShells - 1);
