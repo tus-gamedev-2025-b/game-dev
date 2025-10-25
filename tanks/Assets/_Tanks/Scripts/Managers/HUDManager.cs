@@ -34,6 +34,11 @@ public class HUDManager : MonoBehaviour
         }
     }
 
+    private bool DoesP1Exist()
+    {
+        return m_GameManager.m_SpawnPoints.Any(tank => tank.ControlIndex == 1);
+    }
+
     private bool DoesP2Exist()
     {
         return m_GameManager.m_SpawnPoints.Any(tank => tank.ControlIndex == 2);
@@ -43,12 +48,20 @@ public class HUDManager : MonoBehaviour
     {
         if (state == GameManager.GameLoopState.RoundPlaying)
         {
-            m_StockP1.gameObject.SetActive(true);
+            if (DoesP1Exist()) m_StockP1.gameObject.SetActive(true);
             if (DoesP2Exist()) m_StockP2.gameObject.SetActive(true);
 
             foreach (var tank in m_GameManager.m_SpawnPoints)
             {
-                HandleWeaponStockChanged(tank.ControlIndex, tank.ShellStock);
+                switch (tank.ControlIndex)
+                {
+                    case 1:
+                        m_StockP1.InitPlayerStock(tank.MaxShellStock, tank.ShellStock);
+                        break;
+                    case 2:
+                        m_StockP2.InitPlayerStock(tank.MaxShellStock, tank.ShellStock);
+                        break;
+                }
             }
         }
         else

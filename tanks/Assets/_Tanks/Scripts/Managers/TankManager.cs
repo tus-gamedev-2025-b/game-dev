@@ -38,7 +38,8 @@ namespace Tanks.Complete
         private TankShooting m_Shooting; // Reference to tank's shooting script, used to disable and enable control.
 
         public int ControlIndex { get; set; } = 1; //this defines the index of the control 1 = left keyboard or pad, 2 = right keyboard, -1 = no control
-        public int ShellStock => m_Shooting.m_CurrentShells;
+        public int ShellStock => m_Shooting.CurrentShells;
+        public int MaxShellStock => m_Shooting.m_MaxShells;
 
         public void Setup(GameManager manager)
         {

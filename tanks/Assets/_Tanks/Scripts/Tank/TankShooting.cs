@@ -54,15 +54,15 @@ namespace Tanks.Complete
         private bool m_IsChargingForward;
 
         // The current number of shells the tank has
-        private int currentShells;
-        public int m_CurrentShells
+        private int m_CurrentShells;
+        public int CurrentShells
         {
-            get => currentShells;
+            get => m_CurrentShells;
             private set
             {
-                if (value < 0 || value > m_MaxShells || value == currentShells)
+                if (value < 0 || value > m_MaxShells || value == m_CurrentShells)
                     return;
-                currentShells = value;
+                m_CurrentShells = value;
                 OnShellStockChanges?.Invoke(m_CurrentShells);
             }
         }
@@ -120,7 +120,7 @@ namespace Tanks.Complete
             m_AimSlider.minValue = m_MinLaunchForce;
             m_AimSlider.maxValue = m_MaxLaunchForce;
 
-            m_CurrentShells = m_StartingShells;
+            CurrentShells = m_StartingShells;
         }
 
         public void OnCollisionEnter(Collision collision)
@@ -242,7 +242,7 @@ namespace Tanks.Complete
         private void Fire()
         {
             // Check we have shells to fire
-            if (m_CurrentShells <= 0)
+            if (CurrentShells <= 0)
             {
                 m_CurrentLaunchForce = m_MinLaunchForce;
                 m_ShotCooldownTimer = m_ShotCooldown;
@@ -295,7 +295,7 @@ namespace Tanks.Complete
             m_IsChargingForward = true;
 
             // Consume a shell
-            m_CurrentShells = Mathf.Max(0, m_CurrentShells - 1);
+            CurrentShells = Mathf.Max(0, CurrentShells - 1);
         }
 
 
@@ -341,7 +341,7 @@ namespace Tanks.Complete
 
         public void AddShells()
         {
-            m_CurrentShells = Mathf.Min(m_CurrentShells + m_ShellsPerCartridge, m_MaxShells);
+            CurrentShells = Mathf.Min(CurrentShells + m_ShellsPerCartridge, m_MaxShells);
         }
     }
 }
