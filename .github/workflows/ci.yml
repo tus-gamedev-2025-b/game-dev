@@ -46,12 +46,6 @@ jobs:
             --eXtensions=JetBrains.Unity \
             --exclude="**/Library/**.*;**/Logs/**.*"
 
-      - name: Mark workspace as safe for git
-        run: git config --global --add safe.directory /__w/game-dev/game-dev
-
-      - name: autofix.ci
-        uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27
-
       - name: Annotate
         run: |
           jb inspectcode ./tanks/tanks.sln \
@@ -67,6 +61,12 @@ jobs:
         with:
           sarif_file: results.sarif.json
           category: resharper-inspectcode
+
+      - name: Mark workspace as safe for git
+        run: git config --global --add safe.directory /__w/game-dev/game-dev
+
+      - name: autofix.ci
+        uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27
 
     permissions:
       contents: read
