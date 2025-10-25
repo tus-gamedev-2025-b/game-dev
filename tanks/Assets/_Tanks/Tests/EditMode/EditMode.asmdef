@@ -3,8 +3,7 @@
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
-        "Tanks"
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [
         "Editor"
