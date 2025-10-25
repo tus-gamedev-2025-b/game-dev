@@ -225,7 +225,7 @@ namespace Tanks.Complete
             // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
             else if (fireAction.IsPressed() && !m_Fired)
             {
-                // Increment of decrement the launch force and update the slider.
+                // Increment or decrement the launch force and update the slider.
                 m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime * (m_IsChargingForward ? 1 : -1);
 
                 m_AimSlider.value = m_CurrentLaunchForce;
