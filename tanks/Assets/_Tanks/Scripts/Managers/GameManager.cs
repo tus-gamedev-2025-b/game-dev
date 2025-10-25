@@ -9,18 +9,19 @@ namespace Tanks.Complete
 {
     public class GameManager : MonoBehaviour
     {
-        // Which state the game is currently in
-        public enum GameState
-        {
-            MainMenu,
-            Game
-        }
 
         public enum GameLoopState
         {
             RoundStarting,
             RoundPlaying,
             RoundEnding
+        }
+
+        // Which state the game is currently in
+        public enum GameState
+        {
+            MainMenu,
+            Game
         }
 
         public int m_NumRoundsToWin = 5;      // The number of rounds a single player has to win to win the game.
@@ -36,9 +37,19 @@ namespace Tanks.Complete
 
         [FormerlySerializedAs("m_Tanks")]
         public TankManager[] m_SpawnPoints; // A collection of managers for enabling and disabling different aspects of the tanks.
+        private GameLoopState m_CurrentLoopState;
 
         private GameState m_CurrentState;
-        private GameLoopState m_CurrentLoopState;
+        private WaitForSeconds m_EndWait; // Used to have a delay whilst the round or game ends.
+        private TankManager m_GameWinner; // Reference to the winner of the game.  Used to make an announcement of who won.
+        private int m_PlayerCount;        // The number of players (2 to 4), decided from the number of PlayerData passed by the menu
+
+        private int m_RoundNumber;          // Which round the game is currently on.
+        private TankManager m_RoundWinner;  // Reference to the winner of the current round.  Used to make an announcement of who won.
+        private WaitForSeconds m_StartWait; // Used to have a delay whilst the round starts.
+
+        private PlayerData[] m_TankData;     // Data passed from the menu about each selected tank (at least 2, max 4)
+        private TextMeshProUGUI m_TitleText; // The text used to display game message. Automatically found as part of the Menu prefab
         private GameLoopState CurrentLoopState
         {
             get => m_CurrentLoopState;
@@ -51,18 +62,6 @@ namespace Tanks.Complete
                 OnGameLoopStateChanged?.Invoke(m_CurrentLoopState);
             }
         }
-        private WaitForSeconds m_EndWait; // Used to have a delay whilst the round or game ends.
-        private TankManager m_GameWinner; // Reference to the winner of the game.  Used to make an announcement of who won.
-        private int m_PlayerCount;        // The number of players (2 to 4), decided from the number of PlayerData passed by the menu
-
-        private int m_RoundNumber;          // Which round the game is currently on.
-        private TankManager m_RoundWinner;  // Reference to the winner of the current round.  Used to make an announcement of who won.
-        private WaitForSeconds m_StartWait; // Used to have a delay whilst the round starts.
-
-        private PlayerData[] m_TankData;     // Data passed from the menu about each selected tank (at least 2, max 4)
-        private TextMeshProUGUI m_TitleText; // The text used to display game message. Automatically found as part of the Menu prefab
-
-        public event Action<GameLoopState> OnGameLoopStateChanged;
 
         private void Start()
         {
@@ -88,6 +87,8 @@ namespace Tanks.Complete
                 Debug.LogError("You need to assign 4 tank prefab in the GameManager!");
             }
         }
+
+        public event Action<GameLoopState> OnGameLoopStateChanged;
 
         private void GameStart()
         {

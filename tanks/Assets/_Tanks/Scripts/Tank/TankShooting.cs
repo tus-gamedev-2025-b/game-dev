@@ -37,8 +37,6 @@ namespace Tanks.Complete
         [Tooltip("The number of shells added when a shell cartridge power-up is collected")]
         public int m_ShellsPerCartridge = 10;
 
-        public event Action<int> OnShellStockChanges;
-
         [HideInInspector]
         public TankInputUser m_InputUser;   // The Input User component for that tanks. Contains the Input Actions.
         private InputAction fireAction;     // The Input Action for shooting, retrieve from TankInputUser
@@ -46,15 +44,15 @@ namespace Tanks.Complete
         private float m_ChargeSpeed;        // How fast the launch force increases, based on the max charge time.
         private float m_CurrentLaunchForce; // The force that will be given to the shell when the fire button is released.
 
-        private string m_FireButton;            // The input axis that is used for launching shells.
-        private bool m_Fired;                   // Whether or not the shell has been launched with this button press.
-        private bool m_HasSpecialShell;         // has the tank a shell that makes extra damage?
-        private float m_ShotCooldownTimer;      // The timer counting down before a shot is allowed again
-        private float m_SpecialShellMultiplier; // The amount that the special shell will multiply the damage.
-        private bool m_IsChargingForward;
-
         // The current number of shells the tank has
         private int m_CurrentShells;
+
+        private string m_FireButton;    // The input axis that is used for launching shells.
+        private bool m_Fired;           // Whether or not the shell has been launched with this button press.
+        private bool m_HasSpecialShell; // has the tank a shell that makes extra damage?
+        private bool m_IsChargingForward;
+        private float m_ShotCooldownTimer;      // The timer counting down before a shot is allowed again
+        private float m_SpecialShellMultiplier; // The amount that the special shell will multiply the damage.
         public int CurrentShells
         {
             get => m_CurrentShells;
@@ -132,6 +130,8 @@ namespace Tanks.Complete
                 Destroy(collision.gameObject);
             }
         }
+
+        public event Action<int> OnShellStockChanges;
 
         /// <summary>
         ///     Used by AI to start charging

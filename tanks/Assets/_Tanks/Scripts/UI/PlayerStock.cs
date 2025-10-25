@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerStock : MonoBehaviour
 {
     [SerializeField] private GameObject m_ShellImagePrefab;
+    private bool initialized;
 
     private Transform m_ShellImagesContainer;
-    private bool initialized;
 
     public void Start()
     {

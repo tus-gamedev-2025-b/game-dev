@@ -1,6 +1,6 @@
+using System.Collections;
 using Tanks.Complete;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 public class CartridgeSpawner : MonoBehaviour
@@ -15,9 +15,9 @@ public class CartridgeSpawner : MonoBehaviour
     public float m_SpawnHeight = 5f;
 
     public GameManager m_GameManager;
+    private Transform m_CartridgeGroup;
 
     private Coroutine m_SpawnRoutine;
-    private Transform m_CartridgeGroup;
 
     private void Start()
     {
@@ -54,7 +54,7 @@ public class CartridgeSpawner : MonoBehaviour
         }
     }
 
-    private System.Collections.IEnumerator SpawnRoutine()
+    private IEnumerator SpawnRoutine()
     {
         var wait = new WaitForSeconds(m_SpawnInterval);
         while (true)

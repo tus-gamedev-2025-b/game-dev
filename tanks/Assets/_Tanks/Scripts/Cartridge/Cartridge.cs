@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Cartridge : MonoBehaviour
@@ -9,13 +8,13 @@ public class Cartridge : MonoBehaviour
     public float m_LifeTime = 10f;
     [Tooltip("Interval between blinks in seconds")]
     public float m_BlinkInterval = 0.2f;
+    private float m_BlinkTimer; // Timer used for blinking effect
 
     private float m_LifeTimer;   // Timer to track the lifetime of the cartridge
-    private float m_BlinkTimer;  // Timer used for blinking effect
     private Renderer m_Renderer; // Reference to the Renderer component
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
         m_LifeTimer = 0f;
         m_BlinkTimer = 0f;
@@ -23,7 +22,7 @@ public class Cartridge : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         m_LifeTimer += Time.deltaTime;
 

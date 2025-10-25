@@ -25,10 +25,6 @@ namespace Tanks.Complete
         [HideInInspector] public int m_Wins;                 // The number of wins this player has so far.
         [HideInInspector] public bool m_ComputerControlled;  // Is that tank computer controlled
 
-        // Event to notify when the weapon stock changes for that tank
-        // Parameters: (int controlIndex, int newStock)
-        public event Action<int, int> OnWeaponStockChanged;
-
         private TankAI m_AI;                   // The Tank AI script that let a tank be a bot controlled by the computer
         private GameObject m_CanvasGameObject; // Used to disable the world space UI during the Starting and Ending phases of each round.
         private InputUser m_InputUser;         // The Input user link to that tank. Input user identify a single player in the Input system
@@ -40,6 +36,10 @@ namespace Tanks.Complete
         public int ControlIndex { get; set; } = 1; //this defines the index of the control 1 = left keyboard or pad, 2 = right keyboard, -1 = no control
         public int ShellStock => m_Shooting.CurrentShells;
         public int MaxShellStock => m_Shooting.m_MaxShells;
+
+        // Event to notify when the weapon stock changes for that tank
+        // Parameters: (int controlIndex, int newStock)
+        public event Action<int, int> OnWeaponStockChanged;
 
         public void Setup(GameManager manager)
         {
