@@ -6,57 +6,57 @@ using Random = UnityEngine.Random;
 public class CartridgeSpawner : MonoBehaviour
 {
     [Tooltip("Prefab for the shell cartridge to spawn")]
-    public GameObject shellCartridge;
+    public GameObject m_ShellCartridge;
     [Tooltip("Interval in seconds between spawns")]
-    public float spawnInterval = 10f;
+    public float m_SpawnInterval = 10f;
     [Tooltip("Area in which to spawn cartridges (x,z)")]
-    public Vector2 spawnArea = new Vector2(70f, 70f);
+    public Vector2 m_SpawnArea = new Vector2(70f, 70f);
     [Tooltip("The height at which to spawn the cartridges")]
-    public float spawnHeight = 5f;
+    public float m_SpawnHeight = 5f;
 
-    public GameManager gameManager;
+    public GameManager m_GameManager;
 
-    private Coroutine spawnRoutine;
-    private Transform cartridgeGroup;
+    private Coroutine m_SpawnRoutine;
+    private Transform m_CartridgeGroup;
 
     private void Start()
     {
-        gameManager.OnGameLoopStateChanged += HandleGameLoopStateChanged;
+        m_GameManager.OnGameLoopStateChanged += HandleGameLoopStateChanged;
 
         var groupObject = new GameObject("Cartridge Group");
         groupObject.transform.SetParent(transform, false);
-        cartridgeGroup = groupObject.transform;
+        m_CartridgeGroup = groupObject.transform;
     }
 
     private void OnDestroy()
     {
-        gameManager.OnGameLoopStateChanged -= HandleGameLoopStateChanged;
+        m_GameManager.OnGameLoopStateChanged -= HandleGameLoopStateChanged;
     }
 
     private void SpawnCartridge()
     {
         var position = new Vector3(
-            Random.Range(-spawnArea.x / 2, spawnArea.x / 2),
-            spawnHeight,
-            Random.Range(-spawnArea.y / 2, spawnArea.y / 2)
+            Random.Range(-m_SpawnArea.x / 2, m_SpawnArea.x / 2),
+            m_SpawnHeight,
+            Random.Range(-m_SpawnArea.y / 2, m_SpawnArea.y / 2)
         );
         var rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
-        Instantiate(shellCartridge, position, rotation, cartridgeGroup);
+        Instantiate(m_ShellCartridge, position, rotation, m_CartridgeGroup);
     }
 
     private void WipeAllCartridges()
     {
-        if (!cartridgeGroup) return;
-        for (var i = cartridgeGroup.childCount - 1; i >= 0; i--)
+        if (!m_CartridgeGroup) return;
+        for (var i = m_CartridgeGroup.childCount - 1; i >= 0; i--)
         {
-            var child = cartridgeGroup.GetChild(i);
+            var child = m_CartridgeGroup.GetChild(i);
             if (child) Destroy(child.gameObject);
         }
     }
 
     private System.Collections.IEnumerator SpawnRoutine()
     {
-        var wait = new WaitForSeconds(spawnInterval);
+        var wait = new WaitForSeconds(m_SpawnInterval);
         while (true)
         {
             SpawnCartridge();
@@ -71,14 +71,14 @@ public class CartridgeSpawner : MonoBehaviour
         switch (state)
         {
             case GameManager.GameLoopState.RoundPlaying:
-                spawnRoutine ??= StartCoroutine(SpawnRoutine());
+                m_SpawnRoutine ??= StartCoroutine(SpawnRoutine());
                 break;
 
             case GameManager.GameLoopState.RoundEnding:
-                if (spawnRoutine != null)
+                if (m_SpawnRoutine != null)
                 {
-                    StopCoroutine(spawnRoutine);
-                    spawnRoutine = null;
+                    StopCoroutine(m_SpawnRoutine);
+                    m_SpawnRoutine = null;
                 }
                 WipeAllCartridges();
                 break;

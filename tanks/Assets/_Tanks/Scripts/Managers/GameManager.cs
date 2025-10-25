@@ -38,17 +38,17 @@ namespace Tanks.Complete
         public TankManager[] m_SpawnPoints; // A collection of managers for enabling and disabling different aspects of the tanks.
 
         private GameState m_CurrentState;
-        private GameLoopState currentLoopState;
-        private GameLoopState m_CurrentLoopState
+        private GameLoopState m_CurrentLoopState;
+        private GameLoopState CurrentLoopState
         {
-            get => currentLoopState;
+            get => m_CurrentLoopState;
             set
             {
-                if (currentLoopState == value)
+                if (m_CurrentLoopState == value)
                     return;
 
-                currentLoopState = value;
-                OnGameLoopStateChanged?.Invoke(currentLoopState);
+                m_CurrentLoopState = value;
+                OnGameLoopStateChanged?.Invoke(m_CurrentLoopState);
             }
         }
         private WaitForSeconds m_EndWait; // Used to have a delay whilst the round or game ends.
@@ -202,7 +202,7 @@ namespace Tanks.Complete
 
         private IEnumerator RoundStarting()
         {
-            m_CurrentLoopState = GameLoopState.RoundStarting;
+            CurrentLoopState = GameLoopState.RoundStarting;
 
             // As soon as the round starts reset the tanks and make sure they can't move.
             ResetAllTanks();
@@ -222,7 +222,7 @@ namespace Tanks.Complete
 
         private IEnumerator RoundPlaying()
         {
-            m_CurrentLoopState = GameLoopState.RoundPlaying;
+            CurrentLoopState = GameLoopState.RoundPlaying;
 
             // As soon as the round begins playing let the players control the tanks.
             EnableTankControl();
@@ -241,7 +241,7 @@ namespace Tanks.Complete
 
         private IEnumerator RoundEnding()
         {
-            m_CurrentLoopState = GameLoopState.RoundEnding;
+            CurrentLoopState = GameLoopState.RoundEnding;
 
             // Stop tanks from moving.
             DisableTankControl();

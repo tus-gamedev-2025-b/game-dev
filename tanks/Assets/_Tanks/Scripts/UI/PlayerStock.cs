@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlayerStock : MonoBehaviour
 {
-    private readonly List<GameObject> shellImages = new List<GameObject>();
+    private readonly List<GameObject> m_ShellImages = new List<GameObject>();
 
     void Start()
     {
@@ -12,18 +12,18 @@ public class PlayerStock : MonoBehaviour
         var stockGroup = transform.GetChild(0);
         for (var i = 0; i < stockGroup.childCount; i++)
         {
-            shellImages.Add(stockGroup.GetChild(i).gameObject);
+            m_ShellImages.Add(stockGroup.GetChild(i).gameObject);
         }
     }
 
     public void UpdatePlayerStock(int stock)
     {
-        if (stock < 0 || stock >= shellImages.Count)
+        if (stock < 0 || stock >= m_ShellImages.Count)
             return;
 
-        for (var i = 0; i < shellImages.Count; i++)
+        for (var i = 0; i < m_ShellImages.Count; i++)
         {
-            shellImages[i].SetActive(i < stock);
+            m_ShellImages[i].SetActive(i < stock);
         }
     }
 }
