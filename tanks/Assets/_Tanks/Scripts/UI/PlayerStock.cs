@@ -3,8 +3,8 @@ using UnityEngine;
 public class PlayerStock : MonoBehaviour
 {
     [SerializeField] private GameObject m_ShellImagePrefab;
-    private bool initialized;
 
+    private bool initialized;
     private Transform m_ShellImagesContainer;
 
     public void Start()
