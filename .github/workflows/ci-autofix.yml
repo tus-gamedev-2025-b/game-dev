@@ -43,6 +43,9 @@ jobs:
       - name: Restore dotnet tools
         run: dotnet tool restore
 
+      - name: Restore NuGet packages
+        run: dotnet restore ./tanks/tanks.sln
+
       - name: Lint with Roslynator
         run: dotnet roslynator fix ./tanks/tanks.sln
 
