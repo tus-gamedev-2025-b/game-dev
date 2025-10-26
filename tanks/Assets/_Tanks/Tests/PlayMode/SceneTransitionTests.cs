@@ -1,4 +1,6 @@
 #if UNITY_EDITOR || UNITY_INCLUDE_TESTS
+using System.IO;
+using System.Reflection;
 using NUnit.Framework;
 using Tanks.Complete;
 using UnityEngine.SceneManagement;
@@ -14,8 +16,8 @@ public class ScreenTransitionTests
 
         // StartButtonにOnClickedメソッドがあるか確認
         var method = startButtonType.GetMethod("OnClicked",
-            System.Reflection.BindingFlags.NonPublic |
-            System.Reflection.BindingFlags.Instance);
+            BindingFlags.NonPublic |
+            BindingFlags.Instance);
 
         Assert.IsNotNull(method,
             "StartButtonにOnClickedメソッドが実装されていません");
@@ -29,8 +31,8 @@ public class ScreenTransitionTests
 
         // VersusPlayerButtonにOnClickedメソッドがあるか確認
         var method = versusButtonType.GetMethod("OnClicked",
-            System.Reflection.BindingFlags.NonPublic |
-            System.Reflection.BindingFlags.Instance);
+            BindingFlags.NonPublic |
+            BindingFlags.Instance);
 
         Assert.IsNotNull(method,
             "VersusPlayerButtonにOnClickedメソッドが実装されていません");
@@ -45,8 +47,8 @@ public class ScreenTransitionTests
 
         // GameLoopメソッドの存在確認
         var gameLoopMethod = gameManagerType.GetMethod("GameLoop",
-            System.Reflection.BindingFlags.NonPublic |
-            System.Reflection.BindingFlags.Instance);
+            BindingFlags.NonPublic |
+            BindingFlags.Instance);
 
         Assert.IsNotNull(gameLoopMethod,
             "GameManagerにGameLoopメソッドがありません");
@@ -60,11 +62,11 @@ public class IntegrationTests
     public void FullGameFlow_RequiredScenesExist()
     {
         // 必要な全シーンが存在するか確認
-        bool titleExists = DoesSceneExist("TitleScene");
-        bool homeExists = DoesSceneExist("HomeScene");
-        bool gameExists = DoesSceneExist("Demo_Game_Moon") ||
-                          DoesSceneExist("Demo_Game_Desert") ||
-                          DoesSceneExist("Demo_Game_Jungle");
+        var titleExists = DoesSceneExist("TitleScene");
+        var homeExists = DoesSceneExist("HomeScene");
+        var gameExists = DoesSceneExist("Demo_Game_Moon") ||
+                         DoesSceneExist("Demo_Game_Desert") ||
+                         DoesSceneExist("Demo_Game_Jungle");
 
         Assert.IsTrue(titleExists, "TitleSceneが存在しません");
         Assert.IsTrue(homeExists, "HomeSceneが存在しません");
@@ -73,10 +75,10 @@ public class IntegrationTests
 
     private bool DoesSceneExist(string sceneName)
     {
-        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        for (var i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
         {
-            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-            string name = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+            var scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            var name = Path.GetFileNameWithoutExtension(scenePath);
             if (name == sceneName) return true;
         }
         return false;

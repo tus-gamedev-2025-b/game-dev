@@ -1,9 +1,10 @@
+using System.IO;
 using NUnit.Framework;
-using UnityEngine;
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class UIRequirementsTests
 {
@@ -115,8 +116,8 @@ public class UIRequirementsTests
             "Build Settingsに必要な3つのシーンが登録されていません");
 
         // シーン順序の確認
-        var firstScene = System.IO.Path.GetFileNameWithoutExtension(scenes[0].path);
-        var secondScene = System.IO.Path.GetFileNameWithoutExtension(scenes[1].path);
+        var firstScene = Path.GetFileNameWithoutExtension(scenes[0].path);
+        var secondScene = Path.GetFileNameWithoutExtension(scenes[1].path);
 
         Assert.AreEqual("TitleScene", firstScene,
             "最初のシーンがTitleSceneではありません");
