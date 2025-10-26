@@ -47,7 +47,7 @@ jobs:
         run: dotnet restore ./tanks/tanks.sln
 
       - name: Lint with Roslynator
-        run: dotnet roslynator fix ./tanks/tanks.sln
+        run: dotnet roslynator fix ./tanks/tanks.sln --verbosity detailed
 
       - name: Format with dotnet format
         run: dotnet format ./tanks/tanks.sln --verbosity normal
