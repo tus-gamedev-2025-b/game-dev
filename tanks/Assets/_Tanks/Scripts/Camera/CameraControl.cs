@@ -4,27 +4,27 @@ namespace Tanks.Complete
 {
     public class CameraControl : MonoBehaviour
     {
-        public float m_DampTime = 0.2f;                 // Approximate time for the camera to refocus.
-        public float m_ScreenEdgeBuffer = 4f;           // Space between the top/bottom most target and the screen edge.
-        public float m_MinSize = 6.5f;                  // The smallest orthographic size the camera can be.
-        public Transform[] m_Targets;                   // All the targets the camera needs to encompass.
+        public float m_DampTime = 0.2f;       // Approximate time for the camera to refocus.
+        public float m_ScreenEdgeBuffer = 4f; // Space between the top/bottom most target and the screen edge.
+        public float m_MinSize = 6.5f;        // The smallest orthographic size the camera can be.
+        public Transform[] m_Targets;         // All the targets the camera needs to encompass.
+
+        private Vector3 m_AimToRig; // The offset to apply to the position so the child camera aim at the desired point 
 
 
-        private Camera m_Camera;                        // Used for referencing the camera.
-        private float m_ZoomSpeed;                      // Reference speed for the smooth damping of the orthographic size.
-        private Vector3 m_MoveVelocity;                 // Reference velocity for the smooth damping of the position.
-        private Vector3 m_DesiredPosition;              // The position the camera is moving towards.
+        private Camera m_Camera;           // Used for referencing the camera.
+        private Vector3 m_DesiredPosition; // The position the camera is moving towards.
+        private Vector3 m_MoveVelocity;    // Reference velocity for the smooth damping of the position.
+        private float m_ZoomSpeed;         // Reference speed for the smooth damping of the orthographic size.
 
-        private Vector3 m_AimToRig;                     // The offset to apply to the position so the child camera aim at the desired point 
-
-        private void Awake ()
+        private void Awake()
         {
-            m_Camera = GetComponentInChildren<Camera> ();
-            
+            m_Camera = GetComponentInChildren<Camera>();
+
             // plane in which the camera rig is in
-            Plane p = new Plane(Vector3.up, transform.position);
-            Ray r = new Ray(m_Camera.transform.position, m_Camera.transform.forward);
-            p.Raycast(r, out float d );
+            var p = new Plane(Vector3.up, transform.position);
+            var r = new Ray(m_Camera.transform.position, m_Camera.transform.forward);
+            p.Raycast(r, out var d);
 
             // This is where the camera aim on the rig plane
             var aimTArget = r.GetPoint(d);
@@ -36,34 +36,34 @@ namespace Tanks.Complete
         }
 
 
-        private void FixedUpdate ()
+        private void FixedUpdate()
         {
             // Move the camera towards a desired position.
-            Move ();
+            Move();
 
             // Change the size of the camera based.
-            Zoom ();
+            Zoom();
         }
 
 
-        private void Move ()
+        private void Move()
         {
             // Find the average position of the targets.
-            FindAveragePosition ();
+            FindAveragePosition();
 
-            
+
             // Smoothly transition to that position.
             transform.position = Vector3.SmoothDamp(transform.position, m_DesiredPosition + m_AimToRig, ref m_MoveVelocity, m_DampTime);
         }
 
 
-        private void FindAveragePosition ()
+        private void FindAveragePosition()
         {
-            Vector3 averagePos = new Vector3 ();
-            int numTargets = 0;
+            var averagePos = new Vector3();
+            var numTargets = 0;
 
             // Go through all the targets and add their positions together.
-            for (int i = 0; i < m_Targets.Length; i++)
+            for (var i = 0; i < m_Targets.Length; i++)
             {
                 // If the target isn't active, go on to the next one.
                 if (!m_Targets[i].gameObject.activeSelf)
@@ -80,39 +80,39 @@ namespace Tanks.Complete
 
             // Keep the same y value.
             averagePos.y = transform.position.y;
-            
+
             m_DesiredPosition = averagePos;
         }
 
 
-        private void Zoom ()
+        private void Zoom()
         {
             // Find the required size based on the desired position and smoothly transition to that size.
-            float requiredSize = FindRequiredSize();
-            m_Camera.orthographicSize = Mathf.SmoothDamp (m_Camera.orthographicSize, requiredSize, ref m_ZoomSpeed, m_DampTime);
+            var requiredSize = FindRequiredSize();
+            m_Camera.orthographicSize = Mathf.SmoothDamp(m_Camera.orthographicSize, requiredSize, ref m_ZoomSpeed, m_DampTime);
         }
 
 
-        private float FindRequiredSize ()
+        private float FindRequiredSize()
         {
             // Find the position the camera rig is moving towards in its local space.
-            Vector3 desiredLocalPos = m_Camera.transform.InverseTransformPoint(m_DesiredPosition);
+            var desiredLocalPos = m_Camera.transform.InverseTransformPoint(m_DesiredPosition);
 
             // Start the camera's size calculation at zero.
-            float size = 0f;
+            var size = 0f;
 
             // Go through all the targets...
-            for (int i = 0; i < m_Targets.Length; i++)
+            for (var i = 0; i < m_Targets.Length; i++)
             {
                 // ... and if they aren't active continue on to the next target.
                 if (!m_Targets[i].gameObject.activeSelf)
                     continue;
 
                 // Otherwise, find the position of the target in the camera's local space.
-                Vector3 targetLocalPos = m_Camera.transform.InverseTransformPoint(m_Targets[i].position);
+                var targetLocalPos = m_Camera.transform.InverseTransformPoint(m_Targets[i].position);
 
                 // Find the position of the target from the desired position of the camera's local space.
-                Vector3 desiredPosToTarget = targetLocalPos - desiredLocalPos;
+                var desiredPosToTarget = targetLocalPos - desiredLocalPos;
 
                 // Choose the largest out of the current size and the distance of the tank 'up' or 'down' from the camera.
                 size = Mathf.Max(size, Mathf.Abs(desiredPosToTarget.y));
@@ -125,22 +125,22 @@ namespace Tanks.Complete
             size += m_ScreenEdgeBuffer;
 
             // Make sure the camera's size isn't below the minimum.
-            size = Mathf.Max (size, m_MinSize);
+            size = Mathf.Max(size, m_MinSize);
 
             return size;
         }
 
 
-        public void SetStartPositionAndSize ()
+        public void SetStartPositionAndSize()
         {
             // Find the desired position.
-            FindAveragePosition ();
+            FindAveragePosition();
 
             // Set the camera's position to the desired position without damping.
             transform.position = m_DesiredPosition;
 
             // Find and set the required size of the camera.
-            m_Camera.orthographicSize = FindRequiredSize ();
+            m_Camera.orthographicSize = FindRequiredSize();
         }
     }
 }
