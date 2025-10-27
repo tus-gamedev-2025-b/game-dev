@@ -59,6 +59,7 @@ jobs:
           *.asset
           *.meta
           EOF
+          git ls-files -z -m -- '*.asset' '*.prefab' '*.unity' '*.meta' | xargs -0 -r git update-index --skip-worktree
           git status --ignored -s
 
       - name: autofix.ci
