@@ -44,7 +44,8 @@ jobs:
             --profile="Built-in: Full Cleanup" \
             --verbosity=INFO \
             --eXtensions=JetBrains.Unity \
-            --exclude="**/Library/**.*;**/Logs/**.*;**/*.assets;**/*.meta;**/*.unity;**/*.prefab;"
+            --include="**.cs" \
+            --exclude="**/Library/**.*;**/Logs/**.*;"
 
       - name: Mark workspace as safe for git
         run: git config --global --add safe.directory /__w/game-dev/game-dev
