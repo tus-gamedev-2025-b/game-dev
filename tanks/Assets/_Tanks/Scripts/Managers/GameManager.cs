@@ -38,6 +38,9 @@ namespace Tanks.Complete
 
         [FormerlySerializedAs("m_Tanks")]
         public TankManager[] m_SpawnPoints; // A collection of managers for enabling and disabling different aspects of the tanks.
+
+        [CanBeNull]
+        public TankManager[] m_Players; // Array of the spawned tanks in the current game. Initialized when GameStart() i.e. this is null when Start().
         private GameLoopState m_CurrentLoopState;
 
         private GameState m_CurrentState;
@@ -51,9 +54,6 @@ namespace Tanks.Complete
 
         private PlayerData[] m_TankData;     // Data passed from the menu about each selected tank (at least 2, max 4)
         private TextMeshProUGUI m_TitleText; // The text used to display game message. Automatically found as part of the Menu prefab
-
-        [CanBeNull]
-        public TankManager[] m_Players; // Array of the spawned tanks in the current game. Initialized when GameStart() i.e. this is null when Start().
 
         private GameLoopState CurrentLoopState
         {
