@@ -113,8 +113,7 @@ jobs:
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          PERSONAL_LICENSE: true
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }} # ← PERSONAL_LICENSE ではなく SERIAL を使う
         with:
           projectPath: tanks
           targetPlatform: ${{ matrix.targetPlatform }}
