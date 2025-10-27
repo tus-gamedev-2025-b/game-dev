@@ -20,34 +20,34 @@ namespace Tanks.Complete
         public AudioClip m_EngineDriving;   // Audio to play when the tank is moving.
         public float m_PitchRange = 0.2f;   // The amount by which the pitch of the engine noises can vary.
         [Tooltip("Is set to true this will be controlled by the computer and not a player")]
-        public bool m_IsComputerControlled = false; // Is this tank player or computer controlled
+        public bool m_IsComputerControlled; // Is this tank player or computer controlled
 
         [HideInInspector]
-        public TankInputUser m_InputUser; // The Input User component for that tank. Contains the Input Actions.
-
-        public Rigidbody Rigidbody { get; private set; }
-        public int ControlIndex { get; set; } = -1; // 1=left keyboard, 2=right keyboard, -1=none
+        public TankInputUser m_InputUser;          // The Input User component for that tank. Contains the Input Actions.
+        public float m_TurretTurnSpeedValue = 90f; // 回転速度（調整可）
+        public Transform m_TurretTransform;        // 砲塔Transform参照
+        public Transform m_TurretHUDTransform;     // TurretHUD の Transform 参照
+        private Vector3 m_ExplosionForceValue;
+        private InputAction m_MoveAction;
 
         private string m_MovementAxisName;
-        private string m_TurnAxisName;
         private float m_MovementInputValue;
-        private float m_TurnInputValue;
-        private Vector3 m_RequestedDirection;
         private float m_OriginalPitch;
-        private Vector3 m_ExplosionForceValue;
-        private ParticleSystem[] m_particleSystems;
-        private InputAction m_MoveAction;
+        private Vector3 m_RequestedDirection;
         private InputAction m_TurnAction;
+        private string m_TurnAxisName;
+        private float m_TurnInputValue;
+        private InputAction m_TurretTurnAction; // InputAction参照
+        private string m_TurretTurnActionName;  // Action名
 
         // ================================
         // ▼▼▼ 砲塔制御 追加部分 ▼▼▼
         // ================================
-        private float m_TurretTurnInputValue;           // 入力量
-        public float m_TurretTurnSpeedValue = 90f;      // 回転速度（調整可）
-        public Transform m_TurretTransform;             // 砲塔Transform参照
-        private string m_TurretTurnActionName;          // Action名
-        private InputAction m_TurretTurnAction;         // InputAction参照
-        public Transform m_TurretHUDTransform;          // TurretHUD の Transform 参照
+        private float m_TurretTurnInputValue; // 入力量
+        private ParticleSystem[] m_particleSystems;
+
+        public Rigidbody Rigidbody { get; private set; }
+        public int ControlIndex { get; set; } = -1; // 1=left keyboard, 2=right keyboard, -1=none
         // ================================
 
         private void Awake()
@@ -66,26 +66,6 @@ namespace Tanks.Complete
                 else
                     Debug.LogWarning($"[TankMovement] 砲塔オブジェクトが見つかりません: {name}");
             }
-        }
-
-        private void OnEnable()
-        {
-            Rigidbody.isKinematic = false;
-            m_MovementInputValue = 0f;
-            m_TurnInputValue = 0f;
-            m_TurretTurnInputValue = 0f;
-            m_ExplosionForceValue = Vector3.zero;
-
-            m_particleSystems = GetComponentsInChildren<ParticleSystem>();
-            for (int i = 0; i < m_particleSystems.Length; ++i)
-                m_particleSystems[i].Play();
-        }
-
-        private void OnDisable()
-        {
-            Rigidbody.isKinematic = true;
-            for (int i = 0; i < m_particleSystems.Length; ++i)
-                m_particleSystems[i].Stop();
         }
 
         private void Start()
@@ -163,7 +143,7 @@ namespace Tanks.Complete
 
                 camForward.Normalize();
                 var camRight = Vector3.Cross(Vector3.up, camForward);
-                m_RequestedDirection = (camForward * m_MovementInputValue + camRight * m_TurnInputValue);
+                m_RequestedDirection = camForward * m_MovementInputValue + camRight * m_TurnInputValue;
                 m_RequestedDirection.Normalize();
             }
 
@@ -172,9 +152,33 @@ namespace Tanks.Complete
             TurretTurn(); // 砲塔回転を追加
         }
 
+        private void OnEnable()
+        {
+            Rigidbody.isKinematic = false;
+            m_MovementInputValue = 0f;
+            m_TurnInputValue = 0f;
+            m_TurretTurnInputValue = 0f;
+            m_ExplosionForceValue = Vector3.zero;
+
+            m_particleSystems = GetComponentsInChildren<ParticleSystem>();
+            for (var i = 0; i < m_particleSystems.Length; ++i)
+            {
+                m_particleSystems[i].Play();
+            }
+        }
+
+        private void OnDisable()
+        {
+            Rigidbody.isKinematic = true;
+            for (var i = 0; i < m_particleSystems.Length; ++i)
+            {
+                m_particleSystems[i].Stop();
+            }
+        }
+
         private void Move()
         {
-            float speedInput = 0.0f;
+            var speedInput = 0.0f;
             if (m_InputUser.InputUser.controlScheme.Value.name == "Gamepad" || m_IsDirectControl)
             {
                 speedInput = m_RequestedDirection.magnitude;
@@ -185,7 +189,7 @@ namespace Tanks.Complete
                 speedInput = m_MovementInputValue;
             }
 
-            Vector3 movement = transform.forward * speedInput * m_Speed;
+            var movement = transform.forward * speedInput * m_Speed;
             Rigidbody.linearVelocity = movement + m_ExplosionForceValue;
             m_ExplosionForceValue = Vector3.Lerp(m_ExplosionForceValue, Vector3.zero, Time.deltaTime * 3f);
         }
@@ -201,7 +205,7 @@ namespace Tanks.Complete
             }
             else
             {
-                float turn = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
+                var turn = m_TurnInputValue * m_TurnSpeed * Time.deltaTime;
                 turnRotation = Quaternion.Euler(0f, turn, 0f);
             }
 
@@ -216,8 +220,8 @@ namespace Tanks.Complete
             if (m_TurretTransform == null)
                 return;
 
-            float turn = m_TurretTurnInputValue * m_TurretTurnSpeedValue * Time.deltaTime;
-            Quaternion turretRotation = Quaternion.Euler(0f, turn, 0f);
+            var turn = m_TurretTurnInputValue * m_TurretTurnSpeedValue * Time.deltaTime;
+            var turretRotation = Quaternion.Euler(0f, turn, 0f);
 
             m_TurretTransform.localRotation *= turretRotation;
 
