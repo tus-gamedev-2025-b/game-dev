@@ -64,8 +64,8 @@ public class IntegrationTests
         // 必要な全シーンが存在するか確認
         var titleExists = DoesSceneExist("TitleScene");
         var homeExists = DoesSceneExist("HomeScene");
-        var gameExists = DoesSceneExist("Demo_Game_Moon") ||
-                         DoesSceneExist("Demo_Game_Desert") ||
+        var gameExists = DoesSceneExist("Demo_Game_Desert") ||
+                         DoesSceneExist("Demo_Game_Moon") ||
                          DoesSceneExist("Demo_Game_Jungle");
 
         Assert.IsTrue(titleExists, "TitleSceneが存在しません");
