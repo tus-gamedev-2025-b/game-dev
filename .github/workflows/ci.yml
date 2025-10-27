@@ -44,7 +44,6 @@ jobs:
             --profile="Built-in: Full Cleanup" \
             --verbosity=INFO \
             --eXtensions=JetBrains.Unity \
-            --include="**.cs" \
             --exclude="**/Library/**.*;**/Logs/**.*;"
 
       - name: Mark workspace as safe for git
