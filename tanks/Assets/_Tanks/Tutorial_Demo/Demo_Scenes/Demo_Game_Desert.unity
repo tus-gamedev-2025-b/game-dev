@@ -4766,6 +4766,7 @@ MonoBehaviour:
     m_Instance: {fileID: 0}
     m_Wins: 0
     m_ComputerControlled: 0
+  m_Players: []
 --- !u!4 &1304999366
 Transform:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -50,6 +51,10 @@ namespace Tanks.Complete
 
         private PlayerData[] m_TankData;     // Data passed from the menu about each selected tank (at least 2, max 4)
         private TextMeshProUGUI m_TitleText; // The text used to display game message. Automatically found as part of the Menu prefab
+
+        [CanBeNull]
+        public TankManager[] m_Players; // Array of the spawned tanks in the current game. Initialized when GameStart() i.e. this is null when Start().
+
         private GameLoopState CurrentLoopState
         {
             get => m_CurrentLoopState;
@@ -120,6 +125,14 @@ namespace Tanks.Complete
         {
             m_TankData = playerData;
             m_PlayerCount = m_TankData.Length;
+
+            m_Players = new TankManager[m_PlayerCount];
+            for (var i = 0; i < m_SpawnPoints.Length; i++)
+            {
+                if (i >= m_PlayerCount) break;
+                m_Players[i] = m_SpawnPoints[i];
+            }
+
             ChangeGameState(GameState.Game);
         }
 

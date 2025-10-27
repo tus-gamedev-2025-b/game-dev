@@ -36,12 +36,12 @@ public class HUDManager : MonoBehaviour
 
     private bool DoesP1Exist()
     {
-        return m_GameManager.m_SpawnPoints.Any(tank => tank.ControlIndex == 1);
+        return m_GameManager.m_Players?.Any(tank => tank.ControlIndex == 1) ?? false;
     }
 
     private bool DoesP2Exist()
     {
-        return m_GameManager.m_SpawnPoints.Any(tank => tank.ControlIndex == 2);
+        return m_GameManager.m_Players?.Any(tank => tank.ControlIndex == 2) ?? false;
     }
 
     private void HandleGameLoopStateChanged(GameManager.GameLoopState state)
@@ -51,7 +51,8 @@ public class HUDManager : MonoBehaviour
             if (DoesP1Exist()) m_StockP1.gameObject.SetActive(true);
             if (DoesP2Exist()) m_StockP2.gameObject.SetActive(true);
 
-            foreach (var tank in m_GameManager.m_SpawnPoints)
+            if (m_GameManager.m_Players == null) return;
+            foreach (var tank in m_GameManager.m_Players)
             {
                 switch (tank.ControlIndex)
                 {
