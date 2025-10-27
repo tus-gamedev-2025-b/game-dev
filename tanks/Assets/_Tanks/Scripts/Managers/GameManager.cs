@@ -168,7 +168,7 @@ namespace Tanks.Complete
             {
                 // If there is a game winner, restart the level.
                 yield return new WaitForSeconds(3f);
-                SceneManager.LoadScene(SceneNames.HomeScene);
+                SceneManager.LoadScene(SceneNames.m_HomeScene);
             }
             else
             {

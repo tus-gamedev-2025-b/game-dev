@@ -13,6 +13,6 @@ public class VersusPlayerButton : MonoBehaviour
 
     private void OnClicked()
     {
-        SceneManager.LoadScene(SceneNames.Demo_Game_Moon);
+        SceneManager.LoadScene(SceneNames.m_Demo_Game_Moon);
     }
 }

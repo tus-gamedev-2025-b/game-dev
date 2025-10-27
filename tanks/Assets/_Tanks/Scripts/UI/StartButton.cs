@@ -13,6 +13,6 @@ public class StartButton : MonoBehaviour
 
     private void OnClicked()
     {
-        SceneManager.LoadScene(SceneNames.HomeScene);
+        SceneManager.LoadScene(SceneNames.m_HomeScene);
     }
 }
