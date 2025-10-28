@@ -13,7 +13,7 @@ namespace Tanks.Complete
 
         private GameObject m_ActivePowerUpHUD;
         private float m_DisplayTime;
-        private bool m_HasActivePowerUp;
+        private bool m_HasActivePowerUp = false;
 
         private void Update()
         {
@@ -23,7 +23,7 @@ namespace Tanks.Complete
                 // Rotates the PowerUpHUD
                 transform.rotation = Quaternion.Euler(0, 100f * Time.time, 0);
                 // Checks that the power up is not time based (just EnhancedShell for now)
-                if (m_ActivePowerUpHUD != m_EnhancedShellHUD)
+                if(m_ActivePowerUpHUD != m_EnhancedShellHUD)
                 {
                     // If the display time hasn't run out, the time that has passed gets updated
                     if (m_DisplayTime > 0f)
@@ -37,12 +37,10 @@ namespace Tanks.Complete
         }
 
         /// <summary>
+        /// 
         /// </summary>
         /// <param name="powerUpType">Type of the power up to activate.</param>
-        /// <param name="duration">
-        ///     Time of displaying the power up HUD. This should coincide with the duration time of the power
-        ///     up.
-        /// </param>
+        /// <param name="duration"> Time of displaying the power up HUD. This should coincide with the duration time of the power up.</param>
         public void SetActivePowerUp(PowerUp.PowerUpType powerUpType, float duration)
         {
             switch (powerUpType)
@@ -77,7 +75,7 @@ namespace Tanks.Complete
         }
 
         /// <summary>
-        ///     Disables the Active Power Up HUD of the Tank.
+        /// Disables the Active Power Up HUD of the Tank.
         /// </summary>
         public void DisableActiveHUD()
         {

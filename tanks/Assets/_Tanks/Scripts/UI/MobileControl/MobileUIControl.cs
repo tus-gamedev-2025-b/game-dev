@@ -10,20 +10,20 @@ namespace Tanks.Complete
     [DefaultExecutionOrder(-90)]
     public class MobileUIControl : MonoBehaviour
     {
-
+        public static MobileUIControl Instance { get; private set; }
+        
         [Tooltip("If true (the default) the GameObject on which this is will get disabled when not on a mobile platform")]
         public bool AutoDisableOnNonMobilePlatform = true;
 
-        private OnScreenControl m_Control;
-        public static MobileUIControl Instance { get; private set; }
-
         public InputDevice Device => m_Control.control.device;
+        
+        private OnScreenControl m_Control;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
-        private void Awake()
+        void Awake()
         {
             Instance = this;
-
+            
             m_Control = GetComponentInChildren<OnScreenControl>();
             if (AutoDisableOnNonMobilePlatform && !Application.isMobilePlatform)
             {
@@ -38,7 +38,7 @@ namespace Tanks.Complete
             {
                 return;
             }
-
+            
             gameObject.SetActive(true);
         }
 
@@ -48,7 +48,7 @@ namespace Tanks.Complete
             {
                 return;
             }
-
+            
             gameObject.SetActive(false);
         }
     }

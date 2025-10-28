@@ -4,8 +4,8 @@ namespace Tanks.Complete
 {
     public class PowerUpFX : MonoBehaviour
     {
-        private float lifeTime = 3f;              // Time in seconds that this GameObject will be in scene before being destroyed
-        private AudioSource m_PowerUpAudioSource; // Reference to the AudioSource component
+        private AudioSource m_PowerUpAudioSource;       // Reference to the AudioSource component
+        private float lifeTime = 3f;                    // Time in seconds that this GameObject will be in scene before being destroyed
 
         private void Start()
         {
@@ -20,5 +20,6 @@ namespace Tanks.Complete
             if (lifeTime <= 0.0f)
                 Destroy(gameObject);
         }
+
     }
 }

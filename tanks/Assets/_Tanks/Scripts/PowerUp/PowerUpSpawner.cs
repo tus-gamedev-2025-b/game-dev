@@ -23,10 +23,10 @@ namespace Tanks.Complete
             if (m_PowerUps.Length > 0)
             {
                 // Instantiates a random power up from the power ups array
-                var randomNumber = Random.Range(0, m_PowerUps.Length);
-                var positionToSpawn = transform.position;
+                int randomNumber = Random.Range(0, m_PowerUps.Length);
+                Vector3 positionToSpawn = transform.position;
                 positionToSpawn.y = 1.09f;
-                var m_SpawnedPowerup = Instantiate(m_PowerUps[randomNumber], positionToSpawn, Quaternion.identity);
+                PowerUp m_SpawnedPowerup = Instantiate(m_PowerUps[randomNumber], positionToSpawn, Quaternion.identity);
                 m_SpawnedPowerup.SetSpawner(this);
             }
         }

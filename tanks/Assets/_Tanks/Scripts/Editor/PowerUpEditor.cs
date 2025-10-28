@@ -2,17 +2,17 @@ using UnityEditor;
 
 namespace Tanks.Complete
 {
-    [CustomEditor(typeof(PowerUp))]
+    [CustomEditor(typeof(Complete.PowerUp))]
     public class PowerUpEditor : Editor
     {
-        private SerializedProperty collectFX;
-        private SerializedProperty cooldownReduction;
-        private SerializedProperty damageMultiplier;
-        private SerializedProperty damageReduce;
-        private SerializedProperty durationTime;
-        private SerializedProperty healingAmount;
-        private SerializedProperty powerUpType;
-        private SerializedProperty speedBonus, turnSpeedBonus;
+        SerializedProperty powerUpType;
+        SerializedProperty durationTime;
+        SerializedProperty collectFX;
+        SerializedProperty speedBonus, turnSpeedBonus;
+        SerializedProperty damageReduce;
+        SerializedProperty cooldownReduction;
+        SerializedProperty healingAmount;
+        SerializedProperty damageMultiplier;
 
         private void OnEnable()
         {
@@ -37,7 +37,7 @@ namespace Tanks.Complete
             EditorGUILayout.PropertyField(collectFX);
 
             // Shows  the fields of the selected type
-            var selectedType = (PowerUp.PowerUpType)powerUpType.enumValueIndex;
+            PowerUp.PowerUpType selectedType = (PowerUp.PowerUpType)powerUpType.enumValueIndex;
 
             switch (selectedType)
             {
@@ -58,14 +58,14 @@ namespace Tanks.Complete
                     break;
 
                 case PowerUp.PowerUpType.Healing:
-                    EditorGUILayout.PropertyField(healingAmount);
+                    EditorGUILayout.PropertyField (healingAmount);
                     break;
 
                 case PowerUp.PowerUpType.DamageMultiplier:
                     EditorGUILayout.PropertyField(damageMultiplier);
                     break;
                 case PowerUp.PowerUpType.Invincibility:
-                    EditorGUILayout.PropertyField(durationTime);
+                    EditorGUILayout.PropertyField(durationTime); 
                     break;
             }
 

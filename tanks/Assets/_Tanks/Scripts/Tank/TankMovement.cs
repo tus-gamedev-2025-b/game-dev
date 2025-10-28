@@ -7,14 +7,11 @@ namespace Tanks.Complete
     [DefaultExecutionOrder(-10)]
     public class TankMovement : MonoBehaviour
     {
-        [Tooltip("The player number. Without a tank selection menu, Player 1 is left keyboard control, Player 2 is right keyboard")]
-        public int m_PlayerNumber = 1; // Used to identify which tank belongs to which player.  This is set by this tank's manager.
-        [Tooltip("The speed in unity unit/second the tank move at")]
-        public float m_Speed = 12f; // How fast the tank moves forward and back.
-        [Tooltip("The speed in deg/s that tank will rotate at")]
-        public float m_TurnSpeed = 180f; // How fast the tank turns in degrees per second.
-        [Tooltip("If set to true, the tank auto orient and move toward the pressed direction instead of rotating on left/right and move forward on up")]
+        public int m_PlayerNumber = 1;
+        public float m_Speed = 12f;
+        public float m_TurnSpeed = 180f;
         public bool m_IsDirectControl;
+<<<<<<< HEAD
         public AudioSource m_MovementAudio; // Reference to the audio source used to play engine sounds. NB: different to the shooting audio source.
         public AudioClip m_EngineIdling;    // Audio to play when the tank isn't moving.
         public AudioClip m_EngineDriving;   // Audio to play when the tank is moving.
@@ -39,20 +36,56 @@ namespace Tanks.Complete
         private float m_TurnInputValue;
         private InputAction m_TurretTurnAction; // InputAction参照
         private string m_TurretTurnActionName;  // Action名
+=======
+        public AudioSource m_MovementAudio;
+        public AudioClip m_EngineIdling;
+        public AudioClip m_EngineDriving;
+        public float m_PitchRange = 0.2f;
+        public bool m_IsComputerControlled = false;
+
+        public Rigidbody Rigidbody => m_Rigidbody;
+        public TankInputUser m_InputUser;
+
+        public int ControlIndex { get; set; } = -1;
+
+        private string m_MovementAxisName;
+        private string m_TurnAxisName;
+        private Rigidbody m_Rigidbody;
+        private float m_MovementInputValue;
+        private float m_TurnInputValue;
+        private Vector3 m_ExplosionForceValue;
+        private float m_OriginalPitch;
+        private ParticleSystem[] m_particleSystems;
+
+        private InputAction m_MoveAction;
+        private InputAction m_TurnAction;
+        private Vector3 m_RequestedDirection;
+>>>>>>> parent of 0864c41 (feat: integrate turret control into TankMovement and resolve merge conflict)
 
         // ================================
         // ▼▼▼ 砲塔制御 追加部分 ▼▼▼
         // ================================
+<<<<<<< HEAD
         private float m_TurretTurnInputValue; // 入力量
         private ParticleSystem[] m_particleSystems;
 
         public Rigidbody Rigidbody { get; private set; }
         public int ControlIndex { get; set; } = -1; // 1=left keyboard, 2=right keyboard, -1=none
+=======
+        private float m_TurretTurnInputValue;           // 入力量
+        public float m_TurretTurnSpeedValue = 90f;      // 回転速度（調整可）
+        public Transform m_TurretTransform;             // 砲塔Transform参照
+        private string m_TurretTurnActionName;          // Action名
+        private InputAction m_TurretTurnAction;         // InputAction参照
+
+        // ▼ TurretHUD の Transform 参照
+        public Transform m_TurretHUDTransform;
+>>>>>>> parent of 0864c41 (feat: integrate turret control into TankMovement and resolve merge conflict)
         // ================================
 
         private void Awake()
         {
-            Rigidbody = GetComponent<Rigidbody>();
+            m_Rigidbody = GetComponent<Rigidbody>();
             m_InputUser = GetComponent<TankInputUser>();
             if (m_InputUser == null)
                 m_InputUser = gameObject.AddComponent<TankInputUser>();
@@ -68,6 +101,29 @@ namespace Tanks.Complete
             }
         }
 
+<<<<<<< HEAD
+=======
+        private void OnEnable()
+        {
+            m_Rigidbody.isKinematic = false;
+            m_MovementInputValue = 0f;
+            m_TurnInputValue = 0f;
+            m_ExplosionForceValue = Vector3.zero;
+            m_TurretTurnInputValue = 0f;
+
+            m_particleSystems = GetComponentsInChildren<ParticleSystem>();
+            for (int i = 0; i < m_particleSystems.Length; ++i)
+                m_particleSystems[i].Play();
+        }
+
+        private void OnDisable()
+        {
+            m_Rigidbody.isKinematic = true;
+            for (int i = 0; i < m_particleSystems.Length; ++i)
+                m_particleSystems[i].Stop();
+        }
+
+>>>>>>> parent of 0864c41 (feat: integrate turret control into TankMovement and resolve merge conflict)
         private void Start()
         {
             if (m_IsComputerControlled)
@@ -134,13 +190,11 @@ namespace Tanks.Complete
             {
                 var camForward = Camera.main.transform.forward;
                 camForward.y = 0;
-
                 if (camForward.sqrMagnitude < 0.0001f)
                 {
                     camForward = Camera.main.transform.up;
                     camForward.y = 0;
                 }
-
                 camForward.Normalize();
                 var camRight = Vector3.Cross(Vector3.up, camForward);
                 m_RequestedDirection = camForward * m_MovementInputValue + camRight * m_TurnInputValue;
@@ -149,7 +203,7 @@ namespace Tanks.Complete
 
             Move();
             Turn();
-            TurretTurn(); // 砲塔回転を追加
+            TurretTurn();
         }
 
         private void OnEnable()
@@ -189,8 +243,13 @@ namespace Tanks.Complete
                 speedInput = m_MovementInputValue;
             }
 
+<<<<<<< HEAD
             var movement = transform.forward * speedInput * m_Speed;
             Rigidbody.linearVelocity = movement + m_ExplosionForceValue;
+=======
+            Vector3 movement = transform.forward * speedInput * m_Speed;
+            m_Rigidbody.linearVelocity = movement + m_ExplosionForceValue;
+>>>>>>> parent of 0864c41 (feat: integrate turret control into TankMovement and resolve merge conflict)
             m_ExplosionForceValue = Vector3.Lerp(m_ExplosionForceValue, Vector3.zero, Time.deltaTime * 3f);
         }
 
@@ -199,7 +258,7 @@ namespace Tanks.Complete
             Quaternion turnRotation;
             if (m_InputUser.InputUser.controlScheme.Value.name == "Gamepad" || m_IsDirectControl)
             {
-                var angleTowardTarget = Vector3.SignedAngle(m_RequestedDirection, transform.forward, transform.up);
+                float angleTowardTarget = Vector3.SignedAngle(m_RequestedDirection, transform.forward, transform.up);
                 var rotatingAngle = Mathf.Sign(angleTowardTarget) * Mathf.Min(Mathf.Abs(angleTowardTarget), m_TurnSpeed * Time.deltaTime);
                 turnRotation = Quaternion.AngleAxis(-rotatingAngle, Vector3.up);
             }
@@ -209,7 +268,7 @@ namespace Tanks.Complete
                 turnRotation = Quaternion.Euler(0f, turn, 0f);
             }
 
-            Rigidbody.MoveRotation(Rigidbody.rotation * turnRotation);
+            m_Rigidbody.MoveRotation(m_Rigidbody.rotation * turnRotation);
         }
 
         // ===================================
@@ -220,11 +279,20 @@ namespace Tanks.Complete
             if (m_TurretTransform == null)
                 return;
 
+<<<<<<< HEAD
             var turn = m_TurretTurnInputValue * m_TurretTurnSpeedValue * Time.deltaTime;
             var turretRotation = Quaternion.Euler(0f, turn, 0f);
+=======
+            float turn = m_TurretTurnInputValue * m_TurretTurnSpeedValue * Time.deltaTime;
 
+            // Quaternionを使ってY軸に回転
+            Quaternion turretRotation = Quaternion.Euler(0f, turn, 0f);
+>>>>>>> parent of 0864c41 (feat: integrate turret control into TankMovement and resolve merge conflict)
+
+            // 砲塔を回転
             m_TurretTransform.localRotation *= turretRotation;
 
+            // TurretHUDも砲塔と同じ角度で回転
             if (m_TurretHUDTransform != null)
                 m_TurretHUDTransform.localRotation *= turretRotation;
         }
@@ -254,8 +322,8 @@ namespace Tanks.Complete
 
         public void AddExplosionForce(float explosionForce, Vector3 explosionPosition, float explosionRadius, float upwardsModifier = 0f)
         {
-            var explosionDir = transform.position - explosionPosition;
-            var explosionDistance = explosionDir.magnitude;
+            Vector3 explosionDir = transform.position - explosionPosition;
+            float explosionDistance = explosionDir.magnitude;
 
             if (upwardsModifier != 0)
             {
@@ -267,8 +335,8 @@ namespace Tanks.Complete
                 explosionDir = explosionDir.normalized;
             }
 
-            var attenuation = 1f - Mathf.Clamp01(explosionDistance / explosionRadius);
-            var velocityChange = explosionDir * (explosionForce * attenuation);
+            float attenuation = 1f - Mathf.Clamp01(explosionDistance / explosionRadius);
+            Vector3 velocityChange = explosionDir * (explosionForce * attenuation);
             m_ExplosionForceValue = velocityChange;
         }
     }

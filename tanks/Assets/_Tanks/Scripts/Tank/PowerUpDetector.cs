@@ -6,12 +6,12 @@ namespace Tanks.Complete
     public class PowerUpDetector : MonoBehaviour
     {
         // Variable that indicates if the tank has a PowerUp right now
-        public bool m_HasActivePowerUp;
-        private PowerUpHUD m_PowerUpHUD;
-        private TankHealth m_TankHealth;
-        private TankMovement m_TankMovement;
+        public bool m_HasActivePowerUp = false;
         // References to the tank's components
         private TankShooting m_TankShooting;
+        private TankMovement m_TankMovement;
+        private TankHealth m_TankHealth;
+        private PowerUpHUD m_PowerUpHUD;
 
         private void Awake()
         {
@@ -54,7 +54,7 @@ namespace Tanks.Complete
         private IEnumerator IncreaseShootingRate(float cooldownReduction, float duration)
         {
             // Apply the shooting cooldown reduction if it is greater than zero
-            if (cooldownReduction > 0)
+            if(cooldownReduction > 0)
             {
                 m_HasActivePowerUp = true;
                 m_PowerUpHUD.SetActivePowerUp(PowerUp.PowerUpType.ShootingBonus, duration);
