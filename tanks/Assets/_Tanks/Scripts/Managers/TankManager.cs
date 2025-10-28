@@ -14,7 +14,7 @@ namespace Tanks.Complete
     {
         // This class is to manage various settings on a tank.
         // It works with the GameManager class to control how the tanks behave
-        // and whether or not players have control of their tank in the 
+        // and whether or not players have control of their tank in the
         // different phases of the game.
 
         [HideInInspector] public Color m_PlayerColor;        // This is the color this tank will be tinted.
@@ -34,6 +34,12 @@ namespace Tanks.Complete
         private TankShooting m_Shooting; // Reference to tank's shooting script, used to disable and enable control.
 
         public int ControlIndex { get; set; } = 1; //this defines the index of the control 1 = left keyboard or pad, 2 = right keyboard, -1 = no control
+        public int ShellStock => m_Shooting.CurrentShells;
+        public int MaxShellStock => m_Shooting.m_MaxShells;
+
+        // Event to notify when the weapon stock changes for that tank
+        // Parameters: (int controlIndex, int newStock)
+        public event Action<int, int> OnWeaponStockChanged;
 
         public void Setup(GameManager manager)
         {
@@ -63,6 +69,9 @@ namespace Tanks.Complete
                 m_AI = m_Instance.AddComponent<TankAI>();
                 m_AI.Setup(manager);
             }
+
+            // Subscribe to the shooting stock change event to relay it to external listeners
+            m_Shooting.OnShellStockChanges += stock => OnWeaponStockChanged?.Invoke(ControlIndex, stock);
 
             // Create a string using the correct color that says 'PLAYER 1' etc based on the tank's color and the player's number.
             m_ColoredPlayerText = "<color=#" + ColorUtility.ToHtmlStringRGB(m_PlayerColor) + ">PLAYER " + m_PlayerNumber + "</color>";
