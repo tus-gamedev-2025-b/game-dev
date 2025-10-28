@@ -15,7 +15,7 @@ namespace Tanks.Complete
         private readonly float m_TimeBetweenShot = 2.0f; // The AI Tank have a cooldown on shot to avoid spamming shot
 
         private GameObject[] m_AllTanks; // List of all the tanks in the scene.
-        private int m_CurrentCorner;     // Which corner of the path the tank is currently going forward to 
+        private int m_CurrentCorner;     // Which corner of the path the tank is currently going forward to
 
         private NavMeshPath m_CurrentPath; // The current path followed by the tank.
 
@@ -155,7 +155,7 @@ namespace Tanks.Complete
         private void SeekUpdate()
         {
             // To lighten the load on the CPU the tanks do not pathfind to their target every single frame. Instead, they
-            // wait a bit between each pathfind. They will go toward an "outdated" position in between, but as the pathfind time is 
+            // wait a bit between each pathfind. They will go toward an "outdated" position in between, but as the pathfind time is
             // under 1s, this is visually not noticeable and a lot more efficient than trying to pathfinding 30+ time each second
             if (m_PathfindTimer > m_PathfindTime)
             {
@@ -310,7 +310,7 @@ namespace Tanks.Complete
                 else
                 {
                     // We aren't charging yet, so check if the target is closer than our max shooting distance, which mean we can start charging the shot
-                    // (a "smarter" solution would be to compute how early we can charge so we reach max distance already max charged) 
+                    // (a "smarter" solution would be to compute how early we can charge so we reach max distance already max charged)
                     if (targetDistance < m_MaxShootingDistance)
                     {
                         // This use the navmesh to check if there are any obstacle between us and the target. If this return false
@@ -320,9 +320,9 @@ namespace Tanks.Complete
                             // we stop moving as we can reach our target with our shot
                             m_IsMoving = false;
 
-                            // if our cooldown is not 0 or below, we have to wait for it to be before shooting. If it is
-                            // below 0, we start charging
-                            if (m_ShotCooldown <= 0.0f)
+                            // if our cooldown is not 0 or below, we have to wait for it to be before shooting.
+                            // If it is below 0, and we have shells, we start charging the shot
+                            if (m_ShotCooldown <= 0.0f && m_Shooting.CurrentShells > 0)
                             {
                                 m_Shooting.StartCharging();
                             }
