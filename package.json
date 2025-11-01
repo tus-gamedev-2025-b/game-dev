@@ -9,7 +9,8 @@
   "type": "module",
   "scripts": {
     "format:check": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --check .",
-    "format:write": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --write ."},
+    "format:write": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --write ."
+  },
   "devDependencies": {
     "prettier": "^3.6.2"
   },
