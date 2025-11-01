@@ -64,6 +64,10 @@ PrefabInstance:
       propertyPath: m_TurnSpeed
       value: 150
       objectReference: {fileID: 0}
+    - target: {fileID: 11443146, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
+      propertyPath: m_TurretTransform
+      value: 
+      objectReference: {fileID: 2958239985930826089}
     - target: {fileID: 11488788, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
       propertyPath: m_MaxDamage
       value: 80
@@ -179,6 +183,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 06cdc8d71bc5371408b340eb71884fd3, type: 3}
+--- !u!4 &2958239985930826089 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7474601347599239649, guid: 06cdc8d71bc5371408b340eb71884fd3, type: 3}
+  m_PrefabInstance: {fileID: 5671960245825206408}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5277199205389115235 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 06cdc8d71bc5371408b340eb71884fd3, type: 3}

@@ -78,6 +78,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5898c21fe4410fb4b833ed09adbeebba, type: 3}
   m_PrefabInstance: {fileID: 1929343913973804412}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &4381007041745626013 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6482335040293056799, guid: 5898c21fe4410fb4b833ed09adbeebba, type: 3}
+  m_PrefabInstance: {fileID: 1929343913973804412}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2229267103194913469
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -146,6 +151,10 @@ PrefabInstance:
       propertyPath: m_TurnSpeed
       value: 120
       objectReference: {fileID: 0}
+    - target: {fileID: 11443146, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
+      propertyPath: m_TurretTransform
+      value: 
+      objectReference: {fileID: 4381007041745626013}
     - target: {fileID: 11488788, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
       propertyPath: m_Shell
       value: 

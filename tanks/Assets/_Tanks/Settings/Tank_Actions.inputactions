@@ -188,7 +188,7 @@
                 {
                     "name": "positive",
                     "id": "2bc047e6-417c-4ce8-b5ec-746dc05b1d55",
-                    "path": "<Keyboard>/upArrow",
+                    "path": "<Keyboard>/period",
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardRight",
