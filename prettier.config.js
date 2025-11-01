@@ -3,4 +3,5 @@
  */
 export default {
   semi: false,
+  endOfLine: "crlf",
 }
