@@ -24,8 +24,15 @@ namespace Tanks.Complete
         [Tooltip("Is set to true this will be controlled by the computer and not a player")]
         public bool m_IsComputerControlled; // Is this tank player or computer controlled
         [HideInInspector]
-        public TankInputUser m_InputUser;      // The Input User component for that tanks. Contains the Input Actions.
-        private Vector3 m_ExplosionForceValue; // The current value of the force  applied on the tank from an explosion.
+        public TankInputUser m_InputUser; // The Input User component for that tanks. Contains the Input Actions.
+
+        // Turret control variables
+        [Header("Turret Control")]
+        [SerializeField] private Transform m_TurretTransform;        // The transform of the turret to rotate
+        [SerializeField] private Transform m_TurretHUDTransform;     // The transform of the turret HUD to rotate
+        [SerializeField] private float m_TurretTurnSpeedValue = 90f; // The speed in deg/s that turret will rotate at.
+        [SerializeField] private bool m_InvertTurretRotation;        // If true, inverts the turret rotation direction.
+        private Vector3 m_ExplosionForceValue;                       // The current value of the force  applied on the tank from an explosion.
 
         private InputAction m_MoveAction; // The InputAction used to move, retrieved from TankInputUser
 
@@ -37,17 +44,10 @@ namespace Tanks.Complete
         private InputAction m_TurnAction;           // The InputAction used to shot, retrieved from TankInputUser
         private string m_TurnAxisName;              // The name of the input axis for turning.
         private float m_TurnInputValue;             // The current value of the turn input.
+        private InputAction m_TurretTurnAction;     // The InputAction used to turn the turret, retrieved from TankInputUser
+        private string m_TurretTurnActionName;      // The name of the input axis for turret turning.
+        private float m_TurretTurnInputValue;       // The current value of the turret turn input.
         private ParticleSystem[] m_particleSystems; // References to all the particles systems used by the Tanks
-
-        // Turret control variables
-        [Header("Turret Control")]
-        [SerializeField] private Transform m_TurretTransform;       // The transform of the turret to rotate
-        [SerializeField] private Transform m_TurretHUDTransform;    // The transform of the turret HUD to rotate
-        [SerializeField] private float m_TurretTurnSpeedValue = 90f; // The speed in deg/s that turret will rotate at.
-        [SerializeField] private bool m_InvertTurretRotation = false; // If true, inverts the turret rotation direction.
-        private float m_TurretTurnInputValue;                       // The current value of the turret turn input.
-        private string m_TurretTurnActionName;                      // The name of the input axis for turret turning.
-        private InputAction m_TurretTurnAction;                     // The InputAction used to turn the turret, retrieved from TankInputUser
 
 
         public Rigidbody Rigidbody { get; private set; }
@@ -115,7 +115,7 @@ namespace Tanks.Complete
             m_TurnAxisName = "Horizontal";
 
             // Turret control setup
-            m_TurretTurnActionName = "TurretTurn";  // The name of the input axis for turret turning.
+            m_TurretTurnActionName = "TurretTurn"; // The name of the input axis for turret turning.
 
             // Get the action input from the TankInputUser component which will have taken care of copying them and
             // binding them to the right device and control scheme
@@ -307,14 +307,14 @@ namespace Tanks.Complete
                 return;
 
             // Calculate the rotation for this frame
-            float turretRotation = m_TurretTurnInputValue * m_TurretTurnSpeedValue * Time.deltaTime;
+            var turretRotation = m_TurretTurnInputValue * m_TurretTurnSpeedValue * Time.deltaTime;
 
             // Invert rotation value if needed
-            float turretRotationForTurret = m_InvertTurretRotation ? -turretRotation : turretRotation;
+            var turretRotationForTurret = m_InvertTurretRotation ? -turretRotation : turretRotation;
 
             // Create the rotation quaternion
-            Quaternion turretTurnRotationForTurretQ = Quaternion.Euler(0f, turretRotationForTurret, 0f);
-            Quaternion turretTurnRotationForHUDQ = Quaternion.Euler(0f, turretRotation, 0f);
+            var turretTurnRotationForTurretQ = Quaternion.Euler(0f, turretRotationForTurret, 0f);
+            var turretTurnRotationForHUDQ = Quaternion.Euler(0f, turretRotation, 0f);
 
             // Apply the rotation to the turret transform
             m_TurretTransform.localRotation *= turretTurnRotationForTurretQ;
