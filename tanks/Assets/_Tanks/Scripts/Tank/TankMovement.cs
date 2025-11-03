@@ -44,6 +44,7 @@ namespace Tanks.Complete
         [SerializeField] private Transform m_TurretTransform;       // The transform of the turret to rotate
         [SerializeField] private Transform m_TurretHUDTransform;    // The transform of the turret HUD to rotate
         [SerializeField] private float m_TurretTurnSpeedValue = 90f; // The speed in deg/s that turret will rotate at.
+        [SerializeField] private bool m_InvertTurretRotation = false; // If true, inverts the turret rotation direction.
         private float m_TurretTurnInputValue;                       // The current value of the turret turn input.
         private string m_TurretTurnActionName;                      // The name of the input axis for turret turning.
         private InputAction m_TurretTurnAction;                     // The InputAction used to turn the turret, retrieved from TankInputUser
@@ -308,17 +309,19 @@ namespace Tanks.Complete
             // Calculate the rotation for this frame
             float turretRotation = m_TurretTurnInputValue * m_TurretTurnSpeedValue * Time.deltaTime;
 
-            // Create the rotation quaternion
-            Quaternion turretTurnRotation = Quaternion.Euler(0f, turretRotation, 0f);
+            // Invert rotation value if needed
+            float turretRotationForTurret = m_InvertTurretRotation ? -turretRotation : turretRotation;
 
-            // Apply the rotation to the turret
-            m_TurretTransform.localRotation *= turretTurnRotation;
+            // Create the rotation quaternion
+            Quaternion turretTurnRotationForTurretQ = Quaternion.Euler(0f, turretRotationForTurret, 0f);
+            Quaternion turretTurnRotationForHUDQ = Quaternion.Euler(0f, turretRotation, 0f);
+
+            // Apply the rotation to the turret transform
+            m_TurretTransform.localRotation *= turretTurnRotationForTurretQ;
 
             // Also rotate the turret HUD if assigned
             if (m_TurretHUDTransform != null)
-            {
-                m_TurretHUDTransform.localRotation *= turretTurnRotation;
-            }
+                m_TurretHUDTransform.localRotation *= turretTurnRotationForHUDQ;
         }
 
         public void AddExplosionForce(float explosionForce, Vector3 explosionPosition, float explosionRadius, float upwardsModifier = 0f)
