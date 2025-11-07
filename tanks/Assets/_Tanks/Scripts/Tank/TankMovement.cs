@@ -24,9 +24,7 @@ namespace Tanks.Complete
         [Tooltip("Is set to true this will be controlled by the computer and not a player")]
         public bool m_IsComputerControlled; // Is this tank player or computer controlled
         [HideInInspector]
-        public TankInputUser m_InputUser;      // The Input User component for that tanks. Contains the Input Actions.
-        private Vector3 m_ExplosionForceValue; // The current value of the force  applied on the tank from an explosion.
-        private InputAction m_MoveAction;      // The InputAction used to move, retrieved from TankInputUser
+        public TankInputUser m_InputUser; // The Input User component for that tanks. Contains the Input Actions.
 
         // Turret control variables
         [Header("Turret Control")]
@@ -34,18 +32,20 @@ namespace Tanks.Complete
         [SerializeField] private Transform m_TurretHUDTransform;     // The transform of the turret HUD to rotate
         [SerializeField] private float m_TurretTurnSpeedValue = 90f; // The speed in deg/s that turret will rotate at.
         [SerializeField] private bool m_InvertTurretRotation;        // If true, inverts the turret rotation direction.
+        private Vector3 m_ExplosionForceValue;                       // The current value of the force  applied on the tank from an explosion.
+        private InputAction m_MoveAction;                            // The InputAction used to move, retrieved from TankInputUser
 
         private string m_MovementAxisName;  // The name of the input axis for moving forward and back.
         private float m_MovementInputValue; // The current value of the movement input.
         private float m_OriginalPitch;      // The pitch of the audio source at the start of the scene.
 
-        private Vector3 m_RequestedDirection; // In Direct Control mode, store the direction the user *wants* to go toward
-        private InputAction m_TurnAction;     // The InputAction used to shot, retrieved from TankInputUser
-        private string m_TurnAxisName;        // The name of the input axis for turning.
-        private float m_TurnInputValue;       // The current value of the turn input.
-        private InputAction m_TurretTurnAction;     // The InputAction used to turn the turret, retrieved from TankInputUser
-        private string m_TurretTurnActionName;      // The name of the input axis for turret turning.
-        private float m_TurretTurnInputValue;       // The current value of the turret turn input.
+        private Vector3 m_RequestedDirection;   // In Direct Control mode, store the direction the user *wants* to go toward
+        private InputAction m_TurnAction;       // The InputAction used to shot, retrieved from TankInputUser
+        private string m_TurnAxisName;          // The name of the input axis for turning.
+        private float m_TurnInputValue;         // The current value of the turn input.
+        private InputAction m_TurretTurnAction; // The InputAction used to turn the turret, retrieved from TankInputUser
+        private string m_TurretTurnActionName;  // The name of the input axis for turret turning.
+        private float m_TurretTurnInputValue;   // The current value of the turret turn input.
 
         private TankWormholeState m_WormholeState;  // Wormhole state component for checking teleportation
         private ParticleSystem[] m_particleSystems; // References to all the particles systems used by the Tanks
