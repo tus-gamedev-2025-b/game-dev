@@ -6,7 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>
-/// Demo_Game_Desertシーンの設定テスト
+///     Demo_Game_Desertシーンの設定テスト
 /// </summary>
 public class DemoDesertSceneTests
 {
