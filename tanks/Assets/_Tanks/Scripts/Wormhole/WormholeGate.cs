@@ -128,6 +128,14 @@ namespace Tanks.Complete
             return transform.position + transform.TransformDirection(m_ExitOffset);
         }
 
+        /// <summary>
+        ///     Gets the rotation tanks should have when exiting (faces the exit offset direction)
+        /// </summary>
+        public Quaternion GetExitRotation()
+        {
+            return transform.rotation;
+        }
+
         private void PlayEnterEffects()
         {
             // Play particle effect

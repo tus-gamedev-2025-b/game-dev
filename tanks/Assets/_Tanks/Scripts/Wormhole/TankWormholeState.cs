@@ -150,6 +150,7 @@ namespace Tanks.Complete
 
             // Phase 2: Instant teleportation
             var targetPosition = exitGate.GetExitPosition();
+            var targetRotation = exitGate.GetExitRotation();
 
             if (m_Rigidbody != null)
             {
@@ -159,6 +160,9 @@ namespace Tanks.Complete
             {
                 transform.position = targetPosition;
             }
+
+            // Rotate to face away from the gate (so pressing forward moves away from gate)
+            transform.rotation = targetRotation;
 
             // Notify exit gate
             exitGate.OnTankExit(gameObject);
