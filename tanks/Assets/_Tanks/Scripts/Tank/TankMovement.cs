@@ -28,17 +28,17 @@ namespace Tanks.Complete
         private Vector3 m_ExplosionForceValue; // The current value of the force  applied on the tank from an explosion.
         private InputAction m_MoveAction;      // The InputAction used to move, retrieved from TankInputUser
 
-        private string m_MovementAxisName;          // The name of the input axis for moving forward and back.
-        private float m_MovementInputValue;         // The current value of the movement input.
-        private float m_OriginalPitch;              // The pitch of the audio source at the start of the scene.
-        private ParticleSystem[] m_particleSystems; // References to all the particles systems used by the Tanks
+        private string m_MovementAxisName;  // The name of the input axis for moving forward and back.
+        private float m_MovementInputValue; // The current value of the movement input.
+        private float m_OriginalPitch;      // The pitch of the audio source at the start of the scene.
 
         private Vector3 m_RequestedDirection; // In Direct Control mode, store the direction the user *wants* to go toward
         private InputAction m_TurnAction;     // The InputAction used to shot, retrieved from TankInputUser
         private string m_TurnAxisName;        // The name of the input axis for turning.
         private float m_TurnInputValue;       // The current value of the turn input.
 
-        private TankWormholeState m_WormholeState; // Wormhole state component for checking teleportation
+        private TankWormholeState m_WormholeState;  // Wormhole state component for checking teleportation
+        private ParticleSystem[] m_particleSystems; // References to all the particles systems used by the Tanks
 
         public Rigidbody Rigidbody { get; private set; }
 
