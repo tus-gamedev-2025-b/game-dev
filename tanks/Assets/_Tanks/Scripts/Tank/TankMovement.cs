@@ -26,18 +26,19 @@ namespace Tanks.Complete
         [HideInInspector]
         public TankInputUser m_InputUser;      // The Input User component for that tanks. Contains the Input Actions.
         private Vector3 m_ExplosionForceValue; // The current value of the force  applied on the tank from an explosion.
+        private InputAction m_MoveAction;      // The InputAction used to move, retrieved from TankInputUser
 
-        private InputAction m_MoveAction; // The InputAction used to move, retrieved from TankInputUser
-
-        private string m_MovementAxisName;  // The name of the input axis for moving forward and back.
-        private float m_MovementInputValue; // The current value of the movement input.
-        private float m_OriginalPitch;      // The pitch of the audio source at the start of the scene.
-
-        private Vector3 m_RequestedDirection;       // In Direct Control mode, store the direction the user *wants* to go toward
-        private InputAction m_TurnAction;           // The InputAction used to shot, retrieved from TankInputUser
-        private string m_TurnAxisName;              // The name of the input axis for turning.
-        private float m_TurnInputValue;             // The current value of the turn input.
+        private string m_MovementAxisName;          // The name of the input axis for moving forward and back.
+        private float m_MovementInputValue;         // The current value of the movement input.
+        private float m_OriginalPitch;              // The pitch of the audio source at the start of the scene.
         private ParticleSystem[] m_particleSystems; // References to all the particles systems used by the Tanks
+
+        private Vector3 m_RequestedDirection; // In Direct Control mode, store the direction the user *wants* to go toward
+        private InputAction m_TurnAction;     // The InputAction used to shot, retrieved from TankInputUser
+        private string m_TurnAxisName;        // The name of the input axis for turning.
+        private float m_TurnInputValue;       // The current value of the turn input.
+
+        private TankWormholeState m_WormholeState; // Wormhole state component for checking teleportation
 
         public Rigidbody Rigidbody { get; private set; }
 
@@ -50,6 +51,9 @@ namespace Tanks.Complete
             m_InputUser = GetComponent<TankInputUser>();
             if (m_InputUser == null)
                 m_InputUser = gameObject.AddComponent<TankInputUser>();
+
+            // Get wormhole state component (may be null if not using wormholes)
+            m_WormholeState = GetComponent<TankWormholeState>();
         }
 
 
@@ -225,6 +229,15 @@ namespace Tanks.Complete
 
         private void Move()
         {
+            // Cannot move during wormhole teleportation
+            if (m_WormholeState != null && !m_WormholeState.CanMove())
+            {
+                // Stop the tank completely during teleportation
+                Rigidbody.linearVelocity = Vector3.zero;
+                m_ExplosionForceValue = Vector3.zero;
+                return;
+            }
+
             var speedInput = 0.0f;
 
             // In direct control mode, the speed will depend on how far from the desired direction we are
@@ -252,6 +265,12 @@ namespace Tanks.Complete
 
         private void Turn()
         {
+            // Cannot turn during wormhole teleportation
+            if (m_WormholeState != null && !m_WormholeState.CanMove())
+            {
+                return;
+            }
+
             Quaternion turnRotation;
             // If in direct control...
             if (m_InputUser.InputUser.controlScheme.Value.name == "Gamepad" || m_IsDirectControl)
