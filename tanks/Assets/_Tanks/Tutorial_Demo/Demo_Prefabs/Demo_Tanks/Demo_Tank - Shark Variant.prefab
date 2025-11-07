@@ -64,6 +64,10 @@ PrefabInstance:
       propertyPath: m_StartingHealth
       value: 225
       objectReference: {fileID: 0}
+    - target: {fileID: 11443146, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
+      propertyPath: m_TurretTransform
+      value: 
+      objectReference: {fileID: 8878869737413607873}
     - target: {fileID: 11488788, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
       propertyPath: m_MaxDamage
       value: 60
@@ -174,5 +178,10 @@ PrefabInstance:
 --- !u!4 &7407967995094973317 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9cb291b9205a86444b285015bd02d5d6, type: 3}
+  m_PrefabInstance: {fileID: 7008967545799859310}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8878869737413607873 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -7314745045437555281, guid: 9cb291b9205a86444b285015bd02d5d6, type: 3}
   m_PrefabInstance: {fileID: 7008967545799859310}
   m_PrefabAsset: {fileID: 0}
