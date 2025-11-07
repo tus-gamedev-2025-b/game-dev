@@ -35,7 +35,7 @@ public class DemoDesertSceneTests
         }
 
         // WormholeManagerの存在確認
-        var manager = Object.FindObjectOfType<WormholeManager>();
+        var manager = Object.FindFirstObjectByType<WormholeManager>();
         Assert.IsNotNull(manager,
             "Demo_Game_DesertシーンにWormholeManagerが配置されていません");
     }
@@ -50,7 +50,7 @@ public class DemoDesertSceneTests
         }
 
         // すべてのWormholeGateを検索
-        var gates = Object.FindObjectsOfType<WormholeGate>();
+        var gates = Object.FindObjectsByType<WormholeGate>(FindObjectsSortMode.None);
         Assert.AreEqual(4, gates.Length,
             $"Demo_Game_Desertシーンに4つのWormholeGateが必要ですが、{gates.Length}個見つかりました");
     }
@@ -64,7 +64,7 @@ public class DemoDesertSceneTests
             return;
         }
 
-        var manager = Object.FindObjectOfType<WormholeManager>();
+        var manager = Object.FindFirstObjectByType<WormholeManager>();
         Assert.IsNotNull(manager);
 
         // 各方向のゲートが設定されているか確認
@@ -87,7 +87,7 @@ public class DemoDesertSceneTests
             return;
         }
 
-        var manager = Object.FindObjectOfType<WormholeManager>();
+        var manager = Object.FindFirstObjectByType<WormholeManager>();
         Assert.IsNotNull(manager);
 
         // 上下のゲートが相互接続されているか確認
