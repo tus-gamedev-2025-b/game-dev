@@ -9,6 +9,7 @@ namespace Tanks.Complete
     /// </summary>
     [RequireComponent(typeof(TankHealth))]
     [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(Renderer))]
     public class TankWormholeState : MonoBehaviour
     {
         [Header("Teleportation Settings")]
@@ -28,10 +29,8 @@ namespace Tanks.Complete
         // State tracking
         private Renderer[] m_Renderers;
         private Rigidbody m_Rigidbody;
-
-        [Header("References")]
         private TankHealth m_TankHealth;
-        private TankShooting m_TankShooting;
+
         private Coroutine m_TeleportCoroutine;
 
         public bool IsTeleporting { get; private set; }
@@ -41,7 +40,6 @@ namespace Tanks.Complete
         {
             // Get required components
             m_TankHealth = GetComponent<TankHealth>();
-            m_TankShooting = GetComponent<TankShooting>();
             m_Rigidbody = GetComponent<Rigidbody>();
 
             // Get all renderers for blinking effect
@@ -88,21 +86,15 @@ namespace Tanks.Complete
         /// </summary>
         public void StartTeleportation(WormholeGate entranceGate, WormholeGate exitGate)
         {
-            // Don't teleport if already teleporting
-            if (IsTeleporting)
-            {
-                return;
-            }
-
-            // Don't teleport if in cooldown (prevents infinite loop)
-            if (IsInCooldown)
+            // Don't teleport if already teleporting or in cooldown
+            if (IsTeleporting || IsInCooldown)
             {
                 return;
             }
 
             if (exitGate == null)
             {
-                Debug.LogError("Exit gate is null!");
+                Debug.LogError("Failed to start teleportation: exit gate is null.");
                 return;
             }
 
