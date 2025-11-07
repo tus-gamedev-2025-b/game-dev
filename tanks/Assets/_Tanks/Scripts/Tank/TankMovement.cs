@@ -28,6 +28,13 @@ namespace Tanks.Complete
         private Vector3 m_ExplosionForceValue; // The current value of the force  applied on the tank from an explosion.
         private InputAction m_MoveAction;      // The InputAction used to move, retrieved from TankInputUser
 
+        // Turret control variables
+        [Header("Turret Control")]
+        [SerializeField] private Transform m_TurretTransform;        // The transform of the turret to rotate
+        [SerializeField] private Transform m_TurretHUDTransform;     // The transform of the turret HUD to rotate
+        [SerializeField] private float m_TurretTurnSpeedValue = 90f; // The speed in deg/s that turret will rotate at.
+        [SerializeField] private bool m_InvertTurretRotation;        // If true, inverts the turret rotation direction.
+
         private string m_MovementAxisName;  // The name of the input axis for moving forward and back.
         private float m_MovementInputValue; // The current value of the movement input.
         private float m_OriginalPitch;      // The pitch of the audio source at the start of the scene.
@@ -36,9 +43,13 @@ namespace Tanks.Complete
         private InputAction m_TurnAction;     // The InputAction used to shot, retrieved from TankInputUser
         private string m_TurnAxisName;        // The name of the input axis for turning.
         private float m_TurnInputValue;       // The current value of the turn input.
+        private InputAction m_TurretTurnAction;     // The InputAction used to turn the turret, retrieved from TankInputUser
+        private string m_TurretTurnActionName;      // The name of the input axis for turret turning.
+        private float m_TurretTurnInputValue;       // The current value of the turret turn input.
 
         private TankWormholeState m_WormholeState;  // Wormhole state component for checking teleportation
         private ParticleSystem[] m_particleSystems; // References to all the particles systems used by the Tanks
+
 
         public Rigidbody Rigidbody { get; private set; }
 
@@ -54,6 +65,12 @@ namespace Tanks.Complete
 
             // Get wormhole state component (may be null if not using wormholes)
             m_WormholeState = GetComponent<TankWormholeState>();
+
+            // Turret setup
+            if (m_TurretTransform == null)
+            {
+                Debug.LogWarning($"{name}: Turret Transform is not assigned.");
+            }
         }
 
 
@@ -101,14 +118,20 @@ namespace Tanks.Complete
             m_MovementAxisName = "Vertical";
             m_TurnAxisName = "Horizontal";
 
+            // Turret control setup
+            m_TurretTurnActionName = "TurretTurn"; // The name of the input axis for turret turning.
+
             // Get the action input from the TankInputUser component which will have taken care of copying them and
             // binding them to the right device and control scheme
             m_MoveAction = m_InputUser.ActionAsset.FindAction(m_MovementAxisName);
             m_TurnAction = m_InputUser.ActionAsset.FindAction(m_TurnAxisName);
+            m_TurretTurnAction = m_InputUser.ActionAsset.FindAction(m_TurretTurnActionName);
 
             // actions need to be enabled before they can react to input
             m_MoveAction.Enable();
             m_TurnAction.Enable();
+            if (m_TurretTurnAction != null)
+                m_TurretTurnAction.Enable();
 
             // Store the original pitch of the audio source.
             if (m_MovementAudio)
@@ -125,6 +148,9 @@ namespace Tanks.Complete
             {
                 m_MovementInputValue = m_MoveAction.ReadValue<float>();
                 m_TurnInputValue = m_TurnAction.ReadValue<float>();
+
+                if (m_TurretTurnAction != null)
+                    m_TurretTurnInputValue = m_TurretTurnAction.ReadValue<float>();
             }
 
             if (m_MovementAudio)
@@ -163,6 +189,7 @@ namespace Tanks.Complete
             // Adjust the rigidbodies position and orientation in FixedUpdate.
             Move();
             Turn();
+            TurretTurn();
         }
 
 
@@ -174,6 +201,7 @@ namespace Tanks.Complete
             // Also reset the input values and explosion force.
             m_MovementInputValue = 0f;
             m_TurnInputValue = 0f;
+            m_TurretTurnInputValue = 0f;
             m_ExplosionForceValue = Vector3.zero;
             // We grab all the Particle systems child of that Tank to be able to Stop/Play them on Deactivate/Activate
             // It is needed because we move the Tank when spawning it, and if the Particle System is playing while we do that
@@ -290,6 +318,29 @@ namespace Tanks.Complete
 
             // Apply this rotation to the rigidbody's rotation.
             Rigidbody.MoveRotation(Rigidbody.rotation * turnRotation);
+        }
+
+        private void TurretTurn()
+        {
+            if (m_TurretTransform == null)
+                return;
+
+            // Calculate the rotation for this frame
+            var turretRotation = m_TurretTurnInputValue * m_TurretTurnSpeedValue * Time.deltaTime;
+
+            // Invert rotation value if needed
+            var turretRotationForTurret = m_InvertTurretRotation ? -turretRotation : turretRotation;
+
+            // Create the rotation quaternion
+            var turretTurnRotationForTurretQ = Quaternion.Euler(0f, turretRotationForTurret, 0f);
+            var turretTurnRotationForHUDQ = Quaternion.Euler(0f, turretRotation, 0f);
+
+            // Apply the rotation to the turret transform
+            m_TurretTransform.localRotation *= turretTurnRotationForTurretQ;
+
+            // Also rotate the turret HUD if assigned
+            if (m_TurretHUDTransform != null)
+                m_TurretHUDTransform.localRotation *= turretTurnRotationForHUDQ;
         }
 
         public void AddExplosionForce(float explosionForce, Vector3 explosionPosition, float explosionRadius, float upwardsModifier = 0f)
