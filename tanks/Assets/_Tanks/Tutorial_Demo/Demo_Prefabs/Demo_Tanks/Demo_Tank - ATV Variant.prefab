@@ -57,6 +57,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f1b92b00a0a2a2345b070a28f29c9f39, type: 3}
+--- !u!4 &5525975998013598998 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -7314745045437555281, guid: f1b92b00a0a2a2345b070a28f29c9f39, type: 3}
+  m_PrefabInstance: {fileID: 6254650812594270393}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5856441740536797010 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f1b92b00a0a2a2345b070a28f29c9f39, type: 3}
@@ -126,6 +131,10 @@ PrefabInstance:
       propertyPath: m_Speed
       value: 14
       objectReference: {fileID: 0}
+    - target: {fileID: 11443146, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
+      propertyPath: m_TurretTransform
+      value: 
+      objectReference: {fileID: 5525975998013598998}
     - target: {fileID: 11488788, guid: 756d3a6506f2f8241b4e8badde68567a, type: 3}
       propertyPath: m_Shell
       value: 

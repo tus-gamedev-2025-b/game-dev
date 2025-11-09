@@ -1,0 +1,18 @@
+{
+  "name": "game-dev",
+  "version": "0.0.0",
+  "description": "Tanks!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tus-gamedev-2025-b/game-dev.git"
+  },
+  "type": "module",
+  "scripts": {
+    "format:check": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --check .",
+    "format:write": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
+  "packageManager": "pnpm@10.20.0"
+}

@@ -84,6 +84,61 @@ jobs:
       contents: read
       security-events: write
 
+  prettier:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup tools
+        uses: jdx/mise-action@be3be2260bc02bc3fbf94c5e2fed8b7964baf074 # v3.4.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check code formatting
+        run: pnpm format:check
+
+  test:
+    name: Test in ${{ matrix.testMode }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        testMode:
+          - editmode
+          - playmode
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          submodules: recursive
+
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: tanks/Library
+          key: Library-test-${{ matrix.testMode }}-${{ hashFiles('tanks/Assets/**', 'tanks/Packages/**', 'tanks/ProjectSettings/**') }}
+          restore-keys: |
+            Library-test-${{ matrix.testMode }}-
+            Library-test-
+            Library-
+
+      - uses: game-ci/unity-test-runner@61fd9aa167044adefc3ebda06a005e4312a9f897
+        id: tests
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          projectPath: tanks
+          testMode: ${{ matrix.testMode }}
+          artifactsPath: ${{ matrix.testMode }}-artifacts
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: ${{ matrix.testMode }} Test Results
+          coverageOptions: "generateAdditionalMetrics;generateHtmlReport;generateBadgeReport"
+
+    permissions:
+      contents: read
+      checks: write
+
   build:
     name: Build for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-24.04
