@@ -181,7 +181,7 @@ namespace Tanks.Complete
                 Transform playerTransform = m_Players[0].m_Instance.transform;
 
                 // Find the turret
-                Transform turret = playerTransform.Find("TankRenderers/TankTurret");
+                Transform turret = FindTurretRecursive(playerTransform);
 
                 if (turret != null)
                 {
@@ -194,6 +194,22 @@ namespace Tanks.Complete
                     Debug.Log("GameManager: 砲塔が見つからなかったため車体を追従します。");
                 }
             }
+        }
+
+        // Recursively search for a child transform that likely represents the turret
+        private Transform FindTurretRecursive(Transform parent)
+        {
+            foreach (Transform child in parent)
+            {
+                string lowerName = child.name.ToLower();
+                if (lowerName.Contains("turret") || lowerName.Contains("barrel"))
+                    return child;
+
+                Transform found = FindTurretRecursive(child);
+                if (found != null)
+                    return found;
+            }
+            return null;
         }
 
         // This is called from start and will run each phase of the game one after another.
