@@ -29,6 +29,7 @@ namespace Tanks.Complete
         public float m_StartDelay = 3f;       // The delay between the start of RoundStarting and RoundPlaying phases.
         public float m_EndDelay = 3f;         // The delay between the end of RoundPlaying and RoundEnding phases.
         public CameraControl m_CameraControl; // Reference to the CameraControl script for control during different phases.
+        [SerializeField] private TPSCameraControl m_TPSCameraControl;   // Reference to the TPSCameraControl script for third-person camera control.
 
         [Header("Tanks Prefabs")]
         public GameObject m_Tank1Prefab; // The Prefab used by the tank in Slot 1 of the Menu
@@ -173,18 +174,26 @@ namespace Tanks.Complete
 
         private void SetCameraTargets()
         {
-            // Create a collection of transforms the same size as the number of tanks.
-            var targets = new Transform[m_PlayerCount];
-
-            // For each of these transforms...
-            for (var i = 0; i < targets.Length; i++)
+            // Set the TPS camera target
+            if (m_TPSCameraControl != null)
             {
-                // ... set it to the appropriate tank transform.
-                targets[i] = m_SpawnPoints[i].m_Instance.transform;
-            }
+                // Set the TPS camera to follow the first player's tank
+                Transform playerTransform = m_Players[0].m_Instance.transform;
 
-            // These are the targets the camera should follow.
-            m_CameraControl.m_Targets = targets;
+                // Find the turret
+                Transform turret = playerTransform.Find("TankRenderers/TankTurret");
+
+                if (turret != null)
+                {
+                    m_TPSCameraControl.target = turret;
+                    Debug.Log("GameManager: カメラターゲットを砲塔に設定しました。");
+                }
+                else
+                {
+                    m_TPSCameraControl.target = playerTransform;
+                    Debug.Log("GameManager: 砲塔が見つからなかったため車体を追従します。");
+                }
+            }
         }
 
         // This is called from start and will run each phase of the game one after another.
@@ -224,7 +233,7 @@ namespace Tanks.Complete
             DisableTankControl();
 
             // Snap the camera's zoom and position to something appropriate for the reset tanks.
-            m_CameraControl.SetStartPositionAndSize();
+            // m_CameraControl.SetStartPositionAndSize();
 
             // Increment the round number and display text showing the players what round it is.
             m_RoundNumber++;
