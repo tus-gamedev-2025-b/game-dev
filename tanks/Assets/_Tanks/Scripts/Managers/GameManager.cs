@@ -121,6 +121,8 @@ namespace Tanks.Complete
             }
         }
 
+        private int m_MyControlIndex = -1; // undefined
+
         // Called by the menu, passing along the data from the selection made by the player in the menu
         public void StartGame(PlayerData[] playerData)
         {
@@ -132,6 +134,16 @@ namespace Tanks.Complete
             {
                 if (i >= m_PlayerCount) break;
                 m_Players[i] = m_SpawnPoints[i];
+            }
+
+            // Assume the local player
+            for (int i = 0; i < m_TankData.Length; i++)
+            {
+                if (!m_TankData[i].IsComputer && m_TankData[i].IsLocalPlayer)
+                {
+                    m_MyControlIndex = m_TankData[i].ControlIndex;
+                    break;
+                }
             }
 
             ChangeGameState(GameState.Game);
@@ -174,25 +186,54 @@ namespace Tanks.Complete
 
         private void SetCameraTargets()
         {
-            // Set the TPS camera target
-            if (m_TPSCameraControl != null)
+            if (m_TPSCameraControl == null || m_Players == null)
+                return;
+
+            // Find the local player
+            PlayerData localPlayerData = null;
+            for (int i = 0; i < m_TankData.Length; i++)
             {
-                // Set the TPS camera to follow the first player's tank
-                Transform playerTransform = m_Players[0].m_Instance.transform;
+                if (m_TankData[i].IsLocalPlayer && !m_TankData[i].IsComputer)
+                {
+                    localPlayerData = m_TankData[i];
+                    break;
+                }
+            }
 
-                // Find the turret
-                Transform turret = FindTurretRecursive(playerTransform);
+            if (localPlayerData == null)
+            {
+                Debug.LogWarning("GameManager: ローカルプレイヤーのデータが見つかりませんでした。");
+                return;
+            }
 
+            // Find the TankManager corresponding to the local player
+            TankManager myTank = null;
+            for (int i = 0; i < m_Players.Length; i++)
+            {
+                if (m_Players[i] != null && m_Players[i].ControlIndex == m_MyControlIndex)
+                {
+                    myTank = m_Players[i];
+                    break;
+                }
+            }
+
+            if (myTank != null && myTank.m_Instance != null)
+            {
+                Transform turret = FindTurretRecursive(myTank.m_Instance.transform);
                 if (turret != null)
                 {
                     m_TPSCameraControl.target = turret;
-                    Debug.Log("GameManager: カメラターゲットを砲塔に設定しました。");
+                    Debug.Log("GameManager: 自分の戦車の砲塔をターゲットに設定しました。");
                 }
                 else
                 {
-                    m_TPSCameraControl.target = playerTransform;
+                    m_TPSCameraControl.target = myTank.m_Instance.transform;
                     Debug.Log("GameManager: 砲塔が見つからなかったため車体を追従します。");
                 }
+            }
+            else
+            {
+                Debug.LogWarning("GameManager: 自分の戦車が見つかりませんでした。");
             }
         }
 
@@ -421,6 +462,9 @@ namespace Tanks.Complete
             public bool IsComputer;
             public Color TankColor;
             public GameObject UsedPrefab;
+
+            // Indicates if this player is the local player
+            public bool IsLocalPlayer; 
         }
     }
 }
