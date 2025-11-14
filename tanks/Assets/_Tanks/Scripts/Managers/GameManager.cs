@@ -235,6 +235,24 @@ namespace Tanks.Complete
             {
                 Debug.LogWarning("GameManager: 自分の戦車が見つかりませんでした。");
             }
+
+            if (myTank.m_Instance.name.Contains("Medium"))
+            {
+                m_TPSCameraControl.posOffset = new Vector3(0f, 4f, -8f);
+            }
+            else if (myTank.m_Instance.name.Contains("ATV"))
+            {
+                m_TPSCameraControl.posOffset = new Vector3(0f, 3f, -7f);
+            }
+            else if (myTank.m_Instance.name.Contains("Shark"))
+            {
+                m_TPSCameraControl.posOffset = new Vector3(0f, 2.5f, -7f); // 高すぎないように調整
+            }
+            else
+            {
+                m_TPSCameraControl.posOffset = new Vector3(0f, 5f, -8f);
+            }
+            m_TPSCameraControl.rotOffset = Vector3.zero;
         }
 
         // Recursively search for a child transform that likely represents the turret

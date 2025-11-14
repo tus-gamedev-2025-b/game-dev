@@ -8,35 +8,32 @@ namespace Tanks.Complete
         public Transform target;
 
         [Header("オフセット設定")]
-        [SerializeField] private Vector3 posOffset = new Vector3(0f, 5f, -8f);
-        [SerializeField] private Vector3 rotOffset = Vector3.zero;
+        public Vector3 posOffset = new Vector3(0f, 5f, -8f);
+        public Vector3 rotOffset = Vector3.zero;
 
         [SerializeField] private float followSpeed = 5f;
         [SerializeField] private float rotateSpeed = 5f;
-
-        private void Start()
-        {
-            if (target == null)
-            {
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null)
-                {
-                    Transform turret = player.transform.Find("TankRenderers/TankTurret");
-                    target = turret != null ? turret : player.transform;
-                    Debug.Log($"TPSCameraControl: {target.name} を追従対象に設定しました。");
-                }
-            }
-        }
 
         private void LateUpdate()
         {
             if (target == null) return;
 
-            Vector3 worldPos = target.TransformPoint(posOffset);
-            transform.position = Vector3.Lerp(transform.position, worldPos, Time.deltaTime * followSpeed);
+            Vector3 forward = target.forward;
 
-            Quaternion worldRot = target.rotation * Quaternion.Euler(rotOffset);
-            transform.rotation = Quaternion.Slerp(transform.rotation, worldRot, Time.deltaTime * rotateSpeed);
+            // Medium Variant などで forward が逆なら反転
+            if (Vector3.Dot(forward, target.parent.forward) < 0f)
+            {
+                forward = -forward;
+            }
+
+            Vector3 desiredPosition = target.position - forward * Mathf.Abs(posOffset.z) + Vector3.up * posOffset.y;
+
+            transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * followSpeed);
+
+            // 砲塔を見る方向
+            Vector3 lookPos = target.position + Vector3.up * 0.5f; // 砲塔の中心を少し上に
+            Quaternion targetRotation = Quaternion.LookRotation(lookPos - transform.position);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotateSpeed);
         }
     }
 }
