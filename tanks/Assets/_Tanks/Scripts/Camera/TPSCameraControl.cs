@@ -18,7 +18,7 @@ namespace Tanks.Complete
         {
             if (target == null) return;
 
-            Vector3 forward = target.forward;
+            var forward = target.forward;
 
             // Medium Variant などで forward が逆なら反転
             if (Vector3.Dot(forward, target.parent.forward) < 0f)
@@ -26,13 +26,13 @@ namespace Tanks.Complete
                 forward = -forward;
             }
 
-            Vector3 desiredPosition = target.position - forward * Mathf.Abs(posOffset.z) + Vector3.up * posOffset.y;
+            var desiredPosition = target.position - forward * Mathf.Abs(posOffset.z) + Vector3.up * posOffset.y;
 
             transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * followSpeed);
 
             // 砲塔を見る方向
-            Vector3 lookPos = target.position + Vector3.up * 0.5f; // 砲塔の中心を少し上に
-            Quaternion targetRotation = Quaternion.LookRotation(lookPos - transform.position);
+            var lookPos = target.position + Vector3.up * 0.5f; // 砲塔の中心を少し上に
+            var targetRotation = Quaternion.LookRotation(lookPos - transform.position);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotateSpeed);
         }
     }
