@@ -53,6 +53,9 @@ namespace Tanks.Complete
         private bool m_IsChargingForward;
         private float m_ShotCooldownTimer;      // The timer counting down before a shot is allowed again
         private float m_SpecialShellMultiplier; // The amount that the special shell will multiply the damage.
+
+        // Wormhole state component for checking teleportation
+        private TankWormholeState m_WormholeState;
         public int CurrentShells
         {
             get => m_CurrentShells;
@@ -77,6 +80,9 @@ namespace Tanks.Complete
             m_InputUser = GetComponent<TankInputUser>();
             if (m_InputUser == null)
                 m_InputUser = gameObject.AddComponent<TankInputUser>();
+
+            // Get wormhole state component (may be null if not using wormholes)
+            m_WormholeState = GetComponent<TankWormholeState>();
         }
 
         private void Start()
@@ -138,6 +144,12 @@ namespace Tanks.Complete
         /// </summary>
         public void StartCharging()
         {
+            // Cannot charge during wormhole teleportation
+            if (m_WormholeState != null && !m_WormholeState.CanShoot())
+            {
+                return;
+            }
+
             IsCharging = true;
             // ... reset the fired flag and reset the launch force.
             m_Fired = false;
@@ -172,6 +184,16 @@ namespace Tanks.Complete
             // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
             else if (IsCharging && !m_Fired)
             {
+                // Stop charging if teleporting
+                if (m_WormholeState != null && !m_WormholeState.CanShoot())
+                {
+                    // Reset charge state
+                    m_CurrentLaunchForce = m_MinLaunchForce;
+                    m_ShootingAudio.Stop();
+                    IsCharging = false;
+                    return;
+                }
+
                 // Increment the launch force and update the slider.
                 m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
 
@@ -213,6 +235,12 @@ namespace Tanks.Complete
             // If the fire button has just started being pressed...
             if (m_ShotCooldownTimer <= 0 && fireAction.WasPressedThisFrame())
             {
+                // Cannot charge during wormhole teleportation
+                if (m_WormholeState != null && !m_WormholeState.CanShoot())
+                {
+                    return;
+                }
+
                 // ... reset the fired flag and reset the launch force.
                 m_Fired = false;
                 m_CurrentLaunchForce = m_MinLaunchForce;
@@ -225,6 +253,15 @@ namespace Tanks.Complete
             // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
             else if (fireAction.IsPressed() && !m_Fired)
             {
+                // Stop charging if teleporting
+                if (m_WormholeState != null && !m_WormholeState.CanShoot())
+                {
+                    // Reset charge state
+                    m_CurrentLaunchForce = m_MinLaunchForce;
+                    m_ShootingAudio.Stop();
+                    return;
+                }
+
                 // Increment or decrement the launch force and update the slider.
                 m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime * (m_IsChargingForward ? 1 : -1);
 
@@ -241,6 +278,15 @@ namespace Tanks.Complete
 
         private void Fire()
         {
+            // Check if tank is teleporting through wormhole (cannot shoot during teleportation)
+            if (m_WormholeState != null && !m_WormholeState.CanShoot())
+            {
+                m_CurrentLaunchForce = m_MinLaunchForce;
+                m_ShotCooldownTimer = m_ShotCooldown;
+                m_IsChargingForward = true;
+                return;
+            }
+
             // Check we have shells to fire
             if (CurrentShells <= 0)
             {

@@ -200,12 +200,6 @@ namespace Tanks.Complete
                 }
             }
 
-            if (localPlayerData == null)
-            {
-                Debug.LogWarning("GameManager: ローカルプレイヤーのデータが見つかりませんでした。");
-                return;
-            }
-
             // Find the TankManager corresponding to the local player
             TankManager myTank = null;
             for (int i = 0; i < m_Players.Length; i++)
