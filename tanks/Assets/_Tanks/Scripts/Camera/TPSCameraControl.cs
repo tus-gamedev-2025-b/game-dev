@@ -29,13 +29,14 @@ namespace Tanks.Complete
         {
             if (target == null) return;
 
+            // 砲塔を優先して追従
             Transform turret = FindTurretRecursive(target);
 
-            // Medium Variant の場合だけオフセット方向を反転
+            // Medium Variant の場合はオフセット方向を反転
             Vector3 back = -target.forward;
             if (target.name.Contains("001")) // Medium Variant
             {
-                back = target.forward; // 前方向を反転させて、結果的に背後に回る
+                back = target.forward; // 前方向を反転させて背後に回る
             }
 
             Vector3 right = target.right;
@@ -48,6 +49,7 @@ namespace Tanks.Complete
 
             transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * followSpeed);
 
+            // LookAtは砲塔中心を狙う
             Vector3 lookAtPos = turret != null ? turret.position + Vector3.up * 0.5f : target.position + Vector3.up * 0.5f;
 
             Quaternion targetRotation = Quaternion.LookRotation(lookAtPos - transform.position);
