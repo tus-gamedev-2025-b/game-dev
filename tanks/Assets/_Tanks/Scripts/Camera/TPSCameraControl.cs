@@ -30,29 +30,29 @@ namespace Tanks.Complete
             if (target == null) return;
 
             // 砲塔を優先して追従
-            Transform turret = FindTurretRecursive(target);
+            var turret = FindTurretRecursive(target);
 
             // Medium Variant の場合はオフセット方向を反転
-            Vector3 back = -target.forward;
+            var back = -target.forward;
             if (target.name.Contains("001")) // Medium Variant
             {
                 back = target.forward; // 前方向を反転させて背後に回る
             }
 
-            Vector3 right = target.right;
-            Vector3 up = Vector3.up;
+            var right = target.right;
+            var up = Vector3.up;
 
-            Vector3 desiredPosition = target.position
-                                    + right * posOffset.x
-                                    + up * posOffset.y
-                                    + back * Mathf.Abs(posOffset.z);
+            var desiredPosition = target.position
+                                  + right * posOffset.x
+                                  + up * posOffset.y
+                                  + back * Mathf.Abs(posOffset.z);
 
             transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * followSpeed);
 
             // LookAtは砲塔中心を狙う
-            Vector3 lookAtPos = turret != null ? turret.position + Vector3.up * 0.5f : target.position + Vector3.up * 0.5f;
+            var lookAtPos = turret != null ? turret.position + Vector3.up * 0.5f : target.position + Vector3.up * 0.5f;
 
-            Quaternion targetRotation = Quaternion.LookRotation(lookAtPos - transform.position);
+            var targetRotation = Quaternion.LookRotation(lookAtPos - transform.position);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotateSpeed);
         }
 
@@ -60,11 +60,11 @@ namespace Tanks.Complete
         {
             foreach (Transform child in parent)
             {
-                string lowerName = child.name.ToLower();
+                var lowerName = child.name.ToLower();
                 if (lowerName.Contains("turret") || lowerName.Contains("barrel"))
                     return child;
 
-                Transform found = FindTurretRecursive(child);
+                var found = FindTurretRecursive(child);
                 if (found != null)
                     return found;
             }
