@@ -8,32 +8,65 @@ namespace Tanks.Complete
         public Transform target;
 
         [Header("オフセット設定")]
-        public Vector3 posOffset = new Vector3(0f, 5f, -8f);
+        public Vector3 posOffset = new Vector3(2f, 4f, -6f); // TPS用：斜め後ろ
         public Vector3 rotOffset = Vector3.zero;
 
         [SerializeField] private float followSpeed = 5f;
         [SerializeField] private float rotateSpeed = 5f;
+        private bool initialAdjusted = false;
+
+        private void Start()
+        {
+            if (target != null && target.name.Contains("001")) // Medium Variant
+            {
+                // 初期向きを180度回転
+                transform.Rotate(0f, 180f, 0f, Space.World);
+                Debug.Log("Applied 180 rotation to Medium Variant in Start");
+            }
+        }
 
         private void LateUpdate()
         {
             if (target == null) return;
 
-            Vector3 forward = target.forward;
+            Transform turret = FindTurretRecursive(target);
 
-            // Medium Variant などで forward が逆なら反転
-            if (Vector3.Dot(forward, target.parent.forward) < 0f)
+            // Medium Variant の場合だけオフセット方向を反転
+            Vector3 back = -target.forward;
+            if (target.name.Contains("001")) // Medium Variant
             {
-                forward = -forward;
+                back = target.forward; // 前方向を反転させて、結果的に背後に回る
             }
 
-            Vector3 desiredPosition = target.position - forward * Mathf.Abs(posOffset.z) + Vector3.up * posOffset.y;
+            Vector3 right = target.right;
+            Vector3 up = Vector3.up;
+
+            Vector3 desiredPosition = target.position
+                                    + right * posOffset.x
+                                    + up * posOffset.y
+                                    + back * Mathf.Abs(posOffset.z);
 
             transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * followSpeed);
 
-            // 砲塔を見る方向
-            Vector3 lookPos = target.position + Vector3.up * 0.5f; // 砲塔の中心を少し上に
-            Quaternion targetRotation = Quaternion.LookRotation(lookPos - transform.position);
+            Vector3 lookAtPos = turret != null ? turret.position + Vector3.up * 0.5f : target.position + Vector3.up * 0.5f;
+
+            Quaternion targetRotation = Quaternion.LookRotation(lookAtPos - transform.position);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotateSpeed);
+        }
+
+        private Transform FindTurretRecursive(Transform parent)
+        {
+            foreach (Transform child in parent)
+            {
+                string lowerName = child.name.ToLower();
+                if (lowerName.Contains("turret") || lowerName.Contains("barrel"))
+                    return child;
+
+                Transform found = FindTurretRecursive(child);
+                if (found != null)
+                    return found;
+            }
+            return null;
         }
     }
 }
