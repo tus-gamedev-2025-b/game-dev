@@ -9,11 +9,13 @@ namespace Tanks.Complete
     /// Smoothly interpolates camera position and rotation, prioritizing turret tracking when available.
     /// </summary>
     public class TPSCameraControl : MonoBehaviour
+    {
         [Header("追従対象（砲塔 or 車体）")]
         public Transform target;
 
         [Header("オフセット設定")]
         public Vector3 posOffset = new Vector3(2f, 4f, -6f); // TPS用：斜め後ろ
+        public Vector3 rotOffset = Vector3.zero; //
 
         [SerializeField] private float followSpeed = 5f;
         [SerializeField] private float rotateSpeed = 5f;
