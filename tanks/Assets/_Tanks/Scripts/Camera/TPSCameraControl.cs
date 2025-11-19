@@ -17,7 +17,6 @@ namespace Tanks.Complete
 
         [SerializeField] private float followSpeed = 5f;
         [SerializeField] private float rotateSpeed = 5f;
-        private bool initialAdjusted = false;
 
         private void Start()
         {
