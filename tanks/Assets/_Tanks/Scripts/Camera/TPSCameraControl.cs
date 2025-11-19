@@ -2,8 +2,13 @@ using UnityEngine;
 
 namespace Tanks.Complete
 {
+    /// <summary>
+    /// Controls the third-person shooter (TPS) camera for the tank game.
+    /// Follows and rotates around a target (turret or hull), applying position and rotation offsets.
+    /// Handles special cases for different tank variants (e.g., Medium Variant with reversed orientation).
+    /// Smoothly interpolates camera position and rotation, prioritizing turret tracking when available.
+    /// </summary>
     public class TPSCameraControl : MonoBehaviour
-    {
         [Header("追従対象（砲塔 or 車体）")]
         public Transform target;
 
