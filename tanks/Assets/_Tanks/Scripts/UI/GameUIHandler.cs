@@ -208,7 +208,8 @@ namespace Tanks.Complete
                         TankColor = slot.m_SlotColor,
                         IsComputer = slot.IsComputer,
                         ControlIndex = slot.PlayerControlling,
-                        UsedPrefab = slot.TankPrefab
+                        UsedPrefab = slot.TankPrefab,
+                        IsLocalPlayer = !slot.IsComputer && slot.PlayerControlling == 1 // Assume Player 1 is local
                     });
                 }
             }

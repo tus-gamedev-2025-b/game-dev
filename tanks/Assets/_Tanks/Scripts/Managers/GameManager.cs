@@ -25,10 +25,11 @@ namespace Tanks.Complete
             Game
         }
 
-        public int m_NumRoundsToWin = 5;      // The number of rounds a single player has to win to win the game.
-        public float m_StartDelay = 3f;       // The delay between the start of RoundStarting and RoundPlaying phases.
-        public float m_EndDelay = 3f;         // The delay between the end of RoundPlaying and RoundEnding phases.
-        public CameraControl m_CameraControl; // Reference to the CameraControl script for control during different phases.
+        public int m_NumRoundsToWin = 5;                              // The number of rounds a single player has to win to win the game.
+        public float m_StartDelay = 3f;                               // The delay between the start of RoundStarting and RoundPlaying phases.
+        public float m_EndDelay = 3f;                                 // The delay between the end of RoundPlaying and RoundEnding phases.
+        public CameraControl m_CameraControl;                         // Reference to the CameraControl script for control during different phases.
+        [SerializeField] private TPSCameraControl m_TPSCameraControl; // Reference to the TPSCameraControl script for third-person camera control.
 
         [Header("Tanks Prefabs")]
         public GameObject m_Tank1Prefab; // The Prefab used by the tank in Slot 1 of the Menu
@@ -46,7 +47,9 @@ namespace Tanks.Complete
         private GameState m_CurrentState;
         private WaitForSeconds m_EndWait; // Used to have a delay whilst the round or game ends.
         private TankManager m_GameWinner; // Reference to the winner of the game.  Used to make an announcement of who won.
-        private int m_PlayerCount;        // The number of players (2 to 4), decided from the number of PlayerData passed by the menu
+
+        private int m_MyControlIndex = -1; // undefined
+        private int m_PlayerCount;         // The number of players (2 to 4), decided from the number of PlayerData passed by the menu
 
         private int m_RoundNumber;          // Which round the game is currently on.
         private TankManager m_RoundWinner;  // Reference to the winner of the current round.  Used to make an announcement of who won.
@@ -133,6 +136,16 @@ namespace Tanks.Complete
                 m_Players[i] = m_SpawnPoints[i];
             }
 
+            // Assume the local player
+            for (var i = 0; i < m_TankData.Length; i++)
+            {
+                if (!m_TankData[i].IsComputer && m_TankData[i].IsLocalPlayer)
+                {
+                    m_MyControlIndex = m_TankData[i].ControlIndex;
+                    break;
+                }
+            }
+
             ChangeGameState(GameState.Game);
         }
 
@@ -173,18 +186,83 @@ namespace Tanks.Complete
 
         private void SetCameraTargets()
         {
-            // Create a collection of transforms the same size as the number of tanks.
-            var targets = new Transform[m_PlayerCount];
+            if (m_TPSCameraControl == null || m_Players == null)
+                return;
 
-            // For each of these transforms...
-            for (var i = 0; i < targets.Length; i++)
+            // Find the local player
+            PlayerData localPlayerData = null;
+            for (var i = 0; i < m_TankData.Length; i++)
             {
-                // ... set it to the appropriate tank transform.
-                targets[i] = m_SpawnPoints[i].m_Instance.transform;
+                if (m_TankData[i].IsLocalPlayer && !m_TankData[i].IsComputer)
+                {
+                    localPlayerData = m_TankData[i];
+                    break;
+                }
             }
 
-            // These are the targets the camera should follow.
-            m_CameraControl.m_Targets = targets;
+            // Find the TankManager corresponding to the local player
+            TankManager myTank = null;
+            for (var i = 0; i < m_Players.Length; i++)
+            {
+                if (m_Players[i] != null && m_Players[i].ControlIndex == m_MyControlIndex)
+                {
+                    myTank = m_Players[i];
+                    break;
+                }
+            }
+
+            if (myTank != null && myTank.m_Instance != null)
+            {
+                var turret = FindTurretRecursive(myTank.m_Instance.transform);
+                if (turret != null)
+                {
+                    m_TPSCameraControl.target = turret;
+                    Debug.Log("GameManager: 自分の戦車の砲塔をターゲットに設定しました。");
+                }
+                else
+                {
+                    m_TPSCameraControl.target = myTank.m_Instance.transform;
+                    Debug.Log("GameManager: 砲塔が見つからなかったため車体を追従します。");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("GameManager: 自分の戦車が見つかりませんでした。");
+            }
+
+            if (myTank.m_Instance.name.Contains("Medium"))
+            {
+                m_TPSCameraControl.posOffset = new Vector3(0f, 4f, -8f);
+            }
+            else if (myTank.m_Instance.name.Contains("ATV"))
+            {
+                m_TPSCameraControl.posOffset = new Vector3(0f, 3f, -7f);
+            }
+            else if (myTank.m_Instance.name.Contains("Shark"))
+            {
+                m_TPSCameraControl.posOffset = new Vector3(0f, 2.5f, -7f); // 高すぎないように調整
+            }
+            else
+            {
+                m_TPSCameraControl.posOffset = new Vector3(0f, 5f, -8f);
+            }
+            m_TPSCameraControl.rotOffset = Vector3.zero;
+        }
+
+        // Recursively search for a child transform that likely represents the turret
+        private Transform FindTurretRecursive(Transform parent)
+        {
+            foreach (Transform child in parent)
+            {
+                var lowerName = child.name.ToLower();
+                if (lowerName.Contains("turret") || lowerName.Contains("barrel"))
+                    return child;
+
+                var found = FindTurretRecursive(child);
+                if (found != null)
+                    return found;
+            }
+            return null;
         }
 
         // This is called from start and will run each phase of the game one after another.
@@ -224,7 +302,7 @@ namespace Tanks.Complete
             DisableTankControl();
 
             // Snap the camera's zoom and position to something appropriate for the reset tanks.
-            m_CameraControl.SetStartPositionAndSize();
+            // m_CameraControl.SetStartPositionAndSize();
 
             // Increment the round number and display text showing the players what round it is.
             m_RoundNumber++;
@@ -394,6 +472,9 @@ namespace Tanks.Complete
         {
             public int ControlIndex;
             public bool IsComputer;
+
+            // Indicates if this player is the local player
+            public bool IsLocalPlayer;
             public Color TankColor;
             public GameObject UsedPrefab;
         }

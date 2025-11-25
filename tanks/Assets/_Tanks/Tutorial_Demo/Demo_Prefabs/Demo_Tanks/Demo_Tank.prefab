@@ -1094,6 +1094,7 @@ MonoBehaviour:
   m_TurretTransform: {fileID: 494770}
   m_TurretHUDTransform: {fileID: 6971753704623199148}
   m_TurretTurnSpeedValue: 90
+  m_InvertTurretRotation: 0
 --- !u!114 &11409376
 MonoBehaviour:
   m_ObjectHideFlags: 0
