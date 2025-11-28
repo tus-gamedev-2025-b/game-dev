@@ -21,6 +21,7 @@ public class HUDManager : MonoBehaviour
         m_GameManager.OnGameLoopStateChanged += HandleGameLoopStateChanged;
         foreach (var tank in m_GameManager.m_SpawnPoints)
         {
+            // 新しいWeaponStockData対応のイベントを購読
             tank.OnWeaponStockChanged += HandleWeaponStockChanged;
         }
     }
@@ -72,15 +73,20 @@ public class HUDManager : MonoBehaviour
         }
     }
 
-    private void HandleWeaponStockChanged(int controlIndex, int stock)
+    /// <summary>
+    ///     WeaponStockDataを使用した武器所持数変化のハンドラ
+    /// </summary>
+    /// <param name="controlIndex">プレイヤーのコントロールインデックス</param>
+    /// <param name="stockData">武器の所持数データ</param>
+    private void HandleWeaponStockChanged(int controlIndex, WeaponStockData stockData)
     {
         switch (controlIndex)
         {
             case 1:
-                m_StockP1.UpdatePlayerStock(stock);
+                m_StockP1.UpdatePlayerStock(stockData);
                 break;
             case 2:
-                m_StockP2.UpdatePlayerStock(stock);
+                m_StockP2.UpdatePlayerStock(stockData);
                 break;
         }
     }

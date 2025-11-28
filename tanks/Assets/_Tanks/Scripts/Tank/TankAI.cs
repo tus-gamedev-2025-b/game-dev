@@ -102,7 +102,7 @@ namespace Tanks.Complete
             var orientTarget = m_CurrentPath.corners[Mathf.Min(m_CurrentCorner, m_CurrentPath.corners.Length - 1)];
 
             //if we are not moving, we orient toward our target instead
-            if (!m_IsMoving)
+            if (!m_IsMoving && m_CurrentTarget != null)
                 orientTarget = m_CurrentTarget.position;
 
             var toOrientTarget = orientTarget - transform.position;
@@ -160,172 +160,188 @@ namespace Tanks.Complete
             if (m_PathfindTimer > m_PathfindTime)
             {
                 // reset the time since last pathfind
-                m_PathfindTimer = 0;
+                m_PathfindTimer = 0.0f;
 
-                // This will store each path toward each tank in the scene
-                var paths = new NavMeshPath[m_AllTanks.Length];
+                // Store which target we had, as we use this to test if we changed target later
+                var previousTarget = m_CurrentTarget;
 
-                // Initialize the shorted path length to the max value a float can have, so no matter what is the length
-                // of the first found path, it will for sure be shortest than this initial value
-                var shortestPath = float.MaxValue;
-                // which of the path in the paths array we use. By default none, which is represented by -1 here.
-                var usedPath = -1;
-                Transform target = null;
-
-                // Calculate a path to every tank and check the closest
-                for (var i = 0; i < m_AllTanks.Length; i++)
+                // Check all tank to find the closest
+                var distance = float.MaxValue;
+                foreach (var tank in m_AllTanks)
                 {
-                    var tank = m_AllTanks[i].gameObject;
+                    // skip that tank if it's null (destroyed)
+                    if (tank == null)
+                        continue;
 
-                    //we don't want the tank to try to target itself, so ignore itself
+                    // skip that tank if it's ourself
                     if (tank == gameObject)
                         continue;
 
-                    // this is a destroyed or deactivated tank, this is not a valid target
-                    if (tank == null || !tank.activeInHierarchy)
+                    // skip that tank if it's been disabled (e.g. dead)
+                    if (!tank.activeSelf)
                         continue;
 
-                    paths[i] = new NavMeshPath();
-
-                    // this return true if a path was found
-                    if (NavMesh.CalculatePath(transform.position, tank.transform.position, ~0, paths[i]))
+                    var tankDistance = Vector3.Distance(tank.transform.position, transform.position);
+                    if (tankDistance < distance)
                     {
-                        // Compute how long the path is...
-                        var length = GetPathLength(paths[i]);
-                        // And if it's the shortest path so far, this is the one we want to go after
-                        if (shortestPath > length)
+                        distance = tankDistance;
+                        m_CurrentTarget = tank.transform;
+                    }
+                }
+
+                // If we haven't found any tank, we stop searching
+                if (m_CurrentTarget == null)
+                    return;
+
+                // Create a navmesh path for our current path if it doesn't exist yet
+                if (m_CurrentPath == null)
+                {
+                    m_CurrentPath = new NavMeshPath();
+                }
+
+                // if the target changed (e.g. another tank is now closer to us) OR the current path is empty (there was
+                // no path or we reached the end of our path) we need to calculate a new path
+                if (previousTarget != m_CurrentTarget || m_CurrentPath.corners.Length == 0)
+                {
+                    // Compute a path toward that target
+                    NavMesh.CalculatePath(transform.position, m_CurrentTarget.position, NavMesh.AllAreas, m_CurrentPath);
+
+                    // We start at corners 1, as corners 0 is the starting point (i.e. where we are currently)
+                    m_CurrentCorner = 1;
+
+                    // If we changed target, we reset how long we were close and how long the target haven't moved
+                    m_TimeCloseToTarget = 0.0f;
+                    m_TimeSinceLastTargetMove = 0.0f;
+                }
+                else
+                {
+                    // Compute how much the target moved since last pathfind
+                    var distMoved = Vector3.Distance(m_CurrentTarget.position, m_LastTargetPosition);
+
+                    // if the target moved at least a bit we check if we need a new path. As our corner 0 is the start position
+                    // and our current corners is always the corner of the path where we are going toward, we need at least
+                    // 2 corners (start and target) for that test to be valid.
+                    if (distMoved > 0.01f && m_CurrentPath.corners.Length >= 2)
+                    {
+                        // We calculate a new path only if the difference of position of the target is closer to our current target
+                        // than us.
+                        // In simple term : we don't care if the target move in a direction that doesn't impact us reaching the last
+                        // target point, as the target will still need to get through us anyway. However, if it get closer to
+                        // our target point than us, we may miss them as they are "cutting" in front of us.
+                        var distToTargetFromLastPath =
+                            Vector3.Distance(m_CurrentTarget.position, m_CurrentPath.corners.Last());
+                        var distToTargetFromUs = Vector3.Distance(m_CurrentPath.corners.Last(), transform.position);
+
+                        if (distToTargetFromLastPath < distToTargetFromUs)
                         {
-                            // so this path become the used path
-                            usedPath = i;
-                            //and its length is now the shortest length to beat
-                            shortestPath = length;
-                            target = tank.transform;
+                            // Same as above, compute a path toward our target
+                            NavMesh.CalculatePath(transform.position, m_CurrentTarget.position, NavMesh.AllAreas,
+                                m_CurrentPath);
+                            m_CurrentCorner = 1;
                         }
                     }
                 }
 
-                // usedPath will still be -1 if the tank could not find a path to any tank, otherwise we have a target
-                if (usedPath != -1)
-                {
-                    // we switched target. The last tank we were seeking got farther away than another tank, this new
-                    // tank become our new target, and we reset the last position as this is now a new target
-                    if (target != m_CurrentTarget)
-                    {
-                        m_CurrentTarget = target;
-                        m_LastTargetPosition = m_CurrentTarget.position;
-                    }
-
-                    m_CurrentTarget = target;
-                    m_CurrentPath = paths[usedPath];
-                    m_CurrentCorner = 1;
-                    m_IsMoving = true;
-                }
-
-
+                // Tank is moving by default, as soon as it start charging (in next section of this function) it will switch
+                // to not moving.
+                m_IsMoving = true;
             }
-            // The pathfinding is now either finished or wasn't triggered this frame as it was done recently enough
-            // The SeekUpdate now seek and try to shot at the target it has
 
-            // This tank have a target...
-            if (m_CurrentTarget != null)
+            // if our current target got destroyed (or was otherwise set to null), just exit the function.
+            if (m_CurrentTarget == null)
+                return;
+
+            // Track how long the target hasn't moved. If it hasn't moved for a while, it mean it's probably charging a shot
+            // facing us, and we don't want to just stand still waiting to take its shot
+            if (Vector3.Distance(m_CurrentTarget.position, m_LastTargetPosition) > 0.1f)
             {
-                // check how far our target moved since last update
-                var targetMovement = Vector3.Distance(m_CurrentTarget.position, m_LastTargetPosition);
+                m_TimeSinceLastTargetMove = 0.0f;
+            }
+            else
+            {
+                m_TimeSinceLastTargetMove += Time.deltaTime;
+            }
 
-                //the target didn't (or barely) moved...
-                if (targetMovement < 0.001f)
+            m_LastTargetPosition = m_CurrentTarget.position;
+
+            // Get a vector from this tank to its target
+            var toTarget = m_CurrentTarget.position - transform.position;
+            // by setting y to 0, we ensure that the vector to the target is in the flat plane of the ground
+            toTarget.y = 0;
+
+            var targetDistance = toTarget.magnitude;
+            // normalize the vector to the target, setting its length to 1, which is useful for some mathematical operations.
+            toTarget.Normalize();
+
+            if (targetDistance < 3.0f)
+            {
+                // Count how long we've been very close to the target
+                m_TimeCloseToTarget += Time.deltaTime;
+
+                // ... if we stay close to the target more than 2s, we're probably running in circle around it, so
+                // flee instead to try to get more space to aim at it
+                if (m_TimeCloseToTarget > 2.0f)
                 {
-                    // so we increment the timer. This is used later, if a target we're shooting at haven't moved in 2s, we flee
-                    m_TimeSinceLastTargetMove += Time.deltaTime;
+                    StartFleeing();
+                    return;
                 }
-                else
+            }
+            else
+            {
+                m_TimeCloseToTarget = 0.0f;
+            }
+
+            // the dot product between 2 normalized vector is the cosine of the angle between those vector. This is useful as it
+            // allow to test how aligned those vector are : 1 -> in the same direction, 0 -> 90 deg angle, -1, pointing in opposite direction.
+            // As we compute the dot product between our forward vector and the vector toward our target, this give use how much we are
+            // facing our target : if this is close to 1, we are facing straight at our target.
+            var dotToTarget = Vector3.Dot(toTarget, transform.forward);
+
+            //if we are charging, check if the current shot can reach the target
+            if (m_Shooting.IsCharging)
+            {
+                // get the estimated point of the projectile with the current charging value
+                var currentShotTarget = m_Shooting.GetProjectilePosition(m_Shooting.CurrentChargeRatio);
+                // the distance from us to that estimated point
+                var currentShotDistance = Vector3.Distance(currentShotTarget, transform.position);
+
+                //if we are facing the target and our shot is charged enough to reach the target, release the shot
+                // note : we remove 2 from the target distance as our shot have splash damage, so we can release the
+                // shot earlier
+                if (currentShotDistance >= targetDistance - 2 && dotToTarget > 0.99f)
                 {
-                    //the target did move since last time, so we reset the timer since last move to 0.
-                    m_TimeSinceLastTargetMove = 0;
-                }
+                    m_IsMoving = false;
+                    m_Shooting.StopCharging();
 
-                // the current position become the last position that will be used next frame to test if the target moved
-                m_LastTargetPosition = m_CurrentTarget.position;
+                    // we just shot, so we set the cooldown to the time between shot (this is decremented each frame in the update function)
+                    m_ShotCooldown = m_TimeBetweenShot;
 
-                // Get a vector from this tank to its target
-                var toTarget = m_CurrentTarget.position - transform.position;
-                // by setting y to 0, we ensure that the vector to the target is in the flat plane of the ground
-                toTarget.y = 0;
-
-                var targetDistance = toTarget.magnitude;
-                // normalize the vector to the target, setting its length to 1, which is useful for some mathematical operations.
-                toTarget.Normalize();
-
-                if (targetDistance < 3.0f)
-                {
-                    // Count how long we've been very close to the target
-                    m_TimeCloseToTarget += Time.deltaTime;
-
-                    // ... if we stay close to the target more than 2s, we're probably running in circle around it, so
-                    // flee instead to try to get more space to aim at it
-                    if (m_TimeCloseToTarget > 2.0f)
+                    // We just shot, and our target haven't moved for a while. Which mean they are probably also aiming and shooting at us
+                    // we go into fleeing mode instead of staying there as a static target
+                    if (m_TimeSinceLastTargetMove > 2.0f)
                     {
                         StartFleeing();
-                        return;
                     }
                 }
-                else
+            }
+            else
+            {
+                // We aren't charging yet, so check if the target is closer than our max shooting distance, which mean we can start charging the shot
+                // (a "smarter" solution would be to compute how early we can charge so we reach max distance already max charged)
+                if (targetDistance < m_MaxShootingDistance)
                 {
-                    m_TimeCloseToTarget = 0.0f;
-                }
-
-                // the dot product between 2 normalized vector is the cosine of the angle between those vector. This is useful as it
-                // allow to test how aligned those vector are : 1 -> in the same direction, 0 -> 90 deg angle, -1, pointing in opposite direction.
-                // As we compute the dot product between our forward vector and the vector toward our target, this give use how much we are
-                // facing our target : if this is close to 1, we are facing straight at our target.
-                var dotToTarget = Vector3.Dot(toTarget, transform.forward);
-
-                //if we are charging, check if the current shot can reach the target
-                if (m_Shooting.IsCharging)
-                {
-                    // get the estimated point of the projectile with the current charging value
-                    var currentShotTarget = m_Shooting.GetProjectilePosition(m_Shooting.CurrentChargeRatio);
-                    // the distance from us to that estimated point
-                    var currentShotDistance = Vector3.Distance(currentShotTarget, transform.position);
-
-                    //if we are facing the target and our shot is charged enough to reach the target, release the shot
-                    // note : we remove 2 from the target distance as our shot have splash damage, so we can release the
-                    // shot earlier
-                    if (currentShotDistance >= targetDistance - 2 && dotToTarget > 0.99f)
+                    // This use the navmesh to check if there are any obstacle between us and the target. If this return false
+                    // this mean there is no unobstructed path, so there *is* an obstacle, so we shouldn't start shooting yet
+                    if (!NavMesh.Raycast(transform.position, m_CurrentTarget.position, out var hit, ~0))
                     {
+                        // we stop moving as we can reach our target with our shot
                         m_IsMoving = false;
-                        m_Shooting.StopCharging();
 
-                        // we just shot, so we set the cooldown to the time between shot (this is decremented each frame in the update function)
-                        m_ShotCooldown = m_TimeBetweenShot;
-
-                        // We just shot, and our target haven't moved for a while. Which mean they are probably also aiming and shooting at us
-                        // we go into fleeing mode instead of staying there as a static target
-                        if (m_TimeSinceLastTargetMove > 2.0f)
+                        // if our cooldown is not 0 or below, we have to wait for it to be before shooting.
+                        // If it is below 0, and we have shells (using WeaponStockData), we start charging the shot
+                        if (m_ShotCooldown <= 0.0f && m_Shooting.CurrentShells > 0)
                         {
-                            StartFleeing();
-                        }
-                    }
-                }
-                else
-                {
-                    // We aren't charging yet, so check if the target is closer than our max shooting distance, which mean we can start charging the shot
-                    // (a "smarter" solution would be to compute how early we can charge so we reach max distance already max charged)
-                    if (targetDistance < m_MaxShootingDistance)
-                    {
-                        // This use the navmesh to check if there are any obstacle between us and the target. If this return false
-                        // this mean there is no unobstructed path, so there *is* an obstacle, so we shouldn't start shooting yet
-                        if (!NavMesh.Raycast(transform.position, m_CurrentTarget.position, out var hit, ~0))
-                        {
-                            // we stop moving as we can reach our target with our shot
-                            m_IsMoving = false;
-
-                            // if our cooldown is not 0 or below, we have to wait for it to be before shooting.
-                            // If it is below 0, and we have shells, we start charging the shot
-                            if (m_ShotCooldown <= 0.0f && m_Shooting.CurrentShells > 0)
-                            {
-                                m_Shooting.StartCharging();
-                            }
+                            m_Shooting.StartCharging();
                         }
                     }
                 }
@@ -361,6 +377,10 @@ namespace Tanks.Complete
         private void StartFleeing()
         {
             // To flee, we need to pick a point away from our current target
+            // 現在のターゲットがnullの場合は何もしない
+            if (m_CurrentTarget == null)
+                return;
+
             m_FleeingLastPosition = transform.position;
             m_SinceLastFleeingMove = 0.0f;
 

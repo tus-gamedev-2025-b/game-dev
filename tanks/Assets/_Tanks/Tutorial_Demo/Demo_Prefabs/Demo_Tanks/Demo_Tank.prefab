@@ -1139,9 +1139,17 @@ MonoBehaviour:
   m_MaxDamage: 100
   m_ExplosionForce: 50
   m_ExplosionRadius: 5
-  m_StartingShells: 10
-  m_MaxShells: 50
-  m_ShellsPerCartridge: 10
+  m_ShellStockData:
+    m_WeaponName: Shell
+    m_InitialQuantity: 3
+    m_MaxCapacity: 5
+    m_ReplenishQuantity: 10
+  m_MineStockData:
+    m_WeaponName: Mine
+    m_InitialQuantity: 3
+    m_MaxCapacity: 3
+    m_ReplenishQuantity: 1
+  m_Mine: {fileID: 192454, guid: 65c27cbc80afa46baa8fa20b82148bbf, type: 3}
   m_InputUser: {fileID: 0}
 --- !u!114 &8577645068931744711
 MonoBehaviour:
@@ -1168,10 +1176,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b7e906fbbe860e439728e49fcd13b14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tanks.Complete.TankWormholeState
-  m_TeleportDuration: 1.5
+  m_EnterDuration: 1
+  m_ExitDuration: 1
   m_BlinkFrequency: 5
-  m_GradualMovement: 1
-  m_MovementSpeed: 10
+  m_TeleportCooldown: 1
 --- !u!1 &173936
 GameObject:
   m_ObjectHideFlags: 0

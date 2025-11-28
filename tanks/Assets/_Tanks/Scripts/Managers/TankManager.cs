@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem.Users;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -12,6 +14,9 @@ namespace Tanks.Complete
     [Serializable]
     public class TankManager
     {
+
+        // 地雷設置時の強制停止時間（秒）
+        private const float MINE_PLACE_FREEZE_TIME = 1f;
         // This class is to manage various settings on a tank.
         // It works with the GameManager class to control how the tanks behave
         // and whether or not players have control of their tank in the
@@ -27,7 +32,10 @@ namespace Tanks.Complete
 
         private TankAI m_AI;                   // The Tank AI script that let a tank be a bot controlled by the computer
         private GameObject m_CanvasGameObject; // Used to disable the world space UI during the Starting and Ending phases of each round.
-        private InputUser m_InputUser;         // The Input user link to that tank. Input user identify a single player in the Input system
+
+        // コルーチン実行用のMonoBehaviourの参照（GameManagerから取得）
+        private MonoBehaviour m_CoroutineRunner;
+        private InputUser m_InputUser; // The Input user link to that tank. Input user identify a single player in the Input system
 
 
         private TankMovement m_Movement; // Reference to tank's movement script, used to disable and enable control.
@@ -35,11 +43,18 @@ namespace Tanks.Complete
 
         public int ControlIndex { get; set; } = 1; //this defines the index of the control 1 = left keyboard or pad, 2 = right keyboard, -1 = no control
         public int ShellStock => m_Shooting.CurrentShells;
-        public int MaxShellStock => m_Shooting.m_MaxShells;
+        public int MaxShellStock => m_Shooting.MaxShells;
+        public int MineStock => m_Shooting.CurrentMines;
+        public int MaxMineStock => m_Shooting.MaxMines;
 
         // Event to notify when the weapon stock changes for that tank
+        // Parameters: (int controlIndex, WeaponStockData stockData)
+        public event Action<int, WeaponStockData> OnWeaponStockChanged;
+
+        // 後方互換性のため既存のイベントも維持
         // Parameters: (int controlIndex, int newStock)
-        public event Action<int, int> OnWeaponStockChanged;
+        [Obsolete("Use OnWeaponStockChanged with WeaponStockData instead")]
+        public event Action<int, int> OnShellStockChanged;
 
         public void Setup(GameManager manager)
         {
@@ -48,6 +63,9 @@ namespace Tanks.Complete
             m_Shooting = m_Instance.GetComponent<TankShooting>();
             m_AI = m_Instance.GetComponent<TankAI>();
             m_CanvasGameObject = m_Instance.GetComponentInChildren<Canvas>().gameObject;
+
+            // コルーチン実行用のMonoBehaviourを取得
+            m_CoroutineRunner = manager;
 
             // Assign the Input User of that Tank to the script controlling input system binding, so the move/fire actions
             // get only triggered by the right input for that users (e.g. arrow doesn't trigger move if that input user use WASD)
@@ -71,7 +89,11 @@ namespace Tanks.Complete
             }
 
             // Subscribe to the shooting stock change event to relay it to external listeners
-            m_Shooting.OnShellStockChanges += stock => OnWeaponStockChanged?.Invoke(ControlIndex, stock);
+            m_Shooting.OnWeaponStockChanged += HandleWeaponStockChanged;
+            m_Shooting.OnShellStockChanges += stock => OnShellStockChanged?.Invoke(ControlIndex, stock);
+
+            // 地雷設置イベントを購読
+            m_Shooting.OnMinePlaced += HandleMinePlaced;
 
             // Create a string using the correct color that says 'PLAYER 1' etc based on the tank's color and the player's number.
             m_ColoredPlayerText = "<color=#" + ColorUtility.ToHtmlStringRGB(m_PlayerColor) + ">PLAYER " + m_PlayerNumber + "</color>";
@@ -95,13 +117,73 @@ namespace Tanks.Complete
             }
         }
 
+        /// <summary>
+        ///     武器の所持数変化を受け取ってイベントを発生させる
+        /// </summary>
+        private void HandleWeaponStockChanged(WeaponStockData stockData)
+        {
+            OnWeaponStockChanged?.Invoke(ControlIndex, stockData);
+        }
+
+        /// <summary>
+        ///     地雷設置イベントを受け取って処理を開始
+        /// </summary>
+        private void HandleMinePlaced()
+        {
+            if (m_CoroutineRunner != null)
+            {
+                m_CoroutineRunner.StartCoroutine(PlaceMineRoutine());
+            }
+        }
+
+        /// <summary>
+        ///     地雷設置のコルーチン
+        ///     地雷を設置し、一定時間操作を停止する
+        /// </summary>
+        private IEnumerator PlaceMineRoutine()
+        {
+            // 操作を無効化
+            DisableControl();
+
+            // 地雷を設置（戦車の位置に地雷を生成）
+            var minePrefab = m_Shooting.GetMinePrefab();
+            if (minePrefab != null)
+            {
+                // 戦車の後方に地雷を設置（戦車の位置から少し後ろ）
+                var tankTransform = m_Instance.transform;
+                var minePosition = tankTransform.position - tankTransform.forward * 1.5f;
+                minePosition.y = 0.1f; // 地面に近い位置に配置
+
+                var mineInstance = Object.Instantiate(minePrefab, minePosition, Quaternion.identity);
+
+                // 地雷の爆発設定と設置者を設定
+                var explosion = mineInstance.GetComponent<ShellExplosion>();
+                if (explosion != null)
+                {
+                    explosion.m_ExplosionRadius = 5f;
+                    explosion.m_MaxDamage = 80f;
+                    explosion.m_ExplosionForce = 40f;
+                    explosion.m_MaxLifeTime = 30f; // 地雷は30秒後に自動消滅
+
+                    // 設置したタンクを登録（自分では爆発しないようにする）
+                    explosion.SetPlacer(m_Instance);
+                }
+            }
+
+            // 一定時間待機
+            yield return new WaitForSeconds(MINE_PLACE_FREEZE_TIME);
+
+            // 操作を再有効化
+            EnableControl();
+        }
+
 
         // Used during the phases of the game where the player shouldn't be able to control their tank.
         public void DisableControl()
         {
             m_Movement.enabled = false;
             m_Shooting.enabled = false;
-            if (m_ComputerControlled)
+            if (m_ComputerControlled && m_AI != null)
                 m_AI.enabled = false;
 
             m_CanvasGameObject.SetActive(false);
@@ -113,7 +195,7 @@ namespace Tanks.Complete
         {
             m_Movement.enabled = true;
             m_Shooting.enabled = true;
-            if (m_ComputerControlled)
+            if (m_ComputerControlled && m_AI != null)
                 m_AI.enabled = true;
 
             m_CanvasGameObject.SetActive(true);
@@ -128,6 +210,13 @@ namespace Tanks.Complete
 
             m_Instance.SetActive(false);
             m_Instance.SetActive(true);
+
+            // ラウンド開始時に武器の所持数を初期化
+            if (m_Shooting != null)
+            {
+                m_Shooting.ResetWeaponStockInitialization();
+                m_Shooting.InitializeWeaponStock();
+            }
         }
     }
 
