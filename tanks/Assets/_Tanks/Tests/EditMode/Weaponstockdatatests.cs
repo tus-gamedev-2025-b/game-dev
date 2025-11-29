@@ -56,7 +56,7 @@ public class WeaponStockDataTests
     public void InitializeQuantity_CalledMultipleTimes_ResetsToInitial()
     {
         // Arrange
-        var stockData = CreateTestStockData(10);
+        var stockData = CreateTestStockData();
         stockData.InitializeQuantity();
         stockData.Use();
         stockData.Use();
@@ -72,7 +72,7 @@ public class WeaponStockDataTests
     public void Use_DecrementsCurrentQuantity()
     {
         // Arrange
-        var stockData = CreateTestStockData(10);
+        var stockData = CreateTestStockData();
         stockData.InitializeQuantity();
 
         // Act
@@ -149,7 +149,7 @@ public class WeaponStockDataTests
     public void Replenish_IncreasesCurrentQuantity()
     {
         // Arrange
-        var stockData = CreateTestStockData(5, 50, 10);
+        var stockData = CreateTestStockData(5);
         stockData.InitializeQuantity();
 
         // Act
@@ -163,7 +163,7 @@ public class WeaponStockDataTests
     public void Replenish_DoesNotExceedMaxCapacity()
     {
         // Arrange
-        var stockData = CreateTestStockData(45, 50, 10);
+        var stockData = CreateTestStockData(45);
         stockData.InitializeQuantity();
 
         // Act
@@ -177,7 +177,7 @@ public class WeaponStockDataTests
     public void Replenish_AtMaxCapacity_StaysAtMax()
     {
         // Arrange
-        var stockData = CreateTestStockData(50, 50, 10);
+        var stockData = CreateTestStockData(50);
         stockData.InitializeQuantity();
 
         // Act
@@ -191,7 +191,7 @@ public class WeaponStockDataTests
     public void Replenish_WithAmount_IncreasesCorrectly()
     {
         // Arrange
-        var stockData = CreateTestStockData(5, 50);
+        var stockData = CreateTestStockData(5);
         stockData.InitializeQuantity();
 
         // Act
@@ -205,7 +205,7 @@ public class WeaponStockDataTests
     public void Replenish_WithAmount_DoesNotExceedMax()
     {
         // Arrange
-        var stockData = CreateTestStockData(48, 50);
+        var stockData = CreateTestStockData(48);
         stockData.InitializeQuantity();
 
         // Act
