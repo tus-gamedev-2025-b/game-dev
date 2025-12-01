@@ -1146,7 +1146,7 @@ MonoBehaviour:
     m_ReplenishQuantity: 10
   m_MineStockData:
     m_WeaponName: Mine
-    m_InitialQuantity: 3
+    m_InitialQuantity: 0
     m_MaxCapacity: 3
     m_ReplenishQuantity: 1
   m_Mine: {fileID: 192454, guid: 65c27cbc80afa46baa8fa20b82148bbf, type: 3}
