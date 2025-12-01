@@ -7141,9 +7141,17 @@ MonoBehaviour:
   m_MaxDamage: 100
   m_ExplosionForce: 25
   m_ExplosionRadius: 5
-  m_StartingShells: 10
-  m_MaxShells: 50
-  m_ShellsPerCartridge: 10
+  m_ShellStockData:
+    m_WeaponName: Shell
+    m_InitialQuantity: 10
+    m_MaxCapacity: 50
+    m_ReplenishQuantity: 10
+  m_MineStockData:
+    m_WeaponName: Mine
+    m_InitialQuantity: 0
+    m_MaxCapacity: 3
+    m_ReplenishQuantity: 1
+  m_Mine: {fileID: 192454, guid: 65c27cbc80afa46baa8fa20b82148bbf, type: 3}
   m_InputUser: {fileID: 0}
 --- !u!114 &5018214526599854904
 MonoBehaviour:
