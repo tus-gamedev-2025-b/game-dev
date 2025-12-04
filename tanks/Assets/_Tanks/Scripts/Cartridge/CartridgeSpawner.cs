@@ -5,10 +5,14 @@ using Random = UnityEngine.Random;
 
 public class CartridgeSpawner : MonoBehaviour
 {
-    [Tooltip("Prefab for the shell cartridge to spawn")]
-    public GameObject m_ShellCartridge;
-    [Tooltip("Interval in seconds between spawns")]
-    public float m_SpawnInterval = 10f;
+    [Header("Cartridge Data")]
+    [Tooltip("砲弾カートリッジのデータ")]
+    [SerializeField] private CartridgeData m_ShellCartridgeData;
+
+    [Tooltip("地雷カートリッジのデータ")]
+    [SerializeField] private CartridgeData m_MineCartridgeData;
+
+    [Header("Spawn Settings")]
     [Tooltip("Area in which to spawn cartridges (x,z)")]
     public Vector2 m_SpawnArea = new Vector2(70f, 70f);
     [Tooltip("The height at which to spawn the cartridges")]
@@ -16,8 +20,9 @@ public class CartridgeSpawner : MonoBehaviour
 
     public GameManager m_GameManager;
     private Transform m_CartridgeGroup;
+    private Coroutine m_MineSpawnRoutine;
 
-    private Coroutine m_SpawnRoutine;
+    private Coroutine m_ShellSpawnRoutine;
 
     private void Start()
     {
@@ -33,15 +38,22 @@ public class CartridgeSpawner : MonoBehaviour
         m_GameManager.OnGameLoopStateChanged -= HandleGameLoopStateChanged;
     }
 
-    private void SpawnCartridge()
+    /// <summary>
+    ///     指定されたカートリッジデータを使用してカートリッジを生成
+    /// </summary>
+    /// <param name="cartridgeData">生成するカートリッジのデータ</param>
+    private void SpawnCartridge(CartridgeData cartridgeData)
     {
+        if (cartridgeData == null || cartridgeData.cartridgePrefab == null)
+            return;
+
         var position = new Vector3(
             Random.Range(-m_SpawnArea.x / 2, m_SpawnArea.x / 2),
             m_SpawnHeight,
             Random.Range(-m_SpawnArea.y / 2, m_SpawnArea.y / 2)
         );
         var rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
-        Instantiate(m_ShellCartridge, position, rotation, m_CartridgeGroup);
+        Instantiate(cartridgeData.cartridgePrefab, position, rotation, m_CartridgeGroup);
     }
 
     private void WipeAllCartridges()
@@ -54,12 +66,19 @@ public class CartridgeSpawner : MonoBehaviour
         }
     }
 
-    private IEnumerator SpawnRoutine()
+    /// <summary>
+    ///     指定されたカートリッジデータを使用して定期的にカートリッジを生成するコルーチン
+    /// </summary>
+    /// <param name="cartridgeData">生成するカートリッジのデータ</param>
+    private IEnumerator SpawnRoutine(CartridgeData cartridgeData)
     {
-        var wait = new WaitForSeconds(m_SpawnInterval);
+        if (cartridgeData == null)
+            yield break;
+
+        var wait = new WaitForSeconds(cartridgeData.spawnInterval);
         while (true)
         {
-            SpawnCartridge();
+            SpawnCartridge(cartridgeData);
             yield return wait;
         }
         // ReSharper disable once IteratorNeverReturns
@@ -71,15 +90,34 @@ public class CartridgeSpawner : MonoBehaviour
         switch (state)
         {
             case GameManager.GameLoopState.RoundPlaying:
-                m_SpawnRoutine ??= StartCoroutine(SpawnRoutine());
+                // 砲弾カートリッジの生成開始
+                if (m_ShellCartridgeData != null && m_ShellCartridgeData.cartridgePrefab != null)
+                {
+                    m_ShellSpawnRoutine ??= StartCoroutine(SpawnRoutine(m_ShellCartridgeData));
+                }
+
+                // 地雷カートリッジの生成開始
+                if (m_MineCartridgeData != null && m_MineCartridgeData.cartridgePrefab != null)
+                {
+                    m_MineSpawnRoutine ??= StartCoroutine(SpawnRoutine(m_MineCartridgeData));
+                }
                 break;
 
             case GameManager.GameLoopState.RoundEnding:
-                if (m_SpawnRoutine != null)
+                // 砲弾カートリッジの生成停止
+                if (m_ShellSpawnRoutine != null)
                 {
-                    StopCoroutine(m_SpawnRoutine);
-                    m_SpawnRoutine = null;
+                    StopCoroutine(m_ShellSpawnRoutine);
+                    m_ShellSpawnRoutine = null;
                 }
+
+                // 地雷カートリッジの生成停止
+                if (m_MineSpawnRoutine != null)
+                {
+                    StopCoroutine(m_MineSpawnRoutine);
+                    m_MineSpawnRoutine = null;
+                }
+
                 WipeAllCartridges();
                 break;
         }

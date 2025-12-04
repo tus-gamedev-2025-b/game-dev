@@ -30,12 +30,16 @@ namespace Tanks.Complete
             "The radius of the explosion in Unity unit. Force decrease with distance to the center, and an tank further than this from the shell explosion won't be impacted by the explosion")]
         public float m_ExplosionRadius = 5f; // The maximum distance away from the explosion tanks can be and are still affected.
 
-        [Tooltip("The number of shells the tank starts with")]
-        public int m_StartingShells = 10;
-        [Tooltip("The maximum number of shells the tank can carry")]
-        public int m_MaxShells = 50;
-        [Tooltip("The number of shells added when a shell cartridge power-up is collected")]
-        public int m_ShellsPerCartridge = 10;
+        [Header("Weapon Stock Data")]
+        [Tooltip("砲弾の所持数管理データ")]
+        [SerializeField] private WeaponStockData m_ShellStockData;
+
+        [Header("Mine Settings")]
+        [Tooltip("地雷の所持数管理データ")]
+        [SerializeField] private WeaponStockData m_MineStockData;
+
+        [Tooltip("地雷のプレハブ")]
+        [SerializeField] private GameObject m_Mine;
 
         [HideInInspector]
         public TankInputUser m_InputUser;   // The Input User component for that tanks. Contains the Input Actions.
@@ -44,29 +48,40 @@ namespace Tanks.Complete
         private float m_ChargeSpeed;        // How fast the launch force increases, based on the max charge time.
         private float m_CurrentLaunchForce; // The force that will be given to the shell when the fire button is released.
 
-        // The current number of shells the tank has
-        private int m_CurrentShells;
-
         private string m_FireButton;    // The input axis that is used for launching shells.
         private bool m_Fired;           // Whether or not the shell has been launched with this button press.
         private bool m_HasSpecialShell; // has the tank a shell that makes extra damage?
         private bool m_IsChargingForward;
+        private string m_SetMineButton;         // The input axis that is used for setting mines.
         private float m_ShotCooldownTimer;      // The timer counting down before a shot is allowed again
         private float m_SpecialShellMultiplier; // The amount that the special shell will multiply the damage.
 
+        // 武器の初期化済みフラグ（ラウンド開始時のみ初期化するため）
+        private bool m_WeaponStockInitialized;
+
         // Wormhole state component for checking teleportation
         private TankWormholeState m_WormholeState;
-        public int CurrentShells
-        {
-            get => m_CurrentShells;
-            private set
-            {
-                if (value < 0 || value > m_MaxShells || value == m_CurrentShells)
-                    return;
-                m_CurrentShells = value;
-                OnShellStockChanges?.Invoke(m_CurrentShells);
-            }
-        }
+        private InputAction setMineAction; // The Input Action for setting mines
+
+        /// <summary>
+        ///     砲弾の現在所持数
+        /// </summary>
+        public int CurrentShells => m_ShellStockData?.CurrentQuantity ?? 0;
+
+        /// <summary>
+        ///     砲弾の最大所持数
+        /// </summary>
+        public int MaxShells => m_ShellStockData?.MaxCapacity ?? 0;
+
+        /// <summary>
+        ///     地雷の現在所持数
+        /// </summary>
+        public int CurrentMines => m_MineStockData?.CurrentQuantity ?? 0;
+
+        /// <summary>
+        ///     地雷の最大所持数
+        /// </summary>
+        public int MaxMines => m_MineStockData?.MaxCapacity ?? 0;
 
         public float CurrentChargeRatio =>
             (m_CurrentLaunchForce - m_MinLaunchForce) / (m_MaxLaunchForce - m_MinLaunchForce); //The charging amount between 0-1
@@ -89,9 +104,13 @@ namespace Tanks.Complete
         {
             // The fire axis is based on the player number.
             m_FireButton = "Fire";
-            fireAction = m_InputUser.ActionAsset.FindAction(m_FireButton);
+            m_SetMineButton = "SetMine";
 
-            fireAction.Enable();
+            fireAction = m_InputUser.ActionAsset.FindAction(m_FireButton);
+            setMineAction = m_InputUser.ActionAsset.FindAction(m_SetMineButton);
+
+            fireAction?.Enable();
+            setMineAction?.Enable();
 
             // The rate that the launch force charges up is the range of possible forces by the max charge time.
             m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
@@ -116,15 +135,21 @@ namespace Tanks.Complete
             // When the tank is turned on, reset the launch force, the UI and the power ups
             m_CurrentLaunchForce = m_MinLaunchForce;
             m_BaseMinLaunchForce = m_MinLaunchForce;
-            m_AimSlider.value = m_BaseMinLaunchForce;
             m_HasSpecialShell = false;
             m_SpecialShellMultiplier = 1.0f;
             m_IsChargingForward = true;
 
-            m_AimSlider.minValue = m_MinLaunchForce;
-            m_AimSlider.maxValue = m_MaxLaunchForce;
+            // Sliderが設定されている場合のみUI更新
+            if (m_AimSlider != null)
+            {
+                m_AimSlider.value = m_BaseMinLaunchForce;
+                m_AimSlider.minValue = m_MinLaunchForce;
+                m_AimSlider.maxValue = m_MaxLaunchForce;
+            }
 
-            CurrentShells = m_StartingShells;
+            // 武器の初期化は最初の1回のみ（ラウンド開始時）
+            // Reset()が呼ばれた後のOnEnableでのみ初期化する
+            // （TankManager.DisableControl/EnableControlでは初期化しない）
         }
 
         public void OnCollisionEnter(Collision collision)
@@ -135,15 +160,62 @@ namespace Tanks.Complete
                 AddShells();
                 Destroy(collision.gameObject);
             }
+            // 地雷カートリッジに衝突した場合
+            else if (collision.gameObject.CompareTag("MineCartridge"))
+            {
+                AddMines();
+                Destroy(collision.gameObject);
+            }
         }
 
+        /// <summary>
+        ///     武器の所持数が変化したときに発生するイベント
+        ///     Parameters: (WeaponStockData stockData)
+        /// </summary>
+        public event Action<WeaponStockData> OnWeaponStockChanged;
+
+        /// <summary>
+        ///     地雷が設置されたときに発生するイベント
+        /// </summary>
+        public event Action OnMinePlaced;
+
+        // 後方互換性のために残す（既存のHUDManager等への対応）
         public event Action<int> OnShellStockChanges;
+
+        /// <summary>
+        ///     ラウンド開始時に武器の所持数を初期化する
+        ///     TankManager.Reset()から呼ばれることを想定
+        /// </summary>
+        public void InitializeWeaponStock()
+        {
+            m_ShellStockData?.InitializeQuantity();
+            m_MineStockData?.InitializeQuantity();
+            m_WeaponStockInitialized = true;
+
+            // 初期化後に通知
+            NotifyShellStockChange();
+            NotifyMineStockChange();
+        }
+
+        /// <summary>
+        ///     武器が初期化済みでなければ初期化する（後方互換性用）
+        /// </summary>
+        private void EnsureWeaponStockInitialized()
+        {
+            if (!m_WeaponStockInitialized)
+            {
+                InitializeWeaponStock();
+            }
+        }
 
         /// <summary>
         ///     Used by AI to start charging
         /// </summary>
         public void StartCharging()
         {
+            // 武器が初期化されていなければ初期化
+            EnsureWeaponStockInitialized();
+
             // Cannot charge during wormhole teleportation
             if (m_WormholeState != null && !m_WormholeState.CanShoot())
             {
@@ -160,82 +232,69 @@ namespace Tanks.Complete
             m_ShootingAudio.Play();
         }
 
+        /// <summary>
+        ///     Used by AI to stop charging once reached the target
+        /// </summary>
         public void StopCharging()
         {
-            if (IsCharging)
-            {
-                Fire();
-                IsCharging = false;
-            }
+            IsCharging = false;
+            Fire();
         }
 
         private void ComputerUpdate()
         {
-            // The slider should have a default value of the minimum launch force.
-            m_AimSlider.value = m_BaseMinLaunchForce;
+            // 武器が初期化されていなければ初期化
+            EnsureWeaponStockInitialized();
 
-            // If the max force has been exceeded and the shell hasn't yet been launched...
-            if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
+            // the AI control code live in the TankAI script, so here we just make sure we track the launched force and
+            // update the slider if the AI requested us to charge
+            if (IsCharging)
             {
-                // ... use the max force and launch the shell.
-                m_CurrentLaunchForce = m_MaxLaunchForce;
-                Fire();
-            }
-            // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
-            else if (IsCharging && !m_Fired)
-            {
-                // Stop charging if teleporting
-                if (m_WormholeState != null && !m_WormholeState.CanShoot())
-                {
-                    // Reset charge state
-                    m_CurrentLaunchForce = m_MinLaunchForce;
-                    m_ShootingAudio.Stop();
-                    IsCharging = false;
-                    return;
-                }
-
-                // Increment the launch force and update the slider.
-                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime * (m_IsChargingForward ? 1 : -1);
 
                 m_AimSlider.value = m_CurrentLaunchForce;
-            }
-            // Otherwise, if the fire button is released and the shell hasn't been launched yet...
-            else if (fireAction.WasReleasedThisFrame() && !m_Fired)
-            {
-                // ... launch the shell.
-                Fire();
-                IsCharging = false;
+
+                if (m_CurrentLaunchForce > m_MaxLaunchForce)
+                {
+                    //m_IsChargingForward = false;
+                    //StopCharging();
+                }
+
+                if (m_CurrentLaunchForce < m_MinLaunchForce)
+                {
+                    m_IsChargingForward = true;
+                }
             }
         }
 
         private void HumanUpdate()
         {
-            // if there is a cooldown timer, decrement it
-            if (m_ShotCooldownTimer > 0.0f)
+            // 武器が初期化されていなければ初期化
+            EnsureWeaponStockInitialized();
+
+            if (m_ShotCooldownTimer > 0)
             {
                 m_ShotCooldownTimer -= Time.deltaTime;
+                return;
             }
-
-            // The slider should have a default value of the minimum launch force.
-            m_AimSlider.value = m_BaseMinLaunchForce;
 
             // If the max force has been exceeded and the shell hasn't yet been launched...
             if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
             {
-                m_CurrentLaunchForce = m_MaxLaunchForce;
+                // Switch direction when reaching max force
                 m_IsChargingForward = false;
             }
-            // Otherwise, if the min force has been exceeded and the shell hasn't yet been launched...
-            else if (m_CurrentLaunchForce <= m_MinLaunchForce && !m_Fired)
+
+            // If we're below min launch force while charging backwards...
+            if (m_CurrentLaunchForce <= m_MinLaunchForce && !m_IsChargingForward && !m_Fired)
             {
-                m_CurrentLaunchForce = m_MinLaunchForce;
                 m_IsChargingForward = true;
             }
 
             // If the fire button has just started being pressed...
-            if (m_ShotCooldownTimer <= 0 && fireAction.WasPressedThisFrame())
+            if (fireAction != null && fireAction.WasPressedThisFrame())
             {
-                // Cannot charge during wormhole teleportation
+                // Cannot start charging during wormhole teleportation
                 if (m_WormholeState != null && !m_WormholeState.CanShoot())
                 {
                     return;
@@ -251,7 +310,7 @@ namespace Tanks.Complete
                 m_ShootingAudio.Play();
             }
             // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
-            else if (fireAction.IsPressed() && !m_Fired)
+            else if (fireAction != null && fireAction.IsPressed() && !m_Fired)
             {
                 // Stop charging if teleporting
                 if (m_WormholeState != null && !m_WormholeState.CanShoot())
@@ -268,10 +327,16 @@ namespace Tanks.Complete
                 m_AimSlider.value = m_CurrentLaunchForce;
             }
             // Otherwise, if the fire button is released and the shell hasn't been launched yet...
-            else if (fireAction.WasReleasedThisFrame() && !m_Fired)
+            else if (fireAction != null && fireAction.WasReleasedThisFrame() && !m_Fired)
             {
                 // ... launch the shell.
                 Fire();
+            }
+
+            // 地雷設置の入力チェック
+            if (setMineAction != null && setMineAction.WasPressedThisFrame())
+            {
+                PlaceMine();
             }
         }
 
@@ -288,7 +353,7 @@ namespace Tanks.Complete
             }
 
             // Check we have shells to fire
-            if (CurrentShells <= 0)
+            if (m_ShellStockData == null || !m_ShellStockData.CanUse)
             {
                 m_CurrentLaunchForce = m_MinLaunchForce;
                 m_ShotCooldownTimer = m_ShotCooldown;
@@ -341,9 +406,63 @@ namespace Tanks.Complete
             m_IsChargingForward = true;
 
             // Consume a shell
-            CurrentShells = Mathf.Max(0, CurrentShells - 1);
+            m_ShellStockData.Use();
+            NotifyShellStockChange();
         }
 
+        /// <summary>
+        ///     地雷を設置する
+        /// </summary>
+        private void PlaceMine()
+        {
+            // 地雷を持っているかチェック
+            if (m_MineStockData == null || !m_MineStockData.CanUse)
+            {
+                Debug.Log($"Cannot place mine: MineStockData is null={m_MineStockData == null}, CanUse={m_MineStockData?.CanUse}, CurrentMines={CurrentMines}");
+                return;
+            }
+
+            // 地雷プレハブがあるかチェック
+            if (m_Mine == null)
+            {
+                Debug.Log("Cannot place mine: Mine prefab is null");
+                return;
+            }
+
+            // 地雷を消費
+            var used = m_MineStockData.Use();
+            Debug.Log($"Mine placed! Used={used}, Remaining mines: {CurrentMines}");
+
+            NotifyMineStockChange();
+
+            // 地雷設置イベントを発生（TankManagerで地雷のInstantiateと操作停止を行う）
+            OnMinePlaced?.Invoke();
+        }
+
+        /// <summary>
+        ///     地雷のプレハブを取得
+        /// </summary>
+        public GameObject GetMinePrefab()
+        {
+            return m_Mine;
+        }
+
+        /// <summary>
+        ///     砲弾の所持数変化を通知
+        /// </summary>
+        private void NotifyShellStockChange()
+        {
+            OnWeaponStockChanged?.Invoke(m_ShellStockData);
+            OnShellStockChanges?.Invoke(CurrentShells);
+        }
+
+        /// <summary>
+        ///     地雷の所持数変化を通知
+        /// </summary>
+        private void NotifyMineStockChange()
+        {
+            OnWeaponStockChanged?.Invoke(m_MineStockData);
+        }
 
         public void EquipSpecialShell(float damageMultiplier)
         {
@@ -352,7 +471,7 @@ namespace Tanks.Complete
         }
 
         /// <summary>
-        ///     Return the estyimated position the projectile will have with the charging level (between 0 & 1)
+        ///     Return the estimated position the projectile will have with the charging level (between 0 & 1)
         /// </summary>
         /// <param name="chargingLevel">The fire charging level between 0 - 1</param>
         /// <returns>The position at which the projectile will be (ignore obstacle)</returns>
@@ -387,7 +506,24 @@ namespace Tanks.Complete
 
         public void AddShells()
         {
-            CurrentShells = Mathf.Min(CurrentShells + m_ShellsPerCartridge, m_MaxShells);
+            EnsureWeaponStockInitialized();
+            m_ShellStockData?.Replenish();
+            NotifyShellStockChange();
+        }
+
+        public void AddMines()
+        {
+            EnsureWeaponStockInitialized();
+            m_MineStockData?.Replenish();
+            NotifyMineStockChange();
+        }
+
+        /// <summary>
+        ///     武器の初期化フラグをリセットする（ラウンドリセット時に呼ぶ）
+        /// </summary>
+        public void ResetWeaponStockInitialization()
+        {
+            m_WeaponStockInitialized = false;
         }
     }
 }
