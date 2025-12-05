@@ -13,10 +13,26 @@ public class HUDManager : MonoBehaviour
     [Tooltip("Reference to the GameManager")]
     [SerializeField] public GameManager m_GameManager;
 
+    [SerializeField]
+    private Camera player1Camera;
+
     public void Start()
     {
+        // プレイヤー1の戦車プレハブから MinimapCamera を取得
+        var cam = m_GameManager.m_Tank1Prefab.GetComponentInChildren<Camera>(true);
+        player1Camera = cam;
+
         m_StockP1.gameObject.SetActive(false);
         m_StockP2.gameObject.SetActive(false);
+
+        // TankPrefab を配列にまとめる（存在しない場合は null のまま）
+        var tankPrefabs = new[]
+        {
+            m_GameManager.m_Tank1Prefab,
+            m_GameManager.m_Tank2Prefab,
+            m_GameManager.m_Tank3Prefab,
+            m_GameManager.m_Tank4Prefab
+        };
 
         m_GameManager.OnGameLoopStateChanged += HandleGameLoopStateChanged;
         foreach (var tank in m_GameManager.m_SpawnPoints)
@@ -49,27 +65,22 @@ public class HUDManager : MonoBehaviour
     {
         if (state == GameManager.GameLoopState.RoundPlaying)
         {
-            if (DoesP1Exist()) m_StockP1.gameObject.SetActive(true);
-            if (DoesP2Exist()) m_StockP2.gameObject.SetActive(true);
-
-            if (m_GameManager.m_Players == null) return;
-            foreach (var tank in m_GameManager.m_Players)
+            // プレイヤー1の実体を探す
+            var p1 = m_GameManager.m_Players.FirstOrDefault(t => t.ControlIndex == 1);
+            if (p1 != null)
             {
-                switch (tank.ControlIndex)
+                // インスタンスから MinimapCamera を取得
+                player1Camera = p1.m_Instance.transform.GetComponentInChildren<Camera>(true);
+                if (player1Camera != null)
                 {
-                    case 1:
-                        m_StockP1.InitPlayerStock(tank.MaxShellStock, tank.ShellStock);
-                        break;
-                    case 2:
-                        m_StockP2.InitPlayerStock(tank.MaxShellStock, tank.ShellStock);
-                        break;
+                    player1Camera.enabled = true;
                 }
             }
         }
         else
         {
-            m_StockP1.gameObject.SetActive(false);
-            m_StockP2.gameObject.SetActive(false);
+            if (player1Camera != null)
+                player1Camera.enabled = false;
         }
     }
 
