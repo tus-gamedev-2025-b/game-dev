@@ -14,7 +14,6 @@ namespace Tanks.Complete
         [HideInInspector] public bool m_HasShield;    // Has the tank picked up a shield power up?
         private float m_CurrentHealth;                // How much health the tank currently has.
         private bool m_Dead;                          // Has the tank been reduced beyond zero health yet?
-        public event System.Action<float> OnHealthChanged;
 
 
         private AudioSource m_ExplosionAudio;        // The audio source to play when the tank explodes.
@@ -125,8 +124,6 @@ namespace Tanks.Complete
 
             // Interpolate the color of the bar between the choosen colours based on the current percentage of the starting health.
             m_FillImage.color = Color.Lerp(m_ZeroHealthColor, m_FullHealthColor, m_CurrentHealth / m_StartingHealth);
-
-            OnHealthChanged?.Invoke(m_CurrentHealth / m_StartingHealth);
         }
 
 

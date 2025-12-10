@@ -55,7 +55,6 @@ namespace Tanks.Complete
         // Parameters: (int controlIndex, int newStock)
         [Obsolete("Use OnWeaponStockChanged with WeaponStockData instead")]
         public event Action<int, int> OnShellStockChanged;
-        public event Action<int, float> OnHealthChanged;
 
         public void Setup(GameManager manager)
         {
@@ -64,9 +63,6 @@ namespace Tanks.Complete
             m_Shooting = m_Instance.GetComponent<TankShooting>();
             m_AI = m_Instance.GetComponent<TankAI>();
             m_CanvasGameObject = m_Instance.GetComponentInChildren<Canvas>().gameObject;
-
-            var health = m_Instance.GetComponent<TankHealth>();
-            health.OnHealthChanged += value => OnHealthChanged?.Invoke(ControlIndex, value);
 
             // コルーチン実行用のMonoBehaviourを取得
             m_CoroutineRunner = manager;
