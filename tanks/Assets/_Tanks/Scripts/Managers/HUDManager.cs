@@ -39,6 +39,7 @@ public class HUDManager : MonoBehaviour
         {
             // 新しいWeaponStockData対応のイベントを購読
             tank.OnWeaponStockChanged += HandleWeaponStockChanged;
+            tank.OnHealthChanged += HandleHealthChanged;
         }
     }
 
@@ -98,6 +99,19 @@ public class HUDManager : MonoBehaviour
                 break;
             case 2:
                 m_StockP2.UpdatePlayerStock(stockData);
+                break;
+        }
+    }
+
+    private void HandleHealthChanged(int controlIndex, float value)
+    {
+        switch (controlIndex)
+        {
+            case 1:
+                m_StockP1.UpdateHP(value);
+                break;
+            case 2:
+                m_StockP2.UpdateHP(value);
                 break;
         }
     }
