@@ -1,0 +1,46 @@
+{
+  "name": "backend",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun --hot run index.ts",
+    "start": "bun run index.ts",
+    "test": "DATABASE_PATH=./data/test.db bun test",
+    "test:watch": "DATABASE_PATH=./data/test.db bun test --watch",
+    "test:coverage": "DATABASE_PATH=./data/test.db bun test --coverage",
+    "test:unit": "DATABASE_PATH=./data/test.db bun test app/",
+    "test:integration": "DATABASE_PATH=./data/test.db bun test tests/",
+    "test:verbose": "DATABASE_PATH=./data/test.db bun test --verbose",
+    "typecheck": "bunx tsc --noEmit",
+    "lint": "bunx biome lint .",
+    "lint:fix": "bunx biome lint --write .",
+    "format": "bunx biome format .",
+    "format:fix": "bunx biome format --write .",
+    "check": "bunx biome check .",
+    "check:fix": "bunx biome check --write .",
+    "arch": "bunx depcruise app --config .dependency-cruiser.cjs",
+    "arch:graph": "bunx depcruise app --config .dependency-cruiser.cjs --output-type dot | dot -T svg > dependency-graph.svg",
+    "openapi:gen": "bun run scripts/generate-openapi.ts",
+    "openapi:check": "bun run scripts/check-openapi.ts",
+    "load:smoke": "k6 run tests/load/smoke-test.ts",
+    "load:stress": "k6 run tests/load/stress-test.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
+    "@types/bun": "latest",
+    "dependency-cruiser": "^17.3.2",
+    "drizzle-kit": "^0.31.8"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.1.5",
+    "@hono/zod-validator": "^0.7.5",
+    "@scalar/hono-api-reference": "^0.9.28",
+    "drizzle-orm": "^0.45.0",
+    "hono": "^4.10.7",
+    "zod": "^4.1.13"
+  }
+}

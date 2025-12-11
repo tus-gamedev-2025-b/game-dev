@@ -1,0 +1,788 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Game API",
+    "version": "1.0.0",
+    "description": "Unity game backend API for user management, authentication, matches, and rankings"
+  },
+  "servers": [
+    {
+      "url": "/api",
+      "description": "API server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users",
+      "description": "User management endpoints"
+    },
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints"
+    },
+    {
+      "name": "Matches",
+      "description": "Match recording endpoints"
+    },
+    {
+      "name": "Rankings",
+      "description": "Ranking endpoints"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "UUID",
+        "description": "Access token obtained from POST /users or POST /users/login"
+      }
+    },
+    "schemas": {
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "wins": {
+                "type": "number"
+              },
+              "losses": {
+                "type": "number"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "wins",
+              "losses",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "accessTokenExpiresAt": {
+            "type": "string"
+          },
+          "refreshTokenExpiresAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "user",
+          "accessToken",
+          "refreshToken",
+          "accessTokenExpiresAt",
+          "refreshTokenExpiresAt"
+        ]
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 15,
+            "pattern": "^[\\p{Script=Hiragana}\\p{Script=Katakana}\\p{Script=Han}a-zA-Z0-9\\uFF21-\\uFF3A\\uFF41-\\uFF5A\\uFF10-\\uFF19\\s\\u3000\\u30FC\\u30FB]+$/u"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "refreshToken": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "userId",
+          "refreshToken"
+        ]
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "wins": {
+                "type": "number"
+              },
+              "losses": {
+                "type": "number"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "wins",
+              "losses",
+              "createdAt",
+              "updatedAt"
+            ]
+          }
+        },
+        "required": [
+          "user"
+        ]
+      },
+      "UpdateNameRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 15,
+            "pattern": "^[\\p{Script=Hiragana}\\p{Script=Katakana}\\p{Script=Han}a-zA-Z0-9\\uFF21-\\uFF3A\\uFF41-\\uFF5A\\uFF10-\\uFF19\\s\\u3000\\u30FC\\u30FB]+$/u"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "accessTokenExpiresAt": {
+            "type": "string"
+          },
+          "refreshTokenExpiresAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "accessTokenExpiresAt",
+          "refreshTokenExpiresAt"
+        ]
+      },
+      "RefreshTokenRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "MatchResponse": {
+        "type": "object",
+        "properties": {
+          "match": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "winnerId": {
+                "type": "number"
+              },
+              "loserId": {
+                "type": "number"
+              },
+              "playedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "winnerId",
+              "loserId",
+              "playedAt"
+            ]
+          },
+          "updatedStats": {
+            "type": "object",
+            "properties": {
+              "wins": {
+                "type": "number"
+              },
+              "losses": {
+                "type": "number"
+              },
+              "totalMatches": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "wins",
+              "losses",
+              "totalMatches"
+            ]
+          }
+        },
+        "required": [
+          "match",
+          "updatedStats"
+        ]
+      },
+      "RecordMatchRequest": {
+        "type": "object",
+        "properties": {
+          "visitorId": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "visitorScore": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "homeScore": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "visitorId",
+          "visitorScore",
+          "homeScore"
+        ]
+      },
+      "RankingResponse": {
+        "type": "object",
+        "properties": {
+          "rankings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rank": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "userId": {
+                  "type": "number"
+                },
+                "userName": {
+                  "type": "string"
+                },
+                "winRate": {
+                  "type": "number"
+                },
+                "wins": {
+                  "type": "number"
+                },
+                "losses": {
+                  "type": "number"
+                },
+                "totalMatches": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "rank",
+                "userId",
+                "userName",
+                "winRate",
+                "wins",
+                "losses",
+                "totalMatches"
+              ]
+            }
+          },
+          "currentUser": {
+            "type": "object",
+            "properties": {
+              "rank": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "userId": {
+                "type": "number"
+              },
+              "userName": {
+                "type": "string"
+              },
+              "winRate": {
+                "type": "number"
+              },
+              "wins": {
+                "type": "number"
+              },
+              "losses": {
+                "type": "number"
+              },
+              "totalMatches": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "rank",
+              "userId",
+              "userName",
+              "winRate",
+              "wins",
+              "losses",
+              "totalMatches"
+            ]
+          }
+        },
+        "required": [
+          "rankings",
+          "currentUser"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Create new user",
+        "description": "Creates a new user and returns authentication tokens",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "User login",
+        "description": "Authenticate user with userId and refresh token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user information",
+        "description": "Retrieve user information by user ID",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}/name": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update user name",
+        "description": "Update the name of a user",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNameRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User name updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or invalid name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - cannot update other user's name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Refresh access token",
+        "description": "Exchange a refresh token for new access and refresh tokens",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/matches": {
+      "post": {
+        "tags": [
+          "Matches"
+        ],
+        "summary": "Record match result",
+        "description": "Record the result of a match and update player statistics",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordMatchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Match recorded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or self-match not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Visitor user not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rankings": {
+      "get": {
+        "tags": [
+          "Rankings"
+        ],
+        "summary": "Get rankings",
+        "description": "Retrieve TOP10 rankings and current user's rank",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rankings retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RankingResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}
