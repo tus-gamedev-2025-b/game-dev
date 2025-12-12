@@ -57,6 +57,8 @@ namespace Tanks.Complete
         public event Action<int, int> OnShellStockChanged;
         public event Action<int, float> OnHealthChanged;
 
+        public event Action<int, int> OnWinCountChanged;
+
         public void Setup(GameManager manager)
         {
             // Get references to the components.
@@ -119,6 +121,13 @@ namespace Tanks.Complete
                     }
                 }
             }
+
+            // Receive the Round Victory Count Update Event from GameManager and display it on the HUD
+            manager.OnRoundWinnerChanged += (playerNum, wins) =>
+            {
+                if (playerNum == m_PlayerNumber)
+                    OnWinCountChanged?.Invoke(ControlIndex, wins);
+            };
         }
 
         /// <summary>
