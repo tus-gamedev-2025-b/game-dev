@@ -19,15 +19,19 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private PlayerHP player1HP;
     [SerializeField] private PlayerHP player2HP;
 
-    
+
     // 勝利数のキャッシュ
-    private int lastP1Wins = 0;
-    private int lastP2Wins = 0;
+    private int lastP1Wins;
+    private int lastP2Wins;
 
     private void Start()
     {
         // Nullガード
-        if (m_GameManager == null) { Debug.LogError("[HUDManager] m_GameManager is null"); return; }
+        if (m_GameManager == null)
+        {
+            Debug.LogError("[HUDManager] m_GameManager is null");
+            return;
+        }
         if (m_StockP1 == null) Debug.LogError("[HUDManager] m_StockP1 is null");
         if (m_StockP2 == null) Debug.LogError("[HUDManager] m_StockP2 is null");
 
@@ -101,7 +105,7 @@ public class HUDManager : MonoBehaviour
                 }
             }
 
-            
+
             // 勝利数のキャッシュをUIに反映（取りこぼし対策）
             m_StockP1?.UpdateWinCount(lastP1Wins);
             m_StockP2?.UpdateWinCount(lastP2Wins);

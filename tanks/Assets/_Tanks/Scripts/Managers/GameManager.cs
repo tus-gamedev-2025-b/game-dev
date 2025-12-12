@@ -361,7 +361,7 @@ namespace Tanks.Complete
             yield return m_EndWait;
 
             // Notify each player of their win count at the end of the round
-            for (int i = 0; i < m_PlayerCount; i++)
+            for (var i = 0; i < m_PlayerCount; i++)
             {
                 OnRoundWinnerChanged?.Invoke(i + 1, m_SpawnPoints[i].m_Wins);
             }

@@ -13,10 +13,10 @@ namespace Tanks.UI
             // 安全対策：範囲外の値はクランプ
             winCount = Mathf.Clamp(winCount, 0, WinImages.Length);
 
-            for (int i = 0; i < WinImages.Length; i++)
+            for (var i = 0; i < WinImages.Length; i++)
             {
                 // 勝利数以下の index のみ点灯
-                WinImages[i].enabled = (i < winCount);
+                WinImages[i].enabled = i < winCount;
             }
         }
     }
