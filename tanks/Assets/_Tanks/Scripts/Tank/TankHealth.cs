@@ -150,5 +150,10 @@ namespace Tanks.Complete
             // Turn the tank off.
             gameObject.SetActive(false);
         }
+
+        public float GetNormalizedHealth()
+        {
+            return (m_StartingHealth <= 0f) ? 0f : m_CurrentHealth / m_StartingHealth;
+        }
     }
 }
