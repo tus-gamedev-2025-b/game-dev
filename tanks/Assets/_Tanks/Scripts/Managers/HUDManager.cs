@@ -48,61 +48,61 @@ public class HUDManager : MonoBehaviour
     }
 
     private void HandleGameLoopStateChanged(GameManager.GameLoopState state)
-{
-    if (state == GameManager.GameLoopState.RoundPlaying)
     {
-        // UI を有効にする
-        m_StockP1.gameObject.SetActive(true);
-        m_StockP2.gameObject.SetActive(true);
-
-        // Round 開始後にプレイヤー実体が存在
-        foreach (var tank in m_GameManager.m_Players)
+        if (state == GameManager.GameLoopState.RoundPlaying)
         {
-            // ここで初めてイベントを購読できる
-            tank.OnWeaponStockChanged += HandleWeaponStockChanged;
-            tank.OnHealthChanged += HandleHealthChanged;
+            // UI を有効にする
+            m_StockP1.gameObject.SetActive(true);
+            m_StockP2.gameObject.SetActive(true);
 
-            // これで PlayerStock 内で砲弾アイコンを生成
-            if (tank.ControlIndex == 1)
+            // Round 開始後にプレイヤー実体が存在
+            foreach (var tank in m_GameManager.m_Players)
             {
-                m_StockP1.InitPlayerStock(tank.MaxShellStock, tank.ShellStock);
-                m_StockP1.UpdateMineStock(tank.MineStock);
+                // ここで初めてイベントを購読できる
+                tank.OnWeaponStockChanged += HandleWeaponStockChanged;
+                tank.OnHealthChanged += HandleHealthChanged;
+
+                // これで PlayerStock 内で砲弾アイコンを生成
+                if (tank.ControlIndex == 1)
+                {
+                    m_StockP1.InitPlayerStock(tank.MaxShellStock, tank.ShellStock);
+                    m_StockP1.UpdateMineStock(tank.MineStock);
+                }
+                else if (tank.ControlIndex == 2)
+                {
+                    m_StockP2.InitPlayerStock(tank.MaxShellStock, tank.ShellStock);
+                    m_StockP2.UpdateMineStock(tank.MineStock);
+                }
             }
-            else if (tank.ControlIndex == 2)
+
+            // プレイヤー1の実体を探す/minimap カメラ ON
+            var p1 = m_GameManager.m_Players.FirstOrDefault(t => t.ControlIndex == 1);
+            if (p1 != null)
             {
-                m_StockP2.InitPlayerStock(tank.MaxShellStock, tank.ShellStock);
-                m_StockP2.UpdateMineStock(tank.MineStock);
+                // インスタンスから MinimapCamera を取得
+                player1Camera = p1.m_Instance.GetComponentInChildren<Camera>(true);
+                if (player1Camera != null)
+                    player1Camera.enabled = true;
             }
         }
-
-        // プレイヤー1の実体を探す/minimap カメラ ON
-        var p1 = m_GameManager.m_Players.FirstOrDefault(t => t.ControlIndex == 1);
-        if (p1 != null)
+        else
         {
-            // インスタンスから MinimapCamera を取得
-            player1Camera = p1.m_Instance.GetComponentInChildren<Camera>(true);
+            // minimap カメラ OFF
             if (player1Camera != null)
-                player1Camera.enabled = true;
+                player1Camera.enabled = false;
+
+            // UI OFF
+            m_StockP1.gameObject.SetActive(false);
+            m_StockP2.gameObject.SetActive(false);
+
+            // イベント解除
+            foreach (var tank in m_GameManager.m_Players)
+            {
+                tank.OnWeaponStockChanged -= HandleWeaponStockChanged;
+                tank.OnHealthChanged -= HandleHealthChanged;
+            }
         }
     }
-    else
-    {
-        // minimap カメラ OFF
-        if (player1Camera != null)
-            player1Camera.enabled = false;
-
-        // UI OFF
-        m_StockP1.gameObject.SetActive(false);
-        m_StockP2.gameObject.SetActive(false);
-
-        // イベント解除
-        foreach (var tank in m_GameManager.m_Players)
-        {
-            tank.OnWeaponStockChanged -= HandleWeaponStockChanged;
-            tank.OnHealthChanged -= HandleHealthChanged;
-        }
-    }
-}
 
     /// <summary>
     ///     WeaponStockDataを使用した武器所持数変化のハンドラ
