@@ -2,6 +2,7 @@ import { check, sleep } from "k6"
 import http from "k6/http"
 import { Counter, Rate, Trend } from "k6/metrics"
 import type { Options } from "k6/options"
+import ws from "k6/ws"
 
 // Types
 type User = {
@@ -14,12 +15,20 @@ type SetupData = {
   users: User[]
 }
 
+type WsMessage = {
+  type: string
+  payload?: unknown
+  error?: { code: string; message: string }
+}
+
 // Custom metrics
 const matchRecordDuration = new Trend("match_record_duration")
 const rankingFetchDuration = new Trend("ranking_fetch_duration")
 const userCreateDuration = new Trend("user_create_duration")
+const lobbyDuration = new Trend("lobby_duration")
 const errorRate = new Rate("errors")
 const matchesRecorded = new Counter("matches_recorded")
+const lobbyFlowsCompleted = new Counter("lobby_flows_completed")
 
 // Test configuration
 export const options: Options = {
@@ -64,6 +73,7 @@ export const options: Options = {
     errors: ["rate<0.1"],
     match_record_duration: ["p(95)<300"],
     ranking_fetch_duration: ["p(95)<200"],
+    lobby_duration: ["p(95)<3000"],
   },
 }
 
@@ -155,6 +165,113 @@ function getUser(user: User): boolean {
   return success
 }
 
+function testLobbyFlow(hostToken: string, guestToken: string): boolean {
+  const start = Date.now()
+  const wsUrl = BASE_URL.replace("http://", "ws://").replace(
+    "https://",
+    "wss://",
+  )
+  let success = true
+  let roomCode = ""
+  let isConflictError = false
+
+  // Host creates room
+  const hostRes = ws.connect(`${wsUrl}/ws?token=${hostToken}`, {}, (socket) => {
+    socket.on("open", () => {
+      socket.send(JSON.stringify({ type: "createRoom" }))
+    })
+
+    socket.on("message", (data: string) => {
+      const msg: WsMessage = JSON.parse(data)
+      if (msg.type === "roomCreated") {
+        roomCode = (msg.payload as { roomCode: string }).roomCode
+        socket.close()
+      } else if (msg.type === "error") {
+        // ALREADY_IN_ROOM is expected in load tests due to concurrent access
+        if (msg.error?.code === "ALREADY_IN_ROOM") {
+          isConflictError = true
+        } else {
+          success = false
+        }
+        socket.close()
+      }
+    })
+
+    socket.on("error", () => {
+      success = false
+    })
+
+    socket.setTimeout(() => {
+      socket.close()
+    }, 5000)
+  })
+
+  check(hostRes, { "host ws connected": (r) => r && r.status === 101 })
+
+  // Skip if conflict or no room code
+  if (isConflictError || !roomCode) {
+    lobbyDuration.add(Date.now() - start)
+    // Don't count conflicts as errors
+    if (!isConflictError && !roomCode) {
+      errorRate.add(1)
+    }
+    return isConflictError
+  }
+
+  // Guest joins room
+  const guestRes = ws.connect(
+    `${wsUrl}/ws?token=${guestToken}`,
+    {},
+    (socket) => {
+      socket.on("open", () => {
+        socket.send(JSON.stringify({ type: "joinRoom", payload: { roomCode } }))
+      })
+
+      socket.on("message", (data: string) => {
+        const msg: WsMessage = JSON.parse(data)
+        if (msg.type === "roomJoined") {
+          socket.close()
+        } else if (msg.type === "error") {
+          // ALREADY_IN_ROOM or ROOM_FULL is expected in load tests
+          if (
+            msg.error?.code === "ALREADY_IN_ROOM" ||
+            msg.error?.code === "ROOM_FULL"
+          ) {
+            isConflictError = true
+          } else {
+            success = false
+          }
+          socket.close()
+        }
+      })
+
+      socket.on("error", () => {
+        success = false
+      })
+
+      socket.setTimeout(() => {
+        socket.close()
+      }, 5000)
+    },
+  )
+
+  check(guestRes, { "guest ws connected": (r) => r && r.status === 101 })
+
+  lobbyDuration.add(Date.now() - start)
+
+  // Don't count conflicts as errors
+  if (!isConflictError) {
+    if (success) {
+      lobbyFlowsCompleted.add(1)
+      errorRate.add(0)
+    } else {
+      errorRate.add(1)
+    }
+  }
+
+  return success || isConflictError
+}
+
 export function setup(): SetupData {
   console.log("Creating initial users for load test...")
   const initialUsers: User[] = []
@@ -202,10 +319,21 @@ export default function (data: SetupData): void {
     // 30%: Get rankings
     const user = users[Math.floor(Math.random() * users.length)]
     getRankings(user)
-  } else {
-    // 20%: Get user info
+  } else if (action < 0.95) {
+    // 15%: Get user info
     const user = users[Math.floor(Math.random() * users.length)]
     getUser(user)
+  } else {
+    // 5%: Test lobby flow (reduced to avoid ALREADY_IN_ROOM conflicts)
+    const hostIdx = Math.floor(Math.random() * users.length)
+    let guestIdx = Math.floor(Math.random() * users.length)
+    while (guestIdx === hostIdx) {
+      guestIdx = Math.floor(Math.random() * users.length)
+    }
+
+    const host = users[hostIdx]
+    const guest = users[guestIdx]
+    testLobbyFlow(host.accessToken, guest.accessToken)
   }
 
   sleep(0.1 + Math.random() * 0.2)

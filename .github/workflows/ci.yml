@@ -295,7 +295,7 @@ jobs:
 
       - name: Start server
         run: |
-          DATABASE_PATH=./data/load-test.db bun run app/index.ts &
+          DATABASE_PATH=./data/load-test.db bun run start &
           sleep 3
           curl -f http://localhost:3000/health
 

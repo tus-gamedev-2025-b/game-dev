@@ -1,6 +1,6 @@
 # Game Backend API
 
-Tanks向けのバックエンドAPIサーバーです。ユーザー管理、認証、対戦記録、ランキング機能を提供します。
+Tanks向けのバックエンドAPIサーバーです。ユーザー管理、認証、対戦記録、ランキング、PvPロビー機能を提供します。
 
 ## 技術スタック
 
@@ -58,6 +58,7 @@ bun run start
 | http://localhost:3000/health        | ヘルスチェック                |
 | http://localhost:3000/api/doc       | OpenAPI JSON                  |
 | http://localhost:3000/api/reference | API リファレンス（Scalar UI） |
+| ws://localhost:3000/ws              | WebSocket（PvPロビー）        |
 
 ## 利用可能なスクリプト
 
@@ -115,3 +116,4 @@ bun run start
 
 - [API利用ガイド](./docs/api.md) - APIの使い方、エンドポイント一覧、curl例
 - [設計ドキュメント](./docs/design.md) - 技術設計、アーキテクチャ
+- [PvP設計ドキュメント](./docs/pvp-design.md) - PvPロビー機能の設計、WebSocketメッセージ仕様
