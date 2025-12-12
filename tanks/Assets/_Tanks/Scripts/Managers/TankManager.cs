@@ -58,6 +58,9 @@ namespace Tanks.Complete
         public event Action<int, float> OnHealthChanged;
 
         public event Action<int, int> OnWinCountChanged;
+        
+    private float lastP1HP = 1f;
+    private float lastP2HP = 1f;
 
         public void Setup(GameManager manager)
         {
@@ -68,7 +71,10 @@ namespace Tanks.Complete
             m_CanvasGameObject = m_Instance.GetComponentInChildren<Canvas>().gameObject;
 
             var health = m_Instance.GetComponent<TankHealth>();
-            health.OnHealthChanged += value => OnHealthChanged?.Invoke(ControlIndex, value);
+            health.OnHealthChanged += value => OnHealthChanged?.Invoke(m_PlayerNumber, value);
+
+            // 購読直後に現在HPを一度通知（RoundStartの取りこぼし対策）
+            OnHealthChanged?.Invoke(m_PlayerNumber, health.GetNormalizedHealth());
 
             // コルーチン実行用のMonoBehaviourを取得
             m_CoroutineRunner = manager;
