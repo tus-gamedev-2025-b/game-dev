@@ -97,6 +97,7 @@ namespace Tanks.Complete
         }
 
         public event Action<GameLoopState> OnGameLoopStateChanged;
+        public event Action<int, int> OnRoundWinnerChanged;
 
         private void GameStart()
         {
@@ -358,6 +359,12 @@ namespace Tanks.Complete
 
             // Wait for the specified length of time until yielding control back to the game loop.
             yield return m_EndWait;
+
+            // Notify each player of their win count at the end of the round
+            for (int i = 0; i < m_PlayerCount; i++)
+            {
+                OnRoundWinnerChanged?.Invoke(i + 1, m_SpawnPoints[i].m_Wins);
+            }
         }
 
 

@@ -34,6 +34,8 @@ public class HUDManager : MonoBehaviour
         foreach (var tank in m_GameManager.m_SpawnPoints)
         {
             tank.OnWeaponStockChanged -= HandleWeaponStockChanged;
+            tank.OnHealthChanged -= HandleHealthChanged;
+            tank.OnWinCountChanged -= HandleWinCountChanged;
         }
     }
 
@@ -61,6 +63,7 @@ public class HUDManager : MonoBehaviour
             // ここで初めてイベントを購読できる
             tank.OnWeaponStockChanged += HandleWeaponStockChanged;
             tank.OnHealthChanged += HandleHealthChanged;
+            tank.OnWinCountChanged += HandleWinCountChanged;
 
             // これで PlayerStock 内で砲弾アイコンを生成
             if (tank.ControlIndex == 1)
@@ -94,13 +97,6 @@ public class HUDManager : MonoBehaviour
         // UI OFF
         m_StockP1.gameObject.SetActive(false);
         m_StockP2.gameObject.SetActive(false);
-
-        // イベント解除
-        foreach (var tank in m_GameManager.m_Players)
-        {
-            tank.OnWeaponStockChanged -= HandleWeaponStockChanged;
-            tank.OnHealthChanged -= HandleHealthChanged;
-        }
     }
 }
 
@@ -131,6 +127,20 @@ public class HUDManager : MonoBehaviour
                 break;
             case 2:
                 player2HP.UpdateHPSlider(value);
+                break;
+        }
+    }
+
+    // ラウンド勝利数 UI 更新
+    private void HandleWinCountChanged(int controlIndex, int wins)
+    {
+        switch (controlIndex)
+        {
+            case 1:
+                m_StockP1.UpdateWinCount(wins);
+                break;
+            case 2:
+                m_StockP2.UpdateWinCount(wins);
                 break;
         }
     }
