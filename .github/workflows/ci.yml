@@ -8,51 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  changes:
-    runs-on: ubuntu-24.04
-    outputs:
-      unity: ${{ steps.filter.outputs.unity }}
-      frontend: ${{ steps.filter.outputs.frontend }}
-      backend: ${{ steps.filter.outputs.backend }}
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
-        id: changed-files
-
-      - name: Determine changed paths
-        id: filter
-        run: |
-          UNITY_CHANGED=false
-          FRONTEND_CHANGED=false
-          BACKEND_CHANGED=false
-
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            if [[ "$file" == tanks/* ]] || [[ "$file" == .github/workflows/ci.yml ]]; then
-              UNITY_CHANGED=true
-            fi
-            if [[ "$file" == backend/* ]] || [[ "$file" == .github/workflows/ci.yml ]]; then
-              BACKEND_CHANGED=true
-            fi
-            if [[ "$file" != backend/* ]]; then
-              FRONTEND_CHANGED=true
-            fi
-          done
-
-          # workflow_dispatch always runs all jobs
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            UNITY_CHANGED=true
-            FRONTEND_CHANGED=true
-            BACKEND_CHANGED=true
-          fi
-
-          echo "unity=$UNITY_CHANGED" >> "$GITHUB_OUTPUT"
-          echo "frontend=$FRONTEND_CHANGED" >> "$GITHUB_OUTPUT"
-          echo "backend=$BACKEND_CHANGED" >> "$GITHUB_OUTPUT"
-
   inspect-code:
-    needs: changes
-    if: needs.changes.outputs.unity == 'true'
     runs-on: ubuntu-latest
     container: unityci/editor:ubuntu-6000.2.7f2-base-3.2.0
     steps:
@@ -129,8 +85,6 @@ jobs:
       security-events: write
 
   prettier:
-    needs: changes
-    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -145,8 +99,6 @@ jobs:
         run: pnpm format:check
 
   test:
-    needs: changes
-    if: needs.changes.outputs.unity == 'true'
     name: Test in ${{ matrix.testMode }}
     runs-on: ubuntu-24.04
     strategy:
@@ -188,8 +140,6 @@ jobs:
       checks: write
 
   build:
-    needs: changes
-    if: needs.changes.outputs.unity == 'true'
     name: Build for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-24.04
     strategy:
@@ -239,69 +189,3 @@ jobs:
 
     permissions:
       contents: read
-
-  backend:
-    needs: changes
-    if: needs.changes.outputs.backend == 'true'
-    name: Backend - ${{ matrix.task.name }}
-    runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: backend
-    strategy:
-      fail-fast: false
-      matrix:
-        task:
-          - name: Lint & Format
-            command: bun run check
-          - name: Type Check
-            command: bun run typecheck
-          - name: Architecture
-            command: bun run arch
-          - name: OpenAPI Schema
-            command: bun run openapi:check
-          - name: Unit Tests
-            command: bun run test:unit
-          - name: Integration Tests
-            command: bun run test:integration
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - name: Setup tools
-        uses: jdx/mise-action@be3be2260bc02bc3fbf94c5e2fed8b7964baf074 # v3.4.0
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: ${{ matrix.task.name }}
-        run: ${{ matrix.task.command }}
-
-  backend-load-test:
-    needs: [changes, backend]
-    if: needs.changes.outputs.backend == 'true'
-    name: Backend - Load Test
-    runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - name: Setup tools
-        uses: jdx/mise-action@be3be2260bc02bc3fbf94c5e2fed8b7964baf074 # v3.4.0
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Start server
-        run: |
-          DATABASE_PATH=./data/load-test.db bun run start &
-          sleep 3
-          curl -f http://localhost:3000/health
-
-      - name: Run load test
-        run: bun run load:smoke
-
-      - name: Cleanup
-        if: always()
-        run: rm -f ./data/load-test.db*

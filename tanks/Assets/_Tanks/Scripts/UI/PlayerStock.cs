@@ -11,9 +11,6 @@ public class PlayerStock : MonoBehaviour
     [Tooltip("地雷アイコンのImage配列（Mine1, Mine2, Mine3）")]
     [SerializeField] private Image[] mineImages;
 
-    [Header("HP")]
-    [SerializeField] private Slider HPSlider;
-
     private bool initialized;
     private Transform m_ShellImagesContainer;
 
@@ -134,10 +131,5 @@ public class PlayerStock : MonoBehaviour
                 mineImages[i].gameObject.SetActive(i < stock);
             }
         }
-    }
-
-    public void UpdateHP(float normalizedValue)
-    {
-        HPSlider.value = normalizedValue;
     }
 }
