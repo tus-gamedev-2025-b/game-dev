@@ -14,6 +14,7 @@
   - [トークンリフレッシュ](#トークンリフレッシュ)
   - [対戦結果記録](#対戦結果記録)
   - [ランキング取得](#ランキング取得)
+- [WebSocket API（PvPロビー）](#websocket-apipvpロビー)
 - [バリデーションルール](#バリデーションルール)
 - [エラーレスポンス](#エラーレスポンス)
 
@@ -415,6 +416,91 @@ curl http://localhost:3000/api/rankings \
 
 ---
 
+## WebSocket API（PvPロビー）
+
+PvP対戦のマッチングを行うロビー機能をWebSocketで提供します。
+
+詳細な仕様は [PvP設計ドキュメント](./pvp-design.md) を参照してください。
+
+### 接続
+
+```bash
+ws://localhost:3000/ws?token={accessToken}
+```
+
+認証はURLクエリパラメータでアクセストークンを渡します。
+
+### メッセージフォーマット
+
+すべてのメッセージはJSON形式です。
+
+```typescript
+// クライアント → サーバー
+{ "type": "メッセージタイプ", "payload": { ... } }
+
+// サーバー → クライアント
+{ "type": "メッセージタイプ", "payload": { ... } }
+// または
+{ "type": "error", "error": { "code": "...", "message": "..." } }
+```
+
+### クライアント → サーバー
+
+| type          | payload                | 説明                  |
+| ------------- | ---------------------- | --------------------- |
+| `createRoom`  | なし                   | ルームを作成          |
+| `joinRoom`    | `{ roomCode: string }` | ルームに参加          |
+| `leaveRoom`   | なし                   | ルームを退出          |
+| `stamp`       | `{ stampId: number }`  | スタンプを送信（1-6） |
+| `ready`       | なし                   | 準備完了              |
+| `cancelReady` | なし                   | 準備取り消し          |
+
+### サーバー → クライアント
+
+| type                | payload                                | 説明               |
+| ------------------- | -------------------------------------- | ------------------ |
+| `roomCreated`       | `{ roomCode: string }`                 | ルーム作成成功     |
+| `roomJoined`        | `{ roomCode, opponent: { id, name } }` | ルーム参加成功     |
+| `playerJoined`      | `{ opponent: { id, name } }`           | 相手が参加         |
+| `playerLeft`        | なし                                   | 相手が退出         |
+| `stamp`             | `{ playerId, stampId }`                | スタンプ受信       |
+| `playerReady`       | `{ playerId }`                         | 相手が準備完了     |
+| `playerCancelReady` | `{ playerId }`                         | 相手が準備取り消し |
+| `matchStart`        | `{ roomCode, players: [...] }`         | 対戦開始           |
+| `error`             | `{ code, message }`                    | エラー             |
+
+### エラーコード
+
+| コード             | 説明                   |
+| ------------------ | ---------------------- |
+| `ROOM_NOT_FOUND`   | ルームが存在しない     |
+| `ROOM_FULL`        | ルームが満員           |
+| `ALREADY_IN_ROOM`  | 既にルームに参加中     |
+| `NOT_IN_ROOM`      | ルームに参加していない |
+| `INVALID_STAMP_ID` | 無効なスタンプID       |
+
+### 使用例（websocat）
+
+```bash
+# ユーザー作成してトークン取得
+TOKEN=$(curl -s -X POST http://localhost:3000/api/users | jq -r '.accessToken')
+
+# WebSocket接続
+websocat "ws://localhost:3000/ws?token=$TOKEN"
+
+# ルーム作成
+{"type":"createRoom"}
+# → {"type":"roomCreated","payload":{"roomCode":"ABC123"}}
+
+# スタンプ送信
+{"type":"stamp","payload":{"stampId":1}}
+
+# 準備完了
+{"type":"ready"}
+```
+
+---
+
 ## バリデーションルール
 
 ### ユーザー名
@@ -468,3 +554,13 @@ curl http://localhost:3000/api/rankings \
 | SELF_MATCH_NOT_ALLOWED  | 400            | 自分自身との対戦は不可               |
 | VALIDATION_ERROR        | 400            | リクエストボディが不正               |
 | INTERNAL_ERROR          | 500            | サーバー内部エラー                   |
+
+### WebSocketエラーコード
+
+| コード           | 説明                    |
+| ---------------- | ----------------------- |
+| ROOM_NOT_FOUND   | ルームが存在しない      |
+| ROOM_FULL        | ルームが満員            |
+| ALREADY_IN_ROOM  | 既にルームに参加中      |
+| NOT_IN_ROOM      | ルームに参加していない  |
+| INVALID_STAMP_ID | 無効なスタンプID（1-6） |

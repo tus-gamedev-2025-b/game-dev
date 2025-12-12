@@ -16,4 +16,18 @@ export const config = {
     topRanksCount: 10,
     cacheTtlMs: 30_000,
   },
+  pvp: {
+    room: {
+      codeLength: 6, // ルームコード長
+      expiresIn: 30 * 60 * 1000, // ルーム有効期限（30分）
+      maxPlayers: 2, // 最大プレイヤー数
+    },
+    stamp: {
+      count: 6, // スタンプ種類数
+    },
+    websocket: {
+      path: "/ws", // WebSocketパス
+      pingInterval: 30_000, // Ping間隔（30秒）
+    },
+  },
 } as const
