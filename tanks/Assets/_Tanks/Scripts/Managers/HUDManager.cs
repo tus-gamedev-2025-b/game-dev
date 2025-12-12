@@ -19,23 +19,50 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private PlayerHP player1HP;
     [SerializeField] private PlayerHP player2HP;
 
-    public void Start()
+
+    // 勝利数のキャッシュ
+    private int lastP1Wins;
+    private int lastP2Wins;
+
+    private void Start()
     {
-        m_StockP1.gameObject.SetActive(false);
-        m_StockP2.gameObject.SetActive(false);
+        // Nullガード
+        if (m_GameManager == null)
+        {
+            Debug.LogError("[HUDManager] m_GameManager is null");
+            return;
+        }
+        if (m_StockP1 == null) Debug.LogError("[HUDManager] m_StockP1 is null");
+        if (m_StockP2 == null) Debug.LogError("[HUDManager] m_StockP2 is null");
+
+        // 初期は非表示（仕様）
+        if (m_StockP1 != null) m_StockP1.gameObject.SetActive(false);
+        if (m_StockP2 != null) m_StockP2.gameObject.SetActive(false);
 
         // ゲーム状態イベントを購読
         m_GameManager.OnGameLoopStateChanged += HandleGameLoopStateChanged;
+
+        // GameManager 由来の RoundWinner も購読して取りこぼし防止
+        m_GameManager.OnRoundWinnerChanged += HandleRoundWinnerFromGM;
     }
 
-    public void OnDestroy()
+
+    private void OnDestroy()
     {
-        m_GameManager.OnGameLoopStateChanged -= HandleGameLoopStateChanged;
-        foreach (var tank in m_GameManager.m_SpawnPoints)
+        if (m_GameManager != null)
         {
-            tank.OnWeaponStockChanged -= HandleWeaponStockChanged;
-            tank.OnHealthChanged -= HandleHealthChanged;
-            tank.OnWinCountChanged -= HandleWinCountChanged;
+            m_GameManager.OnGameLoopStateChanged -= HandleGameLoopStateChanged;
+        }
+
+        // 購読と解除の対象を m_Players で揃える
+        if (m_GameManager?.m_Players != null)
+        {
+            foreach (var tank in m_GameManager.m_Players)
+            {
+                tank.OnWeaponStockChanged -= HandleWeaponStockChanged;
+                tank.OnHealthChanged -= HandleHealthChanged;
+                tank.OnWinCountChanged -= HandleWinCountChanged;
+            }
         }
     }
 
@@ -60,7 +87,7 @@ public class HUDManager : MonoBehaviour
             // Round 開始後にプレイヤー実体が存在
             foreach (var tank in m_GameManager.m_Players)
             {
-                // ここで初めてイベントを購読できる
+                // イベント購読
                 tank.OnWeaponStockChanged += HandleWeaponStockChanged;
                 tank.OnHealthChanged += HandleHealthChanged;
                 tank.OnWinCountChanged += HandleWinCountChanged;
@@ -77,6 +104,11 @@ public class HUDManager : MonoBehaviour
                     m_StockP2.UpdateMineStock(tank.MineStock);
                 }
             }
+
+
+            // 勝利数のキャッシュをUIに反映（取りこぼし対策）
+            m_StockP1?.UpdateWinCount(lastP1Wins);
+            m_StockP2?.UpdateWinCount(lastP2Wins);
 
             // プレイヤー1の実体を探す/minimap カメラ ON
             var p1 = m_GameManager.m_Players.FirstOrDefault(t => t.ControlIndex == 1);
@@ -103,6 +135,7 @@ public class HUDManager : MonoBehaviour
             {
                 tank.OnWeaponStockChanged -= HandleWeaponStockChanged;
                 tank.OnHealthChanged -= HandleHealthChanged;
+                tank.OnWinCountChanged -= HandleWinCountChanged;
             }
         }
     }
@@ -141,14 +174,20 @@ public class HUDManager : MonoBehaviour
     // ラウンド勝利数 UI 更新
     private void HandleWinCountChanged(int controlIndex, int wins)
     {
-        switch (controlIndex)
-        {
-            case 1:
-                m_StockP1.UpdateWinCount(wins);
-                break;
-            case 2:
-                m_StockP2.UpdateWinCount(wins);
-                break;
-        }
+        // キャッシュ更新（RoundEndでも値を保持）
+        if (controlIndex == 1) lastP1Wins = wins;
+        else if (controlIndex == 2) lastP2Wins = wins;
+
+        // UIが有効なら直ちに反映
+        if (m_StockP1 != null && m_StockP1.gameObject.activeInHierarchy && controlIndex == 1)
+            m_StockP1.UpdateWinCount(wins);
+        else if (m_StockP2 != null && m_StockP2.gameObject.activeInHierarchy && controlIndex == 2)
+            m_StockP2.UpdateWinCount(wins);
+    }
+
+    // GameManager 由来の勝者通知にも対応
+    private void HandleRoundWinnerFromGM(int controlIndex, int totalWins)
+    {
+        HandleWinCountChanged(controlIndex, totalWins);
     }
 }
