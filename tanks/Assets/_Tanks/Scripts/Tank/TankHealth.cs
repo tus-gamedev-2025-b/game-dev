@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Tanks.Complete
@@ -14,7 +15,6 @@ namespace Tanks.Complete
         [HideInInspector] public bool m_HasShield;    // Has the tank picked up a shield power up?
         private float m_CurrentHealth;                // How much health the tank currently has.
         private bool m_Dead;                          // Has the tank been reduced beyond zero health yet?
-        public event System.Action<float> OnHealthChanged;
 
 
         private AudioSource m_ExplosionAudio;        // The audio source to play when the tank explodes.
@@ -55,6 +55,8 @@ namespace Tanks.Complete
             if (m_ExplosionParticles != null)
                 Destroy(m_ExplosionParticles.gameObject);
         }
+
+        public event Action<float> OnHealthChanged;
 
 
         public void TakeDamage(float amount)
