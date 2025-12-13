@@ -1,7 +1,7 @@
 ignoredBuiltDependencies:
-  - '@nestjs/core'
+  - "@nestjs/core"
 
 minimumReleaseAge: 4320
 
 onlyBuiltDependencies:
-  - '@openapitools/openapi-generator-cli'
+  - "@openapitools/openapi-generator-cli"
