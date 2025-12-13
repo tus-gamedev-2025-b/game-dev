@@ -68,6 +68,7 @@ jobs:
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         run: |
           unity-editor -nographics -logFile /dev/stdout -quit -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" -serial "$UNITY_SERIAL"
+          unity-editor -nographics -logFile /dev/stdout -projectPath ./tanks -quit
           unity-editor -nographics -logFile /dev/stdout -projectPath ./tanks -executeMethod Packages.Rider.Editor.RiderScriptEditor.SyncSolution -quit
 
       - name: Setup .NET
@@ -277,7 +278,7 @@ jobs:
         run: ${{ matrix.task.command }}
 
   backend-load-test:
-    needs: [changes, backend]
+    needs: [ changes, backend ]
     if: needs.changes.outputs.backend == 'true'
     name: Backend - Load Test
     runs-on: ubuntu-24.04
