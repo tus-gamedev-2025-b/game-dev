@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 README.md
 Tanks.ApiClient/Api/AuthApi.cs
 Tanks.ApiClient/Api/MatchesApi.cs
