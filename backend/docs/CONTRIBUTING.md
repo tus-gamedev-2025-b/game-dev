@@ -19,6 +19,13 @@
 
 - [Bun](https://bun.sh) v1.0以上
 - [k6](https://k6.io)（負荷テスト用、オプション）
+- [websocat](https://github.com/vi/websocat)（WebSocketテスト用、オプション）
+
+miseがインストールされている場合、以下で必要なツールをインストールできます：
+
+```bash
+mise i
+```
 
 ### 初回セットアップ
 
@@ -57,12 +64,16 @@ VSCodeを使用する場合、以下の拡張機能を推奨します：
       - `validator.ts` - バリデーション
     - `match/` - 対戦ドメイン
     - `ranking/` - ランキングドメイン
+    - `lobby/` - PvPロビードメイン（インメモリ）
   - `usecases/` - ユースケース層
     - `user/`
     - `match/`
     - `ranking/`
+    - `lobby/` - PvPロビー関連
     - `repositories-provider.ts` - DI設定
-  - `routes/api/` - APIルート（インターフェース層）
+  - `routes/`
+    - `api/` - REST APIルート（インターフェース層）
+    - `ws/` - WebSocketハンドラー（PvPロビー）
   - `schemas/` - Zodスキーマ（OpenAPI用）
   - `helpers/` - ヘルパー（認証など）
   - `libs/` - ライブラリ（DB、キャッシュ）
@@ -119,6 +130,7 @@ tests/api/
 ├── users.test.ts         # ユーザーAPI
 ├── matches.test.ts       # 対戦API
 ├── rankings.test.ts      # ランキングAPI
+├── lobby.test.ts         # PvPロビー（WebSocket）
 └── workflow.test.ts      # ワークフローテスト
 ```
 
@@ -202,7 +214,7 @@ Clean Architectureに基づいた4層構造を採用しています。
 
 | レイヤー       | 責務                                                     | 配置                                    |
 | -------------- | -------------------------------------------------------- | --------------------------------------- |
-| Interface      | リクエストのパース・バリデーション、ユースケース呼び出し | `app/routes/api/`                       |
+| Interface      | リクエストのパース・バリデーション、ユースケース呼び出し | `app/routes/api/`, `app/routes/ws/`     |
 | Usecase        | ビジネスロジックの実装                                   | `app/usecases/`                         |
 | Domain         | エンティティ、抽象リポジトリ定義                         | `app/domain/`                           |
 | Infrastructure | Drizzleによるリポジトリ実装                              | `app/domain/*/adapters.ts`, `app/libs/` |
@@ -219,6 +231,7 @@ Clean Architectureに基づいた4層構造を採用しています。
 | `domain/*/validator.ts`  | `entity.ts` のみ                                                                           |
 | `usecases/*/*.ts`        | `domain/*/entity.ts`, `domain/*/repository.ts`, `repositories-provider.ts`, `libs/cache/*` |
 | `routes/api/*.ts`        | `usecases/*/*.ts`, `schemas/*.ts`, `helpers/*`                                             |
+| `routes/ws/*.ts`         | `usecases/*/*.ts`, `domain/*/entity.ts`, `domain/*/adapters.ts`, `helpers/*`               |
 
 詳細は `docs/api-designdocs.md` の「実装上の注意点（Clean Architecture 準拠）」を参照してください。
 
@@ -283,3 +296,21 @@ bun run load:stress
 ```
 
 テストシナリオは `tests/load/` ディレクトリにあります。
+
+### WebSocket手動テスト
+
+websocat を使ってPvPロビーのWebSocket APIをテストできます。
+
+```bash
+# ユーザー作成してトークン取得
+TOKEN=$(curl -s -X POST http://localhost:3000/api/users | jq -r '.accessToken')
+
+# WebSocket接続
+websocat "ws://localhost:3000/ws?token=$TOKEN"
+
+# メッセージ送信例
+{"type":"createRoom"}
+{"type":"joinRoom","payload":{"roomCode":"ABC123"}}
+{"type":"stamp","payload":{"stampId":1}}
+{"type":"ready"}
+```
