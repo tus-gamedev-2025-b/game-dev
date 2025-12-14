@@ -1,6 +1,7 @@
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
+using Tanks.Complete;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -36,7 +37,7 @@ public class UIRequirementsTests
         EditorSceneManager.OpenScene(SCENE_PATH + "TitleScene.unity");
 
         // TitleSceneUIが存在することを確認
-        var titleSceneUI = Object.FindObjectOfType<Tanks.Complete.TitleSceneUI>();
+        var titleSceneUI = Object.FindObjectOfType<TitleSceneUI>();
         Assert.IsNotNull(titleSceneUI, "TitleSceneUIがシーンに存在しません");
 
         // StartButtonの存在とButtonコンポーネント確認
@@ -47,7 +48,7 @@ public class UIRequirementsTests
         Assert.IsNotNull(buttonComponent, "StartButtonにButtonコンポーネントがありません");
 
         // TitleSceneUIのstartButton参照が設定されているか確認
-        var field = typeof(Tanks.Complete.TitleSceneUI)
+        var field = typeof(TitleSceneUI)
             .GetField("startButton", BindingFlags.Instance | BindingFlags.NonPublic);
         var wiredButton = field?.GetValue(titleSceneUI) as Button;
         Assert.IsNotNull(wiredButton, "TitleSceneUIのstartButton参照が設定されていません");
