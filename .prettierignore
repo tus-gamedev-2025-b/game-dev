@@ -1,8 +1,7 @@
-/tanks/Library
-/tanks/Logs
-/tanks/obj
-/tanks/UserSettings
-
-/tanks/Assets
-/tanks/Packages
-/tanks/ProjectSettings
+/**
+ * @type {import("prettier").Config}
+ */
+export default {
+  semi: false,
+  endOfLine: "lf",
+}
