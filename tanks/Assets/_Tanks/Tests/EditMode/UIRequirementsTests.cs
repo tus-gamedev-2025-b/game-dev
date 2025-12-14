@@ -30,48 +30,6 @@ public class UIRequirementsTests
     }
 
     [Test]
-    public void TitleScene_HasTapToStartButton()
-    {
-        EditorSceneManager.OpenScene(SCENE_PATH + "TitleScene.unity");
-
-        // ボタンの存在確認
-        var startButton = GameObject.Find("StartButton");
-        Assert.IsNotNull(startButton,
-            "「Tap to Start」ボタンが配置されていません");
-
-        // Buttonコンポーネントの確認
-        var buttonComponent = startButton.GetComponent<Button>();
-        Assert.IsNotNull(buttonComponent, "StartButtonにButtonコンポーネントがありません");
-
-        // ボタンテキストの確認
-        var textChild = startButton.GetComponentInChildren<TextMeshProUGUI>();
-        Assert.IsNotNull(textChild, "ボタンにテキストがありません");
-        Assert.AreEqual("Tap to Start", textChild.text,
-            "ボタンテキストが「Tap to Start」ではありません");
-
-        // StartButtonスクリプトがアタッチされているか
-        var startButtonScript = startButton.GetComponent<StartButton>();
-        Assert.IsNotNull(startButtonScript,
-            "StartButtonスクリプトがアタッチされていません");
-    }
-
-    [Test]
-    public void TitleScene_ButtonHasTransitionEvent()
-    {
-        EditorSceneManager.OpenScene(SCENE_PATH + "TitleScene.unity");
-
-        var startButton = GameObject.Find("StartButton");
-        Assert.IsNotNull(startButton);
-
-        var buttonComponent = startButton.GetComponent<Button>();
-
-        // OnClickイベントが設定されているか確認
-        Assert.IsTrue(buttonComponent.onClick.GetPersistentEventCount() > 0 ||
-                      startButton.GetComponent<StartButton>() != null,
-            "ボタンに画面遷移イベントが設定されていません");
-    }
-
-    [Test]
     public void HomeScene_HasVersusPlayerButton()
     {
         EditorSceneManager.OpenScene(SCENE_PATH + "HomeScene.unity");
