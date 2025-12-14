@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using NUnit.Framework;
 using TMPro;
 using UnityEditor;
@@ -27,6 +28,29 @@ public class UIRequirementsTests
         // ロゴテキストが空でないことを確認
         Assert.IsFalse(string.IsNullOrEmpty(textComponent.text),
             "タイトルロゴのテキストが設定されていません");
+    }
+
+    [Test]
+    public void TitleScene_StartButtonIsPresentAndWired()
+    {
+        EditorSceneManager.OpenScene(SCENE_PATH + "TitleScene.unity");
+
+        // TitleSceneUIが存在することを確認
+        var titleSceneUI = Object.FindObjectOfType<Tanks.Complete.TitleSceneUI>();
+        Assert.IsNotNull(titleSceneUI, "TitleSceneUIがシーンに存在しません");
+
+        // StartButtonの存在とButtonコンポーネント確認
+        var startButtonGO = GameObject.Find("StartButton");
+        Assert.IsNotNull(startButtonGO, "StartButtonオブジェクトがありません");
+
+        var buttonComponent = startButtonGO.GetComponent<Button>();
+        Assert.IsNotNull(buttonComponent, "StartButtonにButtonコンポーネントがありません");
+
+        // TitleSceneUIのstartButton参照が設定されているか確認
+        var field = typeof(Tanks.Complete.TitleSceneUI)
+            .GetField("startButton", BindingFlags.Instance | BindingFlags.NonPublic);
+        var wiredButton = field?.GetValue(titleSceneUI) as Button;
+        Assert.IsNotNull(wiredButton, "TitleSceneUIのstartButton参照が設定されていません");
     }
 
     [Test]
