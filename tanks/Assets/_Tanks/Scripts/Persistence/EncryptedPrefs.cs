@@ -7,14 +7,14 @@ using UnityEngine;
 namespace Tanks.Complete.Persistence
 {
     /// <summary>
-    /// PlayerPrefs wrapper that encrypts string values before saving.
-    /// This keeps persisted auth data readable only by the app.
+    ///     PlayerPrefs wrapper that encrypts string values before saving.
+    ///     This keeps persisted auth data readable only by the app.
     /// </summary>
     public static class EncryptedPrefs
     {
         // Hard-coded key/IV are acceptable for this demo project. Obfuscate for production.
-        private static readonly byte[] Key = Encoding.UTF8.GetBytes("tanks-2025b-encrypt-key-32bytes!");
-        private static readonly byte[] Iv = Encoding.UTF8.GetBytes("tanks-2025-iv-16");
+        private readonly static byte[] Key = Encoding.UTF8.GetBytes("tanks-2025b-encrypt-key-32bytes!");
+        private readonly static byte[] Iv = Encoding.UTF8.GetBytes("tanks-2025-iv-16");
 
         public static void SetString(string key, string value)
         {
@@ -52,13 +52,25 @@ namespace Tanks.Complete.Persistence
             }
         }
 
-        public static bool HasKey(string key) => PlayerPrefs.HasKey(key);
+        public static bool HasKey(string key)
+        {
+            return PlayerPrefs.HasKey(key);
+        }
 
-        public static void DeleteKey(string key) => PlayerPrefs.DeleteKey(key);
+        public static void DeleteKey(string key)
+        {
+            PlayerPrefs.DeleteKey(key);
+        }
 
-        public static void DeleteAll() => PlayerPrefs.DeleteAll();
+        public static void DeleteAll()
+        {
+            PlayerPrefs.DeleteAll();
+        }
 
-        public static void Save() => PlayerPrefs.Save();
+        public static void Save()
+        {
+            PlayerPrefs.Save();
+        }
 
         private static string Encrypt(string plainText)
         {

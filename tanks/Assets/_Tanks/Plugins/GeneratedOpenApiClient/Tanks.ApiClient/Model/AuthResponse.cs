@@ -9,111 +9,106 @@
 
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// AuthResponse
+    ///     AuthResponse
     /// </summary>
     [DataContract(Name = "AuthResponse")]
-    public partial class AuthResponse
+    public class AuthResponse
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthResponse" /> class.
+        ///     Initializes a new instance of the <see cref="AuthResponse" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected AuthResponse() { }
+        protected AuthResponse()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthResponse" /> class.
+        ///     Initializes a new instance of the <see cref="AuthResponse" /> class.
         /// </summary>
         /// <param name="user">user (required).</param>
         /// <param name="accessToken">accessToken (required).</param>
         /// <param name="refreshToken">refreshToken (required).</param>
         /// <param name="accessTokenExpiresAt">accessTokenExpiresAt (required).</param>
         /// <param name="refreshTokenExpiresAt">refreshTokenExpiresAt (required).</param>
-        public AuthResponse(AuthResponseUser user = default, string accessToken = default, string refreshToken = default, string accessTokenExpiresAt = default, string refreshTokenExpiresAt = default)
+        public AuthResponse(AuthResponseUser user = default, string accessToken = default, string refreshToken = default, string accessTokenExpiresAt = default,
+            string refreshTokenExpiresAt = default)
         {
             // to ensure "user" is required (not null)
             if (user == null)
             {
                 throw new ArgumentNullException("user is a required property for AuthResponse and cannot be null");
             }
-            this.User = user;
+            User = user;
             // to ensure "accessToken" is required (not null)
             if (accessToken == null)
             {
                 throw new ArgumentNullException("accessToken is a required property for AuthResponse and cannot be null");
             }
-            this.AccessToken = accessToken;
+            AccessToken = accessToken;
             // to ensure "refreshToken" is required (not null)
             if (refreshToken == null)
             {
                 throw new ArgumentNullException("refreshToken is a required property for AuthResponse and cannot be null");
             }
-            this.RefreshToken = refreshToken;
+            RefreshToken = refreshToken;
             // to ensure "accessTokenExpiresAt" is required (not null)
             if (accessTokenExpiresAt == null)
             {
                 throw new ArgumentNullException("accessTokenExpiresAt is a required property for AuthResponse and cannot be null");
             }
-            this.AccessTokenExpiresAt = accessTokenExpiresAt;
+            AccessTokenExpiresAt = accessTokenExpiresAt;
             // to ensure "refreshTokenExpiresAt" is required (not null)
             if (refreshTokenExpiresAt == null)
             {
                 throw new ArgumentNullException("refreshTokenExpiresAt is a required property for AuthResponse and cannot be null");
             }
-            this.RefreshTokenExpiresAt = refreshTokenExpiresAt;
+            RefreshTokenExpiresAt = refreshTokenExpiresAt;
         }
 
         /// <summary>
-        /// Gets or Sets User
+        ///     Gets or Sets User
         /// </summary>
         [DataMember(Name = "user", IsRequired = true, EmitDefaultValue = true)]
         public AuthResponseUser User { get; set; }
 
         /// <summary>
-        /// Gets or Sets AccessToken
+        ///     Gets or Sets AccessToken
         /// </summary>
         [DataMember(Name = "accessToken", IsRequired = true, EmitDefaultValue = true)]
         public string AccessToken { get; set; }
 
         /// <summary>
-        /// Gets or Sets RefreshToken
+        ///     Gets or Sets RefreshToken
         /// </summary>
         [DataMember(Name = "refreshToken", IsRequired = true, EmitDefaultValue = true)]
         public string RefreshToken { get; set; }
 
         /// <summary>
-        /// Gets or Sets AccessTokenExpiresAt
+        ///     Gets or Sets AccessTokenExpiresAt
         /// </summary>
         [DataMember(Name = "accessTokenExpiresAt", IsRequired = true, EmitDefaultValue = true)]
         public string AccessTokenExpiresAt { get; set; }
 
         /// <summary>
-        /// Gets or Sets RefreshTokenExpiresAt
+        ///     Gets or Sets RefreshTokenExpiresAt
         /// </summary>
         [DataMember(Name = "refreshTokenExpiresAt", IsRequired = true, EmitDefaultValue = true)]
         public string RefreshTokenExpiresAt { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class AuthResponse {\n");
             sb.Append("  User: ").Append(User).Append("\n");
             sb.Append("  AccessToken: ").Append(AccessToken).Append("\n");
@@ -125,14 +120,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }

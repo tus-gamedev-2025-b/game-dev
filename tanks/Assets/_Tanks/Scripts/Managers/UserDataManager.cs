@@ -13,6 +13,9 @@ namespace Tanks.Complete
 {
     public class UserDataManager : MonoBehaviour
     {
+        private string _basePath;
+
+        private Configuration _configuration;
         public static UserDataManager Instance { get; private set; }
 
         public UserData CurrentUserData { get; private set; }
@@ -20,12 +23,6 @@ namespace Tanks.Complete
 
         public bool HasSession => CurrentUserData != null && CurrentUserData.IsValid && CurrentTokens != null && CurrentTokens.IsRefreshTokenValid();
         public bool HasValidAccessToken => CurrentTokens != null && CurrentTokens.IsAccessTokenValid();
-
-        public event Action<UserData> OnUserDataChanged;
-        public event Action OnSessionCleared;
-
-        private Configuration _configuration;
-        private string _basePath;
 
         private void Awake()
         {
@@ -41,6 +38,9 @@ namespace Tanks.Complete
             _basePath = ApiConfig.ResolveBasePath();
             RestoreSessionFromStorage();
         }
+
+        public event Action<UserData> OnUserDataChanged;
+        public event Action OnSessionCleared;
 
         public async Task<AuthResponse> CreateAndLoginUserAsync(string displayName, CancellationToken cancellationToken = default)
         {

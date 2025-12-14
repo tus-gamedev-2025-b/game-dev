@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Tanks.Complete.UI
 {
     /// <summary>
-    /// Simple loading overlay that blocks input while an async operation runs.
+    ///     Simple loading overlay that blocks input while an async operation runs.
     /// </summary>
     public class LoadingOverlay : MonoBehaviour
     {

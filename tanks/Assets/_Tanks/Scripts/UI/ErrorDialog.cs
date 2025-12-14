@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace Tanks.Complete.UI
 {
     /// <summary>
-    /// Lightweight error dialog. Shows a message and closes when the button is pressed.
+    ///     Lightweight error dialog. Shows a message and closes when the button is pressed.
     /// </summary>
     public class ErrorDialog : MonoBehaviour
     {

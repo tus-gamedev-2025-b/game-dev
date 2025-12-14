@@ -9,11 +9,8 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net;
-using System.Net.Mime;
+using System.Threading;
+using System.Threading.Tasks;
 using Tanks.ApiClient.Client;
 using Tanks.ApiClient.Model;
 
@@ -21,82 +18,95 @@ namespace Tanks.ApiClient.Api
 {
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
     public interface IRankingsApiSync : IApiAccessor
     {
+
         #region Synchronous Operations
+
         /// <summary>
-        /// Get rankings
+        ///     Get rankings
         /// </summary>
         /// <remarks>
-        /// Retrieve TOP10 rankings and current user&#39;s rank
+        ///     Retrieve TOP10 rankings and current user&#39;s rank
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <returns>RankingResponse</returns>
         RankingResponse RankingsGet();
 
         /// <summary>
-        /// Get rankings
+        ///     Get rankings
         /// </summary>
         /// <remarks>
-        /// Retrieve TOP10 rankings and current user&#39;s rank
+        ///     Retrieve TOP10 rankings and current user&#39;s rank
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <returns>ApiResponse of RankingResponse</returns>
         ApiResponse<RankingResponse> RankingsGetWithHttpInfo();
+
         #endregion Synchronous Operations
+
     }
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
     public interface IRankingsApiAsync : IApiAccessor
     {
+
         #region Asynchronous Operations
+
         /// <summary>
-        /// Get rankings
+        ///     Get rankings
         /// </summary>
         /// <remarks>
-        /// Retrieve TOP10 rankings and current user&#39;s rank
+        ///     Retrieve TOP10 rankings and current user&#39;s rank
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of RankingResponse</returns>
-        System.Threading.Tasks.Task<RankingResponse> RankingsGetAsync(System.Threading.CancellationToken cancellationToken = default);
+        Task<RankingResponse> RankingsGetAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get rankings
+        ///     Get rankings
         /// </summary>
         /// <remarks>
-        /// Retrieve TOP10 rankings and current user&#39;s rank
+        ///     Retrieve TOP10 rankings and current user&#39;s rank
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (RankingResponse)</returns>
-        System.Threading.Tasks.Task<ApiResponse<RankingResponse>> RankingsGetWithHttpInfoAsync(System.Threading.CancellationToken cancellationToken = default);
+        Task<ApiResponse<RankingResponse>> RankingsGetWithHttpInfoAsync(CancellationToken cancellationToken = default);
+
         #endregion Asynchronous Operations
+
     }
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
     public interface IRankingsApi : IRankingsApiSync, IRankingsApiAsync
     {
-
     }
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
-    public partial class RankingsApi : IDisposable, IRankingsApi
+    public class RankingsApi : IDisposable, IRankingsApi
     {
-        private Tanks.ApiClient.Client.ExceptionFactory _exceptionFactory = (name, response) => null;
+        private ExceptionFactory _exceptionFactory = (name, response) => null;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RankingsApi"/> class.
-        /// **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
-        /// It's better to reuse the <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">HttpClient and HttpClientHandler</see>.
+        ///     Initializes a new instance of the <see cref="RankingsApi" /> class.
+        ///     **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
+        ///     It's better to reuse the
+        ///     <see
+        ///         href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">
+        ///         HttpClient
+        ///         and HttpClientHandler
+        ///     </see>
+        ///     .
         /// </summary>
         /// <returns></returns>
         public RankingsApi() : this((string)null)
@@ -104,109 +114,121 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RankingsApi"/> class.
-        /// **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
-        /// It's better to reuse the <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">HttpClient and HttpClientHandler</see>.
+        ///     Initializes a new instance of the <see cref="RankingsApi" /> class.
+        ///     **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
+        ///     It's better to reuse the
+        ///     <see
+        ///         href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">
+        ///         HttpClient
+        ///         and HttpClientHandler
+        ///     </see>
+        ///     .
         /// </summary>
         /// <param name="basePath">The target service's base path in URL format.</param>
         /// <exception cref="ArgumentException"></exception>
         /// <returns></returns>
         public RankingsApi(string basePath)
         {
-            this.Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
-                Tanks.ApiClient.Client.GlobalConfiguration.Instance,
-                new Tanks.ApiClient.Client.Configuration { BasePath = basePath }
+            Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
+                GlobalConfiguration.Instance,
+                new Configuration { BasePath = basePath }
             );
-            this.ApiClient = new Tanks.ApiClient.Client.ApiClient(this.Configuration.BasePath);
-            this.Client =  this.ApiClient;
-            this.AsynchronousClient = this.ApiClient;
-            this.ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RankingsApi"/> class using Configuration object.
-        /// **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
-        /// It's better to reuse the <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">HttpClient and HttpClientHandler</see>.
-        /// </summary>
-        /// <param name="configuration">An instance of Configuration.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <returns></returns>
-        public RankingsApi(Tanks.ApiClient.Client.Configuration configuration)
-        {
-            if (configuration == null) throw new ArgumentNullException("configuration");
-
-            this.Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
-                Tanks.ApiClient.Client.GlobalConfiguration.Instance,
-                configuration
-            );
-            this.ApiClient = new Tanks.ApiClient.Client.ApiClient(this.Configuration.BasePath);
-            this.Client = this.ApiClient;
-            this.AsynchronousClient = this.ApiClient;
+            ApiClient = new Client.ApiClient(Configuration.BasePath);
+            Client = ApiClient;
+            AsynchronousClient = ApiClient;
             ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RankingsApi"/> class
-        /// using a Configuration object and client instance.
+        ///     Initializes a new instance of the <see cref="RankingsApi" /> class using Configuration object.
+        ///     **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
+        ///     It's better to reuse the
+        ///     <see
+        ///         href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">
+        ///         HttpClient
+        ///         and HttpClientHandler
+        ///     </see>
+        ///     .
+        /// </summary>
+        /// <param name="configuration">An instance of Configuration.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns></returns>
+        public RankingsApi(Configuration configuration)
+        {
+            if (configuration == null) throw new ArgumentNullException("configuration");
+
+            Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
+                GlobalConfiguration.Instance,
+                configuration
+            );
+            ApiClient = new Client.ApiClient(Configuration.BasePath);
+            Client = ApiClient;
+            AsynchronousClient = ApiClient;
+            ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="RankingsApi" /> class
+        ///     using a Configuration object and client instance.
         /// </summary>
         /// <param name="client">The client interface for synchronous API access.</param>
         /// <param name="asyncClient">The client interface for asynchronous API access.</param>
         /// <param name="configuration">The configuration object.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public RankingsApi(Tanks.ApiClient.Client.ISynchronousClient client, Tanks.ApiClient.Client.IAsynchronousClient asyncClient, Tanks.ApiClient.Client.IReadableConfiguration configuration)
+        public RankingsApi(ISynchronousClient client, IAsynchronousClient asyncClient, IReadableConfiguration configuration)
         {
             if (client == null) throw new ArgumentNullException("client");
             if (asyncClient == null) throw new ArgumentNullException("asyncClient");
             if (configuration == null) throw new ArgumentNullException("configuration");
 
-            this.Client = client;
-            this.AsynchronousClient = asyncClient;
-            this.Configuration = configuration;
-            this.ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
+            Client = client;
+            AsynchronousClient = asyncClient;
+            Configuration = configuration;
+            ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
         }
 
         /// <summary>
-        /// Disposes resources if they were created by us
+        ///     Holds the ApiClient if created
+        /// </summary>
+        public Client.ApiClient ApiClient { get; set; }
+
+        /// <summary>
+        ///     The client for accessing this underlying API asynchronously.
+        /// </summary>
+        public IAsynchronousClient AsynchronousClient { get; set; }
+
+        /// <summary>
+        ///     The client for accessing this underlying API synchronously.
+        /// </summary>
+        public ISynchronousClient Client { get; set; }
+
+        /// <summary>
+        ///     Disposes resources if they were created by us
         /// </summary>
         public void Dispose()
         {
-            this.ApiClient?.Dispose();
+            ApiClient?.Dispose();
         }
 
         /// <summary>
-        /// Holds the ApiClient if created
-        /// </summary>
-        public Tanks.ApiClient.Client.ApiClient ApiClient { get; set; } = null;
-
-        /// <summary>
-        /// The client for accessing this underlying API asynchronously.
-        /// </summary>
-        public Tanks.ApiClient.Client.IAsynchronousClient AsynchronousClient { get; set; }
-
-        /// <summary>
-        /// The client for accessing this underlying API synchronously.
-        /// </summary>
-        public Tanks.ApiClient.Client.ISynchronousClient Client { get; set; }
-
-        /// <summary>
-        /// Gets the base path of the API client.
+        ///     Gets the base path of the API client.
         /// </summary>
         /// <value>The base path</value>
         public string GetBasePath()
         {
-            return this.Configuration.BasePath;
+            return Configuration.BasePath;
         }
 
         /// <summary>
-        /// Gets or sets the configuration object
+        ///     Gets or sets the configuration object
         /// </summary>
         /// <value>An instance of the Configuration</value>
-        public Tanks.ApiClient.Client.IReadableConfiguration Configuration { get; set; }
+        public IReadableConfiguration Configuration { get; set; }
 
         /// <summary>
-        /// Provides a factory method hook for the creation of exceptions.
+        ///     Provides a factory method hook for the creation of exceptions.
         /// </summary>
-        public Tanks.ApiClient.Client.ExceptionFactory ExceptionFactory
+        public ExceptionFactory ExceptionFactory
         {
             get
             {
@@ -216,57 +238,59 @@ namespace Tanks.ApiClient.Api
                 }
                 return _exceptionFactory;
             }
-            set { _exceptionFactory = value; }
+            set => _exceptionFactory = value;
         }
 
         /// <summary>
-        /// Get rankings Retrieve TOP10 rankings and current user&#39;s rank
+        ///     Get rankings Retrieve TOP10 rankings and current user&#39;s rank
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <returns>RankingResponse</returns>
         public RankingResponse RankingsGet()
         {
-            Tanks.ApiClient.Client.ApiResponse<RankingResponse> localVarResponse = RankingsGetWithHttpInfo();
+            var localVarResponse = RankingsGetWithHttpInfo();
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Get rankings Retrieve TOP10 rankings and current user&#39;s rank
+        ///     Get rankings Retrieve TOP10 rankings and current user&#39;s rank
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <returns>ApiResponse of RankingResponse</returns>
-        public Tanks.ApiClient.Client.ApiResponse<RankingResponse> RankingsGetWithHttpInfo()
+        public ApiResponse<RankingResponse> RankingsGetWithHttpInfo()
         {
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new string[]
+            {
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
 
             // authentication (Bearer) required
             // bearer authentication required
-            if (!string.IsNullOrEmpty(this.Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+            if (!string.IsNullOrEmpty(Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + this.Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
             }
 
             // make the HTTP request
-            var localVarResponse = this.Client.Get<RankingResponse>("/rankings", localVarRequestOptions, this.Configuration);
+            var localVarResponse = Client.Get<RankingResponse>("/rankings", localVarRequestOptions, Configuration);
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("RankingsGet", localVarResponse);
+                var _exception = ExceptionFactory("RankingsGet", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -274,74 +298,75 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Get rankings Retrieve TOP10 rankings and current user&#39;s rank
+        ///     Get rankings Retrieve TOP10 rankings and current user&#39;s rank
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of RankingResponse</returns>
-        public async System.Threading.Tasks.Task<RankingResponse> RankingsGetAsync(System.Threading.CancellationToken cancellationToken = default)
+        public async Task<RankingResponse> RankingsGetAsync(CancellationToken cancellationToken = default)
         {
             var task = RankingsGetWithHttpInfoAsync(cancellationToken);
-#if UNITY_EDITOR || !UNITY_WEBGL
-            Tanks.ApiClient.Client.ApiResponse<RankingResponse> localVarResponse = await task.ConfigureAwait(false);
-#else
+            #if UNITY_EDITOR || !UNITY_WEBGL
+            var localVarResponse = await task.ConfigureAwait(false);
+            #else
             Tanks.ApiClient.Client.ApiResponse<RankingResponse> localVarResponse = await task;
-#endif
+            #endif
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Get rankings Retrieve TOP10 rankings and current user&#39;s rank
+        ///     Get rankings Retrieve TOP10 rankings and current user&#39;s rank
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (RankingResponse)</returns>
-        public async System.Threading.Tasks.Task<Tanks.ApiClient.Client.ApiResponse<RankingResponse>> RankingsGetWithHttpInfoAsync(System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<RankingResponse>> RankingsGetWithHttpInfoAsync(CancellationToken cancellationToken = default)
         {
 
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new string[]
+            {
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
 
             // authentication (Bearer) required
             // bearer authentication required
-            if (!string.IsNullOrEmpty(this.Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+            if (!string.IsNullOrEmpty(Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + this.Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
             }
 
             // make the HTTP request
 
-            var task = this.AsynchronousClient.GetAsync<RankingResponse>("/rankings", localVarRequestOptions, this.Configuration, cancellationToken);
+            var task = AsynchronousClient.GetAsync<RankingResponse>("/rankings", localVarRequestOptions, Configuration, cancellationToken);
 
-#if UNITY_EDITOR || !UNITY_WEBGL
+            #if UNITY_EDITOR || !UNITY_WEBGL
             var localVarResponse = await task.ConfigureAwait(false);
-#else
+            #else
             var localVarResponse = await task;
-#endif
+            #endif
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("RankingsGet", localVarResponse);
+                var _exception = ExceptionFactory("RankingsGet", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
             return localVarResponse;
         }
-
     }
 }

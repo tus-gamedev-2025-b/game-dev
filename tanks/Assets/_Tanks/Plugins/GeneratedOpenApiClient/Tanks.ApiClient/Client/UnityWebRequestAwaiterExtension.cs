@@ -15,9 +15,9 @@ using UnityEngine.Networking;
 namespace Tanks.ApiClient.Client
 {
     /// <summary>
-    /// Provides an awaiter for UnityWebRequestAsyncOperation to allow `await request.SendWebRequest()`
-    /// in Unity async methods. Unity's AsyncOperation types are not awaitable by default, so this
-    /// extension bridges that gap by converting the operation into a Task.
+    ///     Provides an awaiter for UnityWebRequestAsyncOperation to allow `await request.SendWebRequest()`
+    ///     in Unity async methods. Unity's AsyncOperation types are not awaitable by default, so this
+    ///     extension bridges that gap by converting the operation into a Task.
     /// </summary>
     public static class UnityWebRequestAwaiterExtensions
     {

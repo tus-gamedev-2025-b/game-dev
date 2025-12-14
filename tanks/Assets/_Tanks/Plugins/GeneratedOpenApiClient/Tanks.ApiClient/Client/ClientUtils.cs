@@ -17,28 +17,35 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Tanks.ApiClient.Client
 {
     /// <summary>
-    /// Utility functions providing some benefit to API client consumers.
+    ///     Utility functions providing some benefit to API client consumers.
     /// </summary>
     public static class ClientUtils
     {
+
         /// <summary>
-        /// Sanitize filename by removing the path
+        ///     Provides a case-insensitive check that a provided content type is a known JSON-like content type.
+        /// </summary>
+        public readonly static Regex JsonRegex = new Regex("(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$");
+
+        /// <summary>
+        ///     Sanitize filename by removing the path
         /// </summary>
         /// <param name="filename">Filename</param>
         /// <returns>Filename</returns>
         public static string SanitizeFilename(string filename)
         {
-            Match match = Regex.Match(filename, @".*[/\\](.*)$");
+            var match = Regex.Match(filename, @".*[/\\](.*)$");
             return match.Success ? match.Groups[1].Value : filename;
         }
 
         /// <summary>
-        /// Convert params to key/value pairs.
-        /// Use collectionFormat to properly format lists and collections.
+        ///     Convert params to key/value pairs.
+        ///     Use collectionFormat to properly format lists and collections.
         /// </summary>
         /// <param name="collectionFormat">The swagger-supported collection format, one of: csv, tsv, ssv, pipes, multi</param>
         /// <param name="name">Key name.</param>
@@ -57,13 +64,15 @@ namespace Tanks.ApiClient.Client
             }
             else if (value is IDictionary dictionary)
             {
-                if(collectionFormat == "deepObject") {
+                if (collectionFormat == "deepObject")
+                {
                     foreach (DictionaryEntry entry in dictionary)
                     {
                         parameters.Add(name + "[" + entry.Key + "]", ParameterToString(entry.Value));
                     }
                 }
-                else {
+                else
+                {
                     foreach (DictionaryEntry entry in dictionary)
                     {
                         parameters.Add(entry.Key.ToString(), ParameterToString(entry.Value));
@@ -79,9 +88,10 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// If parameter is DateTime, output in a formatted string (default ISO 8601), customizable with Configuration.DateTime.
-        /// If parameter is a list, join the list with ",".
-        /// Otherwise just return the string.
+        ///     If parameter is DateTime, output in a formatted string (default ISO 8601), customizable with
+        ///     Configuration.DateTime.
+        ///     If parameter is a list, join the list with ",".
+        ///     Otherwise just return the string.
         /// </summary>
         /// <param name="obj">The parameter (header, path, query, form).</param>
         /// <param name="configuration">An optional configuration instance, providing formatting options used in processing.</param>
@@ -102,8 +112,9 @@ namespace Tanks.ApiClient.Client
                 return dateTimeOffset.ToString((configuration ?? GlobalConfiguration.Instance).DateTimeFormat);
             if (obj is bool boolean)
                 return boolean ? "true" : "false";
-            if (obj is ICollection collection) {
-                List<string> entries = new List<string>();
+            if (obj is ICollection collection)
+            {
+                var entries = new List<string>();
                 foreach (var entry in collection)
                     entries.Add(ParameterToString(entry, configuration));
                 return string.Join(",", entries);
@@ -115,27 +126,27 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Serializes the given object when not null. Otherwise return null.
+        ///     Serializes the given object when not null. Otherwise return null.
         /// </summary>
         /// <param name="obj">The object to serialize.</param>
         /// <returns>Serialized string.</returns>
         public static string Serialize(object obj)
         {
-            return obj != null ? Newtonsoft.Json.JsonConvert.SerializeObject(obj) : null;
+            return obj != null ? JsonConvert.SerializeObject(obj) : null;
         }
 
         /// <summary>
-        /// Encode string in base64 format.
+        ///     Encode string in base64 format.
         /// </summary>
         /// <param name="text">string to be encoded.</param>
         /// <returns>Encoded string.</returns>
         public static string Base64Encode(string text)
         {
-            return Convert.ToBase64String(global::System.Text.Encoding.UTF8.GetBytes(text));
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
         }
 
         /// <summary>
-        /// Convert stream to byte array
+        ///     Convert stream to byte array
         /// </summary>
         /// <param name="inputStream">Input stream to be converted</param>
         /// <returns>Byte array</returns>
@@ -149,9 +160,9 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Select the Content-Type header's value from the given content-type array:
-        /// if JSON type exists in the given array, use it;
-        /// otherwise use the first one defined in 'consumes'
+        ///     Select the Content-Type header's value from the given content-type array:
+        ///     if JSON type exists in the given array, use it;
+        ///     otherwise use the first one defined in 'consumes'
         /// </summary>
         /// <param name="contentTypes">The Content-Type array to select from.</param>
         /// <returns>The Content-Type header to use.</returns>
@@ -170,9 +181,9 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Select the Accept header's value from the given accepts array:
-        /// if JSON exists in the given array, use it;
-        /// otherwise use all of them (joining into a string)
+        ///     Select the Accept header's value from the given accepts array:
+        ///     if JSON exists in the given array, use it;
+        ///     otherwise use all of them (joining into a string)
         /// </summary>
         /// <param name="accepts">The accepts array to select from.</param>
         /// <returns>The Accept header to use.</returns>
@@ -188,17 +199,12 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Provides a case-insensitive check that a provided content type is a known JSON-like content type.
-        /// </summary>
-        public static readonly Regex JsonRegex = new Regex("(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$");
-
-        /// <summary>
-        /// Check if the given MIME is a JSON MIME.
-        /// JSON MIME examples:
-        ///    application/json
-        ///    application/json; charset=UTF8
-        ///    APPLICATION/JSON
-        ///    application/vnd.company+json
+        ///     Check if the given MIME is a JSON MIME.
+        ///     JSON MIME examples:
+        ///     application/json
+        ///     application/json; charset=UTF8
+        ///     APPLICATION/JSON
+        ///     application/vnd.company+json
         /// </summary>
         /// <param name="mime">MIME</param>
         /// <returns>Returns True if MIME type is json.</returns>
@@ -210,7 +216,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Is the Enum decorated with EnumMember Attribute
+        ///     Is the Enum decorated with EnumMember Attribute
         /// </summary>
         /// <param name="enumVal"></param>
         /// <returns>true if found</returns>
@@ -222,11 +228,11 @@ namespace Tanks.ApiClient.Client
             var memInfo = enumType.GetMember(enumVal.ToString() ?? throw new InvalidOperationException());
             var attr = memInfo.FirstOrDefault()?.GetCustomAttributes(false).OfType<EnumMemberAttribute>().FirstOrDefault();
             if (attr != null) return true;
-                return false;
+            return false;
         }
 
         /// <summary>
-        /// Get the EnumMember value
+        ///     Get the EnumMember value
         /// </summary>
         /// <param name="enumVal"></param>
         /// <returns>EnumMember value as string otherwise null</returns>

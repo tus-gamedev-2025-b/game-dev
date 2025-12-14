@@ -15,101 +15,96 @@ using System.Net;
 namespace Tanks.ApiClient.Client
 {
     /// <summary>
-    /// Provides a non-generic contract for the ApiResponse wrapper.
+    ///     Provides a non-generic contract for the ApiResponse wrapper.
     /// </summary>
     public interface IApiResponse
     {
         /// <summary>
-        /// The data type of <see cref="Content"/>
+        ///     The data type of <see cref="Content" />
         /// </summary>
         Type ResponseType { get; }
 
         /// <summary>
-        /// The content of this response
+        ///     The content of this response
         /// </summary>
-        Object Content { get; }
+        object Content { get; }
 
         /// <summary>
-        /// Gets or sets the status code (HTTP status code)
+        ///     Gets or sets the status code (HTTP status code)
         /// </summary>
         /// <value>The status code.</value>
         HttpStatusCode StatusCode { get; }
 
         /// <summary>
-        /// Gets or sets the HTTP headers
+        ///     Gets or sets the HTTP headers
         /// </summary>
         /// <value>HTTP headers</value>
         Multimap<string, string> Headers { get; }
 
         /// <summary>
-        /// Gets or sets any error text defined by the calling client.
+        ///     Gets or sets any error text defined by the calling client.
         /// </summary>
         string ErrorText { get; set; }
 
         /// <summary>
-        /// Gets or sets any cookies passed along on the response.
+        ///     Gets or sets any cookies passed along on the response.
         /// </summary>
         List<Cookie> Cookies { get; set; }
 
         /// <summary>
-        /// The raw content of this response
+        ///     The raw content of this response
         /// </summary>
         string RawContent { get; }
     }
 
     /// <summary>
-    /// API Response
+    ///     API Response
     /// </summary>
     public class ApiResponse<T> : IApiResponse
     {
+
         #region Properties
 
         /// <summary>
-        /// Gets or sets the status code (HTTP status code)
+        ///     Gets or sets the status code (HTTP status code)
         /// </summary>
         /// <value>The status code.</value>
         public HttpStatusCode StatusCode { get; }
 
         /// <summary>
-        /// Gets or sets the HTTP headers
+        ///     Gets or sets the HTTP headers
         /// </summary>
         /// <value>HTTP headers</value>
         public Multimap<string, string> Headers { get; }
 
         /// <summary>
-        /// Gets or sets the data (parsed HTTP body)
+        ///     Gets or sets the data (parsed HTTP body)
         /// </summary>
         /// <value>The data.</value>
         public T Data { get; }
 
         /// <summary>
-        /// Gets or sets any error text defined by the calling client.
+        ///     Gets or sets any error text defined by the calling client.
         /// </summary>
         public string ErrorText { get; set; }
 
         /// <summary>
-        /// Gets or sets any cookies passed along on the response.
+        ///     Gets or sets any cookies passed along on the response.
         /// </summary>
         public List<Cookie> Cookies { get; set; }
 
         /// <summary>
-        /// The content of this response
+        ///     The content of this response
         /// </summary>
-        public Type ResponseType
-        {
-            get { return typeof(T); }
-        }
+        public Type ResponseType => typeof(T);
 
         /// <summary>
-        /// The data type of <see cref="Content"/>
+        ///     The data type of <see cref="Content" />
         /// </summary>
-        public object Content
-        {
-            get { return Data; }
-        }
+        public object Content => Data;
 
         /// <summary>
-        /// The raw content
+        ///     The raw content
         /// </summary>
         public string RawContent { get; }
 
@@ -118,7 +113,7 @@ namespace Tanks.ApiClient.Client
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApiResponse{T}" /> class.
+        ///     Initializes a new instance of the <see cref="ApiResponse{T}" /> class.
         /// </summary>
         /// <param name="statusCode">HTTP status code.</param>
         /// <param name="headers">HTTP headers.</param>
@@ -133,7 +128,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApiResponse{T}" /> class.
+        ///     Initializes a new instance of the <see cref="ApiResponse{T}" /> class.
         /// </summary>
         /// <param name="statusCode">HTTP status code.</param>
         /// <param name="headers">HTTP headers.</param>
@@ -143,7 +138,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApiResponse{T}" /> class.
+        ///     Initializes a new instance of the <see cref="ApiResponse{T}" /> class.
         /// </summary>
         /// <param name="statusCode">HTTP status code.</param>
         /// <param name="data">Data (parsed HTTP body)</param>
@@ -153,7 +148,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApiResponse{T}" /> class.
+        ///     Initializes a new instance of the <see cref="ApiResponse{T}" /> class.
         /// </summary>
         /// <param name="statusCode">HTTP status code.</param>
         /// <param name="data">Data (parsed HTTP body)</param>
@@ -162,5 +157,6 @@ namespace Tanks.ApiClient.Client
         }
 
         #endregion Constructors
+
     }
 }

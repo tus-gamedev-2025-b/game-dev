@@ -9,11 +9,8 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net;
-using System.Net.Mime;
+using System.Threading;
+using System.Threading.Tasks;
 using Tanks.ApiClient.Client;
 using Tanks.ApiClient.Model;
 
@@ -21,16 +18,18 @@ namespace Tanks.ApiClient.Api
 {
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
     public interface IMatchesApiSync : IApiAccessor
     {
+
         #region Synchronous Operations
+
         /// <summary>
-        /// Record match result
+        ///     Record match result
         /// </summary>
         /// <remarks>
-        /// Record the result of a match and update player statistics
+        ///     Record the result of a match and update player statistics
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="recordMatchRequest"> (optional)</param>
@@ -38,69 +37,81 @@ namespace Tanks.ApiClient.Api
         MatchResponse MatchesPost(RecordMatchRequest recordMatchRequest = default);
 
         /// <summary>
-        /// Record match result
+        ///     Record match result
         /// </summary>
         /// <remarks>
-        /// Record the result of a match and update player statistics
+        ///     Record the result of a match and update player statistics
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="recordMatchRequest"> (optional)</param>
         /// <returns>ApiResponse of MatchResponse</returns>
         ApiResponse<MatchResponse> MatchesPostWithHttpInfo(RecordMatchRequest recordMatchRequest = default);
+
         #endregion Synchronous Operations
+
     }
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
     public interface IMatchesApiAsync : IApiAccessor
     {
+
         #region Asynchronous Operations
+
         /// <summary>
-        /// Record match result
+        ///     Record match result
         /// </summary>
         /// <remarks>
-        /// Record the result of a match and update player statistics
+        ///     Record the result of a match and update player statistics
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="recordMatchRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of MatchResponse</returns>
-        System.Threading.Tasks.Task<MatchResponse> MatchesPostAsync(RecordMatchRequest recordMatchRequest = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<MatchResponse> MatchesPostAsync(RecordMatchRequest recordMatchRequest = default, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Record match result
+        ///     Record match result
         /// </summary>
         /// <remarks>
-        /// Record the result of a match and update player statistics
+        ///     Record the result of a match and update player statistics
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="recordMatchRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (MatchResponse)</returns>
-        System.Threading.Tasks.Task<ApiResponse<MatchResponse>> MatchesPostWithHttpInfoAsync(RecordMatchRequest recordMatchRequest = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<ApiResponse<MatchResponse>>
+            MatchesPostWithHttpInfoAsync(RecordMatchRequest recordMatchRequest = default, CancellationToken cancellationToken = default);
+
         #endregion Asynchronous Operations
+
     }
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
     public interface IMatchesApi : IMatchesApiSync, IMatchesApiAsync
     {
-
     }
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
-    public partial class MatchesApi : IDisposable, IMatchesApi
+    public class MatchesApi : IDisposable, IMatchesApi
     {
-        private Tanks.ApiClient.Client.ExceptionFactory _exceptionFactory = (name, response) => null;
+        private ExceptionFactory _exceptionFactory = (name, response) => null;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchesApi"/> class.
-        /// **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
-        /// It's better to reuse the <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">HttpClient and HttpClientHandler</see>.
+        ///     Initializes a new instance of the <see cref="MatchesApi" /> class.
+        ///     **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
+        ///     It's better to reuse the
+        ///     <see
+        ///         href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">
+        ///         HttpClient
+        ///         and HttpClientHandler
+        ///     </see>
+        ///     .
         /// </summary>
         /// <returns></returns>
         public MatchesApi() : this((string)null)
@@ -108,109 +119,121 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchesApi"/> class.
-        /// **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
-        /// It's better to reuse the <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">HttpClient and HttpClientHandler</see>.
+        ///     Initializes a new instance of the <see cref="MatchesApi" /> class.
+        ///     **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
+        ///     It's better to reuse the
+        ///     <see
+        ///         href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">
+        ///         HttpClient
+        ///         and HttpClientHandler
+        ///     </see>
+        ///     .
         /// </summary>
         /// <param name="basePath">The target service's base path in URL format.</param>
         /// <exception cref="ArgumentException"></exception>
         /// <returns></returns>
         public MatchesApi(string basePath)
         {
-            this.Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
-                Tanks.ApiClient.Client.GlobalConfiguration.Instance,
-                new Tanks.ApiClient.Client.Configuration { BasePath = basePath }
+            Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
+                GlobalConfiguration.Instance,
+                new Configuration { BasePath = basePath }
             );
-            this.ApiClient = new Tanks.ApiClient.Client.ApiClient(this.Configuration.BasePath);
-            this.Client =  this.ApiClient;
-            this.AsynchronousClient = this.ApiClient;
-            this.ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MatchesApi"/> class using Configuration object.
-        /// **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
-        /// It's better to reuse the <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">HttpClient and HttpClientHandler</see>.
-        /// </summary>
-        /// <param name="configuration">An instance of Configuration.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <returns></returns>
-        public MatchesApi(Tanks.ApiClient.Client.Configuration configuration)
-        {
-            if (configuration == null) throw new ArgumentNullException("configuration");
-
-            this.Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
-                Tanks.ApiClient.Client.GlobalConfiguration.Instance,
-                configuration
-            );
-            this.ApiClient = new Tanks.ApiClient.Client.ApiClient(this.Configuration.BasePath);
-            this.Client = this.ApiClient;
-            this.AsynchronousClient = this.ApiClient;
+            ApiClient = new Client.ApiClient(Configuration.BasePath);
+            Client = ApiClient;
+            AsynchronousClient = ApiClient;
             ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchesApi"/> class
-        /// using a Configuration object and client instance.
+        ///     Initializes a new instance of the <see cref="MatchesApi" /> class using Configuration object.
+        ///     **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
+        ///     It's better to reuse the
+        ///     <see
+        ///         href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">
+        ///         HttpClient
+        ///         and HttpClientHandler
+        ///     </see>
+        ///     .
+        /// </summary>
+        /// <param name="configuration">An instance of Configuration.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns></returns>
+        public MatchesApi(Configuration configuration)
+        {
+            if (configuration == null) throw new ArgumentNullException("configuration");
+
+            Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
+                GlobalConfiguration.Instance,
+                configuration
+            );
+            ApiClient = new Client.ApiClient(Configuration.BasePath);
+            Client = ApiClient;
+            AsynchronousClient = ApiClient;
+            ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MatchesApi" /> class
+        ///     using a Configuration object and client instance.
         /// </summary>
         /// <param name="client">The client interface for synchronous API access.</param>
         /// <param name="asyncClient">The client interface for asynchronous API access.</param>
         /// <param name="configuration">The configuration object.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public MatchesApi(Tanks.ApiClient.Client.ISynchronousClient client, Tanks.ApiClient.Client.IAsynchronousClient asyncClient, Tanks.ApiClient.Client.IReadableConfiguration configuration)
+        public MatchesApi(ISynchronousClient client, IAsynchronousClient asyncClient, IReadableConfiguration configuration)
         {
             if (client == null) throw new ArgumentNullException("client");
             if (asyncClient == null) throw new ArgumentNullException("asyncClient");
             if (configuration == null) throw new ArgumentNullException("configuration");
 
-            this.Client = client;
-            this.AsynchronousClient = asyncClient;
-            this.Configuration = configuration;
-            this.ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
+            Client = client;
+            AsynchronousClient = asyncClient;
+            Configuration = configuration;
+            ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
         }
 
         /// <summary>
-        /// Disposes resources if they were created by us
+        ///     Holds the ApiClient if created
+        /// </summary>
+        public Client.ApiClient ApiClient { get; set; }
+
+        /// <summary>
+        ///     The client for accessing this underlying API asynchronously.
+        /// </summary>
+        public IAsynchronousClient AsynchronousClient { get; set; }
+
+        /// <summary>
+        ///     The client for accessing this underlying API synchronously.
+        /// </summary>
+        public ISynchronousClient Client { get; set; }
+
+        /// <summary>
+        ///     Disposes resources if they were created by us
         /// </summary>
         public void Dispose()
         {
-            this.ApiClient?.Dispose();
+            ApiClient?.Dispose();
         }
 
         /// <summary>
-        /// Holds the ApiClient if created
-        /// </summary>
-        public Tanks.ApiClient.Client.ApiClient ApiClient { get; set; } = null;
-
-        /// <summary>
-        /// The client for accessing this underlying API asynchronously.
-        /// </summary>
-        public Tanks.ApiClient.Client.IAsynchronousClient AsynchronousClient { get; set; }
-
-        /// <summary>
-        /// The client for accessing this underlying API synchronously.
-        /// </summary>
-        public Tanks.ApiClient.Client.ISynchronousClient Client { get; set; }
-
-        /// <summary>
-        /// Gets the base path of the API client.
+        ///     Gets the base path of the API client.
         /// </summary>
         /// <value>The base path</value>
         public string GetBasePath()
         {
-            return this.Configuration.BasePath;
+            return Configuration.BasePath;
         }
 
         /// <summary>
-        /// Gets or sets the configuration object
+        ///     Gets or sets the configuration object
         /// </summary>
         /// <value>An instance of the Configuration</value>
-        public Tanks.ApiClient.Client.IReadableConfiguration Configuration { get; set; }
+        public IReadableConfiguration Configuration { get; set; }
 
         /// <summary>
-        /// Provides a factory method hook for the creation of exceptions.
+        ///     Provides a factory method hook for the creation of exceptions.
         /// </summary>
-        public Tanks.ApiClient.Client.ExceptionFactory ExceptionFactory
+        public ExceptionFactory ExceptionFactory
         {
             get
             {
@@ -220,61 +243,63 @@ namespace Tanks.ApiClient.Api
                 }
                 return _exceptionFactory;
             }
-            set { _exceptionFactory = value; }
+            set => _exceptionFactory = value;
         }
 
         /// <summary>
-        /// Record match result Record the result of a match and update player statistics
+        ///     Record match result Record the result of a match and update player statistics
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="recordMatchRequest"> (optional)</param>
         /// <returns>MatchResponse</returns>
         public MatchResponse MatchesPost(RecordMatchRequest recordMatchRequest = default)
         {
-            Tanks.ApiClient.Client.ApiResponse<MatchResponse> localVarResponse = MatchesPostWithHttpInfo(recordMatchRequest);
+            var localVarResponse = MatchesPostWithHttpInfo(recordMatchRequest);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Record match result Record the result of a match and update player statistics
+        ///     Record match result Record the result of a match and update player statistics
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="recordMatchRequest"> (optional)</param>
         /// <returns>ApiResponse of MatchResponse</returns>
-        public Tanks.ApiClient.Client.ApiResponse<MatchResponse> MatchesPostWithHttpInfo(RecordMatchRequest recordMatchRequest = default)
+        public ApiResponse<MatchResponse> MatchesPostWithHttpInfo(RecordMatchRequest recordMatchRequest = default)
         {
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new[]
+            {
                 "application/json"
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
             localVarRequestOptions.Data = recordMatchRequest;
 
             // authentication (Bearer) required
             // bearer authentication required
-            if (!string.IsNullOrEmpty(this.Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+            if (!string.IsNullOrEmpty(Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + this.Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
             }
 
             // make the HTTP request
-            var localVarResponse = this.Client.Post<MatchResponse>("/matches", localVarRequestOptions, this.Configuration);
+            var localVarResponse = Client.Post<MatchResponse>("/matches", localVarRequestOptions, Configuration);
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("MatchesPost", localVarResponse);
+                var _exception = ExceptionFactory("MatchesPost", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -282,78 +307,80 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Record match result Record the result of a match and update player statistics
+        ///     Record match result Record the result of a match and update player statistics
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="recordMatchRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of MatchResponse</returns>
-        public async System.Threading.Tasks.Task<MatchResponse> MatchesPostAsync(RecordMatchRequest recordMatchRequest = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<MatchResponse> MatchesPostAsync(RecordMatchRequest recordMatchRequest = default, CancellationToken cancellationToken = default)
         {
             var task = MatchesPostWithHttpInfoAsync(recordMatchRequest, cancellationToken);
-#if UNITY_EDITOR || !UNITY_WEBGL
-            Tanks.ApiClient.Client.ApiResponse<MatchResponse> localVarResponse = await task.ConfigureAwait(false);
-#else
+            #if UNITY_EDITOR || !UNITY_WEBGL
+            var localVarResponse = await task.ConfigureAwait(false);
+            #else
             Tanks.ApiClient.Client.ApiResponse<MatchResponse> localVarResponse = await task;
-#endif
+            #endif
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Record match result Record the result of a match and update player statistics
+        ///     Record match result Record the result of a match and update player statistics
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="recordMatchRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (MatchResponse)</returns>
-        public async System.Threading.Tasks.Task<Tanks.ApiClient.Client.ApiResponse<MatchResponse>> MatchesPostWithHttpInfoAsync(RecordMatchRequest recordMatchRequest = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<MatchResponse>> MatchesPostWithHttpInfoAsync(RecordMatchRequest recordMatchRequest = default,
+            CancellationToken cancellationToken = default)
         {
 
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new[]
+            {
                 "application/json"
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
             localVarRequestOptions.Data = recordMatchRequest;
 
             // authentication (Bearer) required
             // bearer authentication required
-            if (!string.IsNullOrEmpty(this.Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+            if (!string.IsNullOrEmpty(Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + this.Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
             }
 
             // make the HTTP request
 
-            var task = this.AsynchronousClient.PostAsync<MatchResponse>("/matches", localVarRequestOptions, this.Configuration, cancellationToken);
+            var task = AsynchronousClient.PostAsync<MatchResponse>("/matches", localVarRequestOptions, Configuration, cancellationToken);
 
-#if UNITY_EDITOR || !UNITY_WEBGL
+            #if UNITY_EDITOR || !UNITY_WEBGL
             var localVarResponse = await task.ConfigureAwait(false);
-#else
+            #else
             var localVarResponse = await task;
-#endif
+            #endif
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("MatchesPost", localVarResponse);
+                var _exception = ExceptionFactory("MatchesPost", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
             return localVarResponse;
         }
-
     }
 }

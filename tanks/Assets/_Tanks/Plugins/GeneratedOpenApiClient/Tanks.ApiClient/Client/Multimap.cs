@@ -15,12 +15,13 @@ using System.Collections.Generic;
 namespace Tanks.ApiClient.Client
 {
     /// <summary>
-    /// A dictionary in which one key has many associated values.
+    ///     A dictionary in which one key has many associated values.
     /// </summary>
     /// <typeparam name="TKey">The type of the key</typeparam>
     /// <typeparam name="TValue">The type of the value associated with the key.</typeparam>
     public class Multimap<TKey, TValue> : IDictionary<TKey, IList<TValue>>
     {
+
         #region Private Fields
 
         private readonly Dictionary<TKey, IList<TValue>> _dictionary;
@@ -30,7 +31,7 @@ namespace Tanks.ApiClient.Client
         #region Constructors
 
         /// <summary>
-        /// Empty Constructor.
+        ///     Empty Constructor.
         /// </summary>
         public Multimap()
         {
@@ -38,7 +39,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Constructor with comparer.
+        ///     Constructor with comparer.
         /// </summary>
         /// <param name="comparer"></param>
         public Multimap(IEqualityComparer<TKey> comparer)
@@ -51,7 +52,7 @@ namespace Tanks.ApiClient.Client
         #region Enumerators
 
         /// <summary>
-        /// To get the enumerator.
+        ///     To get the enumerator.
         /// </summary>
         /// <returns>Enumerator</returns>
         public IEnumerator<KeyValuePair<TKey, IList<TValue>>> GetEnumerator()
@@ -60,7 +61,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// To get the enumerator.
+        ///     To get the enumerator.
         /// </summary>
         /// <returns>Enumerator</returns>
         IEnumerator IEnumerable.GetEnumerator()
@@ -71,8 +72,9 @@ namespace Tanks.ApiClient.Client
         #endregion Enumerators
 
         #region Public Members
+
         /// <summary>
-        /// Add values to Multimap
+        ///     Add values to Multimap
         /// </summary>
         /// <param name="item">Key value pair</param>
         public void Add(KeyValuePair<TKey, IList<TValue>> item)
@@ -82,7 +84,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Add Multimap to Multimap
+        ///     Add Multimap to Multimap
         /// </summary>
         /// <param name="multimap">Multimap</param>
         public void Add(Multimap<TKey, TValue> multimap)
@@ -95,7 +97,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Clear Multimap
+        ///     Clear Multimap
         /// </summary>
         public void Clear()
         {
@@ -103,7 +105,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Determines whether Multimap contains the specified item.
+        ///     Determines whether Multimap contains the specified item.
         /// </summary>
         /// <param name="item">Key value pair</param>
         /// <exception cref="NotImplementedException">Method needs to be implemented</exception>
@@ -114,11 +116,13 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        ///  Copy items of the Multimap to an array,
+        ///     Copy items of the Multimap to an array,
         ///     starting at a particular array index.
         /// </summary>
-        /// <param name="array">The array that is the destination of the items copied
-        ///     from Multimap. The array must have zero-based indexing.</param>
+        /// <param name="array">
+        ///     The array that is the destination of the items copied
+        ///     from Multimap. The array must have zero-based indexing.
+        /// </param>
         /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
         /// <exception cref="NotImplementedException">Method needs to be implemented</exception>
         public void CopyTo(KeyValuePair<TKey, IList<TValue>>[] array, int arrayIndex)
@@ -127,7 +131,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Removes the specified item from the Multimap.
+        ///     Removes the specified item from the Multimap.
         /// </summary>
         /// <param name="item">Key value pair</param>
         /// <returns>true if the item is successfully removed; otherwise, false.</returns>
@@ -138,17 +142,17 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Gets the number of items contained in the Multimap.
+        ///     Gets the number of items contained in the Multimap.
         /// </summary>
         public int Count => _dictionary.Count;
 
         /// <summary>
-        /// Gets a value indicating whether the Multimap is read-only.
+        ///     Gets a value indicating whether the Multimap is read-only.
         /// </summary>
         public bool IsReadOnly => false;
 
         /// <summary>
-        /// Adds an item with the provided key and value to the Multimap.
+        ///     Adds an item with the provided key and value to the Multimap.
         /// </summary>
         /// <param name="key">The object to use as the key of the item to add.</param>
         /// <param name="value">The object to use as the value of the item to add.</param>
@@ -171,42 +175,48 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Determines whether the Multimap contains an item with the specified key.
+        ///     Determines whether the Multimap contains an item with the specified key.
         /// </summary>
         /// <param name="key">The key to locate in the Multimap.</param>
-        /// <returns>true if the Multimap contains an item with
-        ///     the key; otherwise, false.</returns>
+        /// <returns>
+        ///     true if the Multimap contains an item with
+        ///     the key; otherwise, false.
+        /// </returns>
         public bool ContainsKey(TKey key)
         {
             return _dictionary.ContainsKey(key);
         }
 
         /// <summary>
-        /// Removes item with the specified key from the Multimap.
+        ///     Removes item with the specified key from the Multimap.
         /// </summary>
         /// <param name="key">The key to locate in the Multimap.</param>
         /// <returns>true if the item is successfully removed; otherwise, false.</returns>
         public bool Remove(TKey key)
         {
-            return TryRemove(key, out var _);
+            return TryRemove(key, out _);
         }
 
         /// <summary>
-        /// Gets the value associated with the specified key.
+        ///     Gets the value associated with the specified key.
         /// </summary>
         /// <param name="key">The key whose value to get.</param>
-        /// <param name="value">When this method returns, the value associated with the specified key, if the
+        /// <param name="value">
+        ///     When this method returns, the value associated with the specified key, if the
         ///     key is found; otherwise, the default value for the type of the value parameter.
-        ///     This parameter is passed uninitialized.</param>
-        /// <returns> true if the object that implements Multimap contains
-        ///     an item with the specified key; otherwise, false.</returns>
+        ///     This parameter is passed uninitialized.
+        /// </param>
+        /// <returns>
+        ///     true if the object that implements Multimap contains
+        ///     an item with the specified key; otherwise, false.
+        /// </returns>
         public bool TryGetValue(TKey key, out IList<TValue> value)
         {
             return _dictionary.TryGetValue(key, out value);
         }
 
         /// <summary>
-        /// Gets or sets the item with the specified key.
+        ///     Gets or sets the item with the specified key.
         /// </summary>
         /// <param name="key">The key of the item to get or set.</param>
         /// <returns>The value of the specified key.</returns>
@@ -217,21 +227,23 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Gets a System.Collections.Generic.ICollection containing the keys of the Multimap.
+        ///     Gets a System.Collections.Generic.ICollection containing the keys of the Multimap.
         /// </summary>
         public ICollection<TKey> Keys => _dictionary.Keys;
 
         /// <summary>
-        /// Gets a System.Collections.Generic.ICollection containing the values of the Multimap.
+        ///     Gets a System.Collections.Generic.ICollection containing the values of the Multimap.
         /// </summary>
         public ICollection<IList<TValue>> Values => _dictionary.Values;
 
         /// <summary>
-        ///  Copy the items of the Multimap to an System.Array,
+        ///     Copy the items of the Multimap to an System.Array,
         ///     starting at a particular System.Array index.
         /// </summary>
-        /// <param name="array">The one-dimensional System.Array that is the destination of the items copied
-        ///     from Multimap. The System.Array must have zero-based indexing.</param>
+        /// <param name="array">
+        ///     The one-dimensional System.Array that is the destination of the items copied
+        ///     from Multimap. The System.Array must have zero-based indexing.
+        /// </param>
         /// <param name="index">The zero-based index in array at which copying begins.</param>
         public void CopyTo(Array array, int index)
         {
@@ -239,7 +251,7 @@ namespace Tanks.ApiClient.Client
         }
 
         /// <summary>
-        /// Adds an item with the provided key and value to the Multimap.
+        ///     Adds an item with the provided key and value to the Multimap.
         /// </summary>
         /// <param name="key">The object to use as the key of the item to add.</param>
         /// <param name="value">The object to use as the value of the item to add.</param>
@@ -290,6 +302,8 @@ namespace Tanks.ApiClient.Client
 
             return true;
         }
+
         #endregion Private Members
+
     }
 }

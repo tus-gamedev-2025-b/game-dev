@@ -83,7 +83,10 @@ namespace Tanks.Complete.Persistence.Models
             };
         }
 
-        public string ToJson() => JsonUtility.ToJson(this);
+        public string ToJson()
+        {
+            return JsonUtility.ToJson(this);
+        }
 
         public static AuthTokens FromJson(string json)
         {

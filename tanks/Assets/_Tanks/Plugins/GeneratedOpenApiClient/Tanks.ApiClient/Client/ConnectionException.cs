@@ -13,11 +13,9 @@ using UnityEngine.Networking;
 
 namespace Tanks.ApiClient.Client
 {
-#if UNITY_2020_1_OR_NEWER
+    #if UNITY_2020_1_OR_NEWER
     public class ConnectionException : Exception
     {
-        public UnityWebRequest.Result Result { get; private set; }
-        public string Error { get; private set; }
 
         // NOTE: Cannot keep reference to the request since it will be disposed.
         public ConnectionException(UnityWebRequest request)
@@ -26,8 +24,11 @@ namespace Tanks.ApiClient.Client
             Result = request.result;
             Error = request.error ?? "";
         }
+
+        public UnityWebRequest.Result Result { get; private set; }
+        public string Error { get; private set; }
     }
-#else
+    #else
     // For Unity 2019, define a custom enum that roughly simulates UnityWebRequest.Result.
     public enum UnityWebRequestResultLegacy
     {
@@ -61,5 +62,5 @@ namespace Tanks.ApiClient.Client
             Error = request.error ?? "";
         }
     }
-#endif
+    #endif
 }

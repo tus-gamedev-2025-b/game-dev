@@ -9,34 +9,28 @@
 
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// MatchResponse
+    ///     MatchResponse
     /// </summary>
     [DataContract(Name = "MatchResponse")]
-    public partial class MatchResponse
+    public class MatchResponse
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchResponse" /> class.
+        ///     Initializes a new instance of the <see cref="MatchResponse" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected MatchResponse() { }
+        protected MatchResponse()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchResponse" /> class.
+        ///     Initializes a new instance of the <see cref="MatchResponse" /> class.
         /// </summary>
         /// <param name="match">match (required).</param>
         /// <param name="updatedStats">updatedStats (required).</param>
@@ -47,34 +41,34 @@ namespace Tanks.ApiClient.Model
             {
                 throw new ArgumentNullException("match is a required property for MatchResponse and cannot be null");
             }
-            this.Match = match;
+            Match = match;
             // to ensure "updatedStats" is required (not null)
             if (updatedStats == null)
             {
                 throw new ArgumentNullException("updatedStats is a required property for MatchResponse and cannot be null");
             }
-            this.UpdatedStats = updatedStats;
+            UpdatedStats = updatedStats;
         }
 
         /// <summary>
-        /// Gets or Sets Match
+        ///     Gets or Sets Match
         /// </summary>
         [DataMember(Name = "match", IsRequired = true, EmitDefaultValue = true)]
         public MatchResponseMatch Match { get; set; }
 
         /// <summary>
-        /// Gets or Sets UpdatedStats
+        ///     Gets or Sets UpdatedStats
         /// </summary>
         [DataMember(Name = "updatedStats", IsRequired = true, EmitDefaultValue = true)]
         public MatchResponseUpdatedStats UpdatedStats { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class MatchResponse {\n");
             sb.Append("  Match: ").Append(Match).Append("\n");
             sb.Append("  UpdatedStats: ").Append(UpdatedStats).Append("\n");
@@ -83,14 +77,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }

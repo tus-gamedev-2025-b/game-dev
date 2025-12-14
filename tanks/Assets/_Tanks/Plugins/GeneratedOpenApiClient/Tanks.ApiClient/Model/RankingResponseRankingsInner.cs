@@ -9,34 +9,28 @@
 
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// RankingResponseRankingsInner
+    ///     RankingResponseRankingsInner
     /// </summary>
     [DataContract(Name = "RankingResponse_rankings_inner")]
-    public partial class RankingResponseRankingsInner
+    public class RankingResponseRankingsInner
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RankingResponseRankingsInner" /> class.
+        ///     Initializes a new instance of the <see cref="RankingResponseRankingsInner" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected RankingResponseRankingsInner() { }
+        protected RankingResponseRankingsInner()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="RankingResponseRankingsInner" /> class.
+        ///     Initializes a new instance of the <see cref="RankingResponseRankingsInner" /> class.
         /// </summary>
         /// <param name="rank">rank (required).</param>
         /// <param name="userId">userId (required).</param>
@@ -45,76 +39,77 @@ namespace Tanks.ApiClient.Model
         /// <param name="wins">wins (required).</param>
         /// <param name="losses">losses (required).</param>
         /// <param name="totalMatches">totalMatches (required).</param>
-        public RankingResponseRankingsInner(decimal? rank = default, decimal userId = default, string userName = default, decimal winRate = default, decimal wins = default, decimal losses = default, decimal totalMatches = default)
+        public RankingResponseRankingsInner(decimal? rank = default, decimal userId = default, string userName = default, decimal winRate = default,
+            decimal wins = default, decimal losses = default, decimal totalMatches = default)
         {
             // to ensure "rank" is required (not null)
             if (rank == null)
             {
                 throw new ArgumentNullException("rank is a required property for RankingResponseRankingsInner and cannot be null");
             }
-            this.Rank = rank;
-            this.UserId = userId;
+            Rank = rank;
+            UserId = userId;
             // to ensure "userName" is required (not null)
             if (userName == null)
             {
                 throw new ArgumentNullException("userName is a required property for RankingResponseRankingsInner and cannot be null");
             }
-            this.UserName = userName;
-            this.WinRate = winRate;
-            this.Wins = wins;
-            this.Losses = losses;
-            this.TotalMatches = totalMatches;
+            UserName = userName;
+            WinRate = winRate;
+            Wins = wins;
+            Losses = losses;
+            TotalMatches = totalMatches;
         }
 
         /// <summary>
-        /// Gets or Sets Rank
+        ///     Gets or Sets Rank
         /// </summary>
         [DataMember(Name = "rank", IsRequired = true, EmitDefaultValue = true)]
         public decimal? Rank { get; set; }
 
         /// <summary>
-        /// Gets or Sets UserId
+        ///     Gets or Sets UserId
         /// </summary>
         [DataMember(Name = "userId", IsRequired = true, EmitDefaultValue = true)]
         public decimal UserId { get; set; }
 
         /// <summary>
-        /// Gets or Sets UserName
+        ///     Gets or Sets UserName
         /// </summary>
         [DataMember(Name = "userName", IsRequired = true, EmitDefaultValue = true)]
         public string UserName { get; set; }
 
         /// <summary>
-        /// Gets or Sets WinRate
+        ///     Gets or Sets WinRate
         /// </summary>
         [DataMember(Name = "winRate", IsRequired = true, EmitDefaultValue = true)]
         public decimal WinRate { get; set; }
 
         /// <summary>
-        /// Gets or Sets Wins
+        ///     Gets or Sets Wins
         /// </summary>
         [DataMember(Name = "wins", IsRequired = true, EmitDefaultValue = true)]
         public decimal Wins { get; set; }
 
         /// <summary>
-        /// Gets or Sets Losses
+        ///     Gets or Sets Losses
         /// </summary>
         [DataMember(Name = "losses", IsRequired = true, EmitDefaultValue = true)]
         public decimal Losses { get; set; }
 
         /// <summary>
-        /// Gets or Sets TotalMatches
+        ///     Gets or Sets TotalMatches
         /// </summary>
         [DataMember(Name = "totalMatches", IsRequired = true, EmitDefaultValue = true)]
         public decimal TotalMatches { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class RankingResponseRankingsInner {\n");
             sb.Append("  Rank: ").Append(Rank).Append("\n");
             sb.Append("  UserId: ").Append(UserId).Append("\n");
@@ -128,14 +123,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }

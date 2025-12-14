@@ -9,11 +9,8 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net;
-using System.Net.Mime;
+using System.Threading;
+using System.Threading.Tasks;
 using Tanks.ApiClient.Client;
 using Tanks.ApiClient.Model;
 
@@ -21,16 +18,18 @@ namespace Tanks.ApiClient.Api
 {
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
     public interface IUsersApiSync : IApiAccessor
     {
+
         #region Synchronous Operations
+
         /// <summary>
-        /// Get user information
+        ///     Get user information
         /// </summary>
         /// <remarks>
-        /// Retrieve user information by user ID
+        ///     Retrieve user information by user ID
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
@@ -38,20 +37,21 @@ namespace Tanks.ApiClient.Api
         UserResponse UsersIdGet(string id);
 
         /// <summary>
-        /// Get user information
+        ///     Get user information
         /// </summary>
         /// <remarks>
-        /// Retrieve user information by user ID
+        ///     Retrieve user information by user ID
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <returns>ApiResponse of UserResponse</returns>
         ApiResponse<UserResponse> UsersIdGetWithHttpInfo(string id);
+
         /// <summary>
-        /// Update user name
+        ///     Update user name
         /// </summary>
         /// <remarks>
-        /// Update the name of a user
+        ///     Update the name of a user
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
@@ -60,21 +60,22 @@ namespace Tanks.ApiClient.Api
         UserResponse UsersIdNamePatch(string id, UpdateNameRequest updateNameRequest = default);
 
         /// <summary>
-        /// Update user name
+        ///     Update user name
         /// </summary>
         /// <remarks>
-        /// Update the name of a user
+        ///     Update the name of a user
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="updateNameRequest"> (optional)</param>
         /// <returns>ApiResponse of UserResponse</returns>
         ApiResponse<UserResponse> UsersIdNamePatchWithHttpInfo(string id, UpdateNameRequest updateNameRequest = default);
+
         /// <summary>
-        /// User login
+        ///     User login
         /// </summary>
         /// <remarks>
-        /// Authenticate user with userId and refresh token
+        ///     Authenticate user with userId and refresh token
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="loginRequest"> (optional)</param>
@@ -82,20 +83,21 @@ namespace Tanks.ApiClient.Api
         AuthResponse UsersLoginPost(LoginRequest loginRequest = default);
 
         /// <summary>
-        /// User login
+        ///     User login
         /// </summary>
         /// <remarks>
-        /// Authenticate user with userId and refresh token
+        ///     Authenticate user with userId and refresh token
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="loginRequest"> (optional)</param>
         /// <returns>ApiResponse of AuthResponse</returns>
         ApiResponse<AuthResponse> UsersLoginPostWithHttpInfo(LoginRequest loginRequest = default);
+
         /// <summary>
-        /// Create new user
+        ///     Create new user
         /// </summary>
         /// <remarks>
-        /// Creates a new user and returns authentication tokens
+        ///     Creates a new user and returns authentication tokens
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="createUserRequest"> (optional)</param>
@@ -103,140 +105,155 @@ namespace Tanks.ApiClient.Api
         AuthResponse UsersPost(CreateUserRequest createUserRequest = default);
 
         /// <summary>
-        /// Create new user
+        ///     Create new user
         /// </summary>
         /// <remarks>
-        /// Creates a new user and returns authentication tokens
+        ///     Creates a new user and returns authentication tokens
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="createUserRequest"> (optional)</param>
         /// <returns>ApiResponse of AuthResponse</returns>
         ApiResponse<AuthResponse> UsersPostWithHttpInfo(CreateUserRequest createUserRequest = default);
+
         #endregion Synchronous Operations
+
     }
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
     public interface IUsersApiAsync : IApiAccessor
     {
+
         #region Asynchronous Operations
+
         /// <summary>
-        /// Get user information
+        ///     Get user information
         /// </summary>
         /// <remarks>
-        /// Retrieve user information by user ID
+        ///     Retrieve user information by user ID
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of UserResponse</returns>
-        System.Threading.Tasks.Task<UserResponse> UsersIdGetAsync(string id, System.Threading.CancellationToken cancellationToken = default);
+        Task<UserResponse> UsersIdGetAsync(string id, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get user information
+        ///     Get user information
         /// </summary>
         /// <remarks>
-        /// Retrieve user information by user ID
+        ///     Retrieve user information by user ID
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (UserResponse)</returns>
-        System.Threading.Tasks.Task<ApiResponse<UserResponse>> UsersIdGetWithHttpInfoAsync(string id, System.Threading.CancellationToken cancellationToken = default);
+        Task<ApiResponse<UserResponse>> UsersIdGetWithHttpInfoAsync(string id, CancellationToken cancellationToken = default);
+
         /// <summary>
-        /// Update user name
+        ///     Update user name
         /// </summary>
         /// <remarks>
-        /// Update the name of a user
+        ///     Update the name of a user
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="updateNameRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of UserResponse</returns>
-        System.Threading.Tasks.Task<UserResponse> UsersIdNamePatchAsync(string id, UpdateNameRequest updateNameRequest = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<UserResponse> UsersIdNamePatchAsync(string id, UpdateNameRequest updateNameRequest = default, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Update user name
+        ///     Update user name
         /// </summary>
         /// <remarks>
-        /// Update the name of a user
+        ///     Update the name of a user
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="updateNameRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (UserResponse)</returns>
-        System.Threading.Tasks.Task<ApiResponse<UserResponse>> UsersIdNamePatchWithHttpInfoAsync(string id, UpdateNameRequest updateNameRequest = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<ApiResponse<UserResponse>> UsersIdNamePatchWithHttpInfoAsync(string id, UpdateNameRequest updateNameRequest = default,
+            CancellationToken cancellationToken = default);
+
         /// <summary>
-        /// User login
+        ///     User login
         /// </summary>
         /// <remarks>
-        /// Authenticate user with userId and refresh token
+        ///     Authenticate user with userId and refresh token
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="loginRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of AuthResponse</returns>
-        System.Threading.Tasks.Task<AuthResponse> UsersLoginPostAsync(LoginRequest loginRequest = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<AuthResponse> UsersLoginPostAsync(LoginRequest loginRequest = default, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// User login
+        ///     User login
         /// </summary>
         /// <remarks>
-        /// Authenticate user with userId and refresh token
+        ///     Authenticate user with userId and refresh token
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="loginRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (AuthResponse)</returns>
-        System.Threading.Tasks.Task<ApiResponse<AuthResponse>> UsersLoginPostWithHttpInfoAsync(LoginRequest loginRequest = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<ApiResponse<AuthResponse>> UsersLoginPostWithHttpInfoAsync(LoginRequest loginRequest = default, CancellationToken cancellationToken = default);
+
         /// <summary>
-        /// Create new user
+        ///     Create new user
         /// </summary>
         /// <remarks>
-        /// Creates a new user and returns authentication tokens
+        ///     Creates a new user and returns authentication tokens
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="createUserRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of AuthResponse</returns>
-        System.Threading.Tasks.Task<AuthResponse> UsersPostAsync(CreateUserRequest createUserRequest = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<AuthResponse> UsersPostAsync(CreateUserRequest createUserRequest = default, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Create new user
+        ///     Create new user
         /// </summary>
         /// <remarks>
-        /// Creates a new user and returns authentication tokens
+        ///     Creates a new user and returns authentication tokens
         /// </remarks>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="createUserRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (AuthResponse)</returns>
-        System.Threading.Tasks.Task<ApiResponse<AuthResponse>> UsersPostWithHttpInfoAsync(CreateUserRequest createUserRequest = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<ApiResponse<AuthResponse>> UsersPostWithHttpInfoAsync(CreateUserRequest createUserRequest = default, CancellationToken cancellationToken = default);
+
         #endregion Asynchronous Operations
+
     }
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
     public interface IUsersApi : IUsersApiSync, IUsersApiAsync
     {
-
     }
 
     /// <summary>
-    /// Represents a collection of functions to interact with the API endpoints
+    ///     Represents a collection of functions to interact with the API endpoints
     /// </summary>
-    public partial class UsersApi : IDisposable, IUsersApi
+    public class UsersApi : IDisposable, IUsersApi
     {
-        private Tanks.ApiClient.Client.ExceptionFactory _exceptionFactory = (name, response) => null;
+        private ExceptionFactory _exceptionFactory = (name, response) => null;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UsersApi"/> class.
-        /// **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
-        /// It's better to reuse the <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">HttpClient and HttpClientHandler</see>.
+        ///     Initializes a new instance of the <see cref="UsersApi" /> class.
+        ///     **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
+        ///     It's better to reuse the
+        ///     <see
+        ///         href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">
+        ///         HttpClient
+        ///         and HttpClientHandler
+        ///     </see>
+        ///     .
         /// </summary>
         /// <returns></returns>
         public UsersApi() : this((string)null)
@@ -244,109 +261,121 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UsersApi"/> class.
-        /// **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
-        /// It's better to reuse the <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">HttpClient and HttpClientHandler</see>.
+        ///     Initializes a new instance of the <see cref="UsersApi" /> class.
+        ///     **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
+        ///     It's better to reuse the
+        ///     <see
+        ///         href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">
+        ///         HttpClient
+        ///         and HttpClientHandler
+        ///     </see>
+        ///     .
         /// </summary>
         /// <param name="basePath">The target service's base path in URL format.</param>
         /// <exception cref="ArgumentException"></exception>
         /// <returns></returns>
         public UsersApi(string basePath)
         {
-            this.Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
-                Tanks.ApiClient.Client.GlobalConfiguration.Instance,
-                new Tanks.ApiClient.Client.Configuration { BasePath = basePath }
+            Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
+                GlobalConfiguration.Instance,
+                new Configuration { BasePath = basePath }
             );
-            this.ApiClient = new Tanks.ApiClient.Client.ApiClient(this.Configuration.BasePath);
-            this.Client =  this.ApiClient;
-            this.AsynchronousClient = this.ApiClient;
-            this.ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UsersApi"/> class using Configuration object.
-        /// **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
-        /// It's better to reuse the <see href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">HttpClient and HttpClientHandler</see>.
-        /// </summary>
-        /// <param name="configuration">An instance of Configuration.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <returns></returns>
-        public UsersApi(Tanks.ApiClient.Client.Configuration configuration)
-        {
-            if (configuration == null) throw new ArgumentNullException("configuration");
-
-            this.Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
-                Tanks.ApiClient.Client.GlobalConfiguration.Instance,
-                configuration
-            );
-            this.ApiClient = new Tanks.ApiClient.Client.ApiClient(this.Configuration.BasePath);
-            this.Client = this.ApiClient;
-            this.AsynchronousClient = this.ApiClient;
+            ApiClient = new Client.ApiClient(Configuration.BasePath);
+            Client = ApiClient;
+            AsynchronousClient = ApiClient;
             ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UsersApi"/> class
-        /// using a Configuration object and client instance.
+        ///     Initializes a new instance of the <see cref="UsersApi" /> class using Configuration object.
+        ///     **IMPORTANT** This will also create an instance of HttpClient, which is less than ideal.
+        ///     It's better to reuse the
+        ///     <see
+        ///         href="https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests#issues-with-the-original-httpclient-class-available-in-net">
+        ///         HttpClient
+        ///         and HttpClientHandler
+        ///     </see>
+        ///     .
+        /// </summary>
+        /// <param name="configuration">An instance of Configuration.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns></returns>
+        public UsersApi(Configuration configuration)
+        {
+            if (configuration == null) throw new ArgumentNullException("configuration");
+
+            Configuration = Tanks.ApiClient.Client.Configuration.MergeConfigurations(
+                GlobalConfiguration.Instance,
+                configuration
+            );
+            ApiClient = new Client.ApiClient(Configuration.BasePath);
+            Client = ApiClient;
+            AsynchronousClient = ApiClient;
+            ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="UsersApi" /> class
+        ///     using a Configuration object and client instance.
         /// </summary>
         /// <param name="client">The client interface for synchronous API access.</param>
         /// <param name="asyncClient">The client interface for asynchronous API access.</param>
         /// <param name="configuration">The configuration object.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public UsersApi(Tanks.ApiClient.Client.ISynchronousClient client, Tanks.ApiClient.Client.IAsynchronousClient asyncClient, Tanks.ApiClient.Client.IReadableConfiguration configuration)
+        public UsersApi(ISynchronousClient client, IAsynchronousClient asyncClient, IReadableConfiguration configuration)
         {
             if (client == null) throw new ArgumentNullException("client");
             if (asyncClient == null) throw new ArgumentNullException("asyncClient");
             if (configuration == null) throw new ArgumentNullException("configuration");
 
-            this.Client = client;
-            this.AsynchronousClient = asyncClient;
-            this.Configuration = configuration;
-            this.ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
+            Client = client;
+            AsynchronousClient = asyncClient;
+            Configuration = configuration;
+            ExceptionFactory = Tanks.ApiClient.Client.Configuration.DefaultExceptionFactory;
         }
 
         /// <summary>
-        /// Disposes resources if they were created by us
+        ///     Holds the ApiClient if created
+        /// </summary>
+        public Client.ApiClient ApiClient { get; set; }
+
+        /// <summary>
+        ///     The client for accessing this underlying API asynchronously.
+        /// </summary>
+        public IAsynchronousClient AsynchronousClient { get; set; }
+
+        /// <summary>
+        ///     The client for accessing this underlying API synchronously.
+        /// </summary>
+        public ISynchronousClient Client { get; set; }
+
+        /// <summary>
+        ///     Disposes resources if they were created by us
         /// </summary>
         public void Dispose()
         {
-            this.ApiClient?.Dispose();
+            ApiClient?.Dispose();
         }
 
         /// <summary>
-        /// Holds the ApiClient if created
-        /// </summary>
-        public Tanks.ApiClient.Client.ApiClient ApiClient { get; set; } = null;
-
-        /// <summary>
-        /// The client for accessing this underlying API asynchronously.
-        /// </summary>
-        public Tanks.ApiClient.Client.IAsynchronousClient AsynchronousClient { get; set; }
-
-        /// <summary>
-        /// The client for accessing this underlying API synchronously.
-        /// </summary>
-        public Tanks.ApiClient.Client.ISynchronousClient Client { get; set; }
-
-        /// <summary>
-        /// Gets the base path of the API client.
+        ///     Gets the base path of the API client.
         /// </summary>
         /// <value>The base path</value>
         public string GetBasePath()
         {
-            return this.Configuration.BasePath;
+            return Configuration.BasePath;
         }
 
         /// <summary>
-        /// Gets or sets the configuration object
+        ///     Gets or sets the configuration object
         /// </summary>
         /// <value>An instance of the Configuration</value>
-        public Tanks.ApiClient.Client.IReadableConfiguration Configuration { get; set; }
+        public IReadableConfiguration Configuration { get; set; }
 
         /// <summary>
-        /// Provides a factory method hook for the creation of exceptions.
+        ///     Provides a factory method hook for the creation of exceptions.
         /// </summary>
-        public Tanks.ApiClient.Client.ExceptionFactory ExceptionFactory
+        public ExceptionFactory ExceptionFactory
         {
             get
             {
@@ -356,64 +385,66 @@ namespace Tanks.ApiClient.Api
                 }
                 return _exceptionFactory;
             }
-            set { _exceptionFactory = value; }
+            set => _exceptionFactory = value;
         }
 
         /// <summary>
-        /// Get user information Retrieve user information by user ID
+        ///     Get user information Retrieve user information by user ID
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <returns>UserResponse</returns>
         public UserResponse UsersIdGet(string id)
         {
-            Tanks.ApiClient.Client.ApiResponse<UserResponse> localVarResponse = UsersIdGetWithHttpInfo(id);
+            var localVarResponse = UsersIdGetWithHttpInfo(id);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Get user information Retrieve user information by user ID
+        ///     Get user information Retrieve user information by user ID
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <returns>ApiResponse of UserResponse</returns>
-        public Tanks.ApiClient.Client.ApiResponse<UserResponse> UsersIdGetWithHttpInfo(string id)
+        public ApiResponse<UserResponse> UsersIdGetWithHttpInfo(string id)
         {
             // verify the required parameter 'id' is set
             if (id == null)
-                throw new Tanks.ApiClient.Client.ApiException(400, "Missing required parameter 'id' when calling UsersApi->UsersIdGet");
+                throw new ApiException(400, "Missing required parameter 'id' when calling UsersApi->UsersIdGet");
 
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new string[]
+            {
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
-            localVarRequestOptions.PathParameters.Add("id", Tanks.ApiClient.Client.ClientUtils.ParameterToString(id)); // path parameter
+            localVarRequestOptions.PathParameters.Add("id", ClientUtils.ParameterToString(id)); // path parameter
 
             // authentication (Bearer) required
             // bearer authentication required
-            if (!string.IsNullOrEmpty(this.Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+            if (!string.IsNullOrEmpty(Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + this.Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
             }
 
             // make the HTTP request
-            var localVarResponse = this.Client.Get<UserResponse>("/users/{id}", localVarRequestOptions, this.Configuration);
+            var localVarResponse = Client.Get<UserResponse>("/users/{id}", localVarRequestOptions, Configuration);
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("UsersIdGet", localVarResponse);
+                var _exception = ExceptionFactory("UsersIdGet", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -421,76 +452,78 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Get user information Retrieve user information by user ID
+        ///     Get user information Retrieve user information by user ID
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of UserResponse</returns>
-        public async System.Threading.Tasks.Task<UserResponse> UsersIdGetAsync(string id, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<UserResponse> UsersIdGetAsync(string id, CancellationToken cancellationToken = default)
         {
             var task = UsersIdGetWithHttpInfoAsync(id, cancellationToken);
-#if UNITY_EDITOR || !UNITY_WEBGL
-            Tanks.ApiClient.Client.ApiResponse<UserResponse> localVarResponse = await task.ConfigureAwait(false);
-#else
+            #if UNITY_EDITOR || !UNITY_WEBGL
+            var localVarResponse = await task.ConfigureAwait(false);
+            #else
             Tanks.ApiClient.Client.ApiResponse<UserResponse> localVarResponse = await task;
-#endif
+            #endif
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Get user information Retrieve user information by user ID
+        ///     Get user information Retrieve user information by user ID
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (UserResponse)</returns>
-        public async System.Threading.Tasks.Task<Tanks.ApiClient.Client.ApiResponse<UserResponse>> UsersIdGetWithHttpInfoAsync(string id, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<UserResponse>> UsersIdGetWithHttpInfoAsync(string id, CancellationToken cancellationToken = default)
         {
             // verify the required parameter 'id' is set
             if (id == null)
-                throw new Tanks.ApiClient.Client.ApiException(400, "Missing required parameter 'id' when calling UsersApi->UsersIdGet");
+                throw new ApiException(400, "Missing required parameter 'id' when calling UsersApi->UsersIdGet");
 
 
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new string[]
+            {
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
-            localVarRequestOptions.PathParameters.Add("id", Tanks.ApiClient.Client.ClientUtils.ParameterToString(id)); // path parameter
+            localVarRequestOptions.PathParameters.Add("id", ClientUtils.ParameterToString(id)); // path parameter
 
             // authentication (Bearer) required
             // bearer authentication required
-            if (!string.IsNullOrEmpty(this.Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+            if (!string.IsNullOrEmpty(Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + this.Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
             }
 
             // make the HTTP request
 
-            var task = this.AsynchronousClient.GetAsync<UserResponse>("/users/{id}", localVarRequestOptions, this.Configuration, cancellationToken);
+            var task = AsynchronousClient.GetAsync<UserResponse>("/users/{id}", localVarRequestOptions, Configuration, cancellationToken);
 
-#if UNITY_EDITOR || !UNITY_WEBGL
+            #if UNITY_EDITOR || !UNITY_WEBGL
             var localVarResponse = await task.ConfigureAwait(false);
-#else
+            #else
             var localVarResponse = await task;
-#endif
+            #endif
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("UsersIdGet", localVarResponse);
+                var _exception = ExceptionFactory("UsersIdGet", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -498,7 +531,7 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Update user name Update the name of a user
+        ///     Update user name Update the name of a user
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
@@ -506,56 +539,58 @@ namespace Tanks.ApiClient.Api
         /// <returns>UserResponse</returns>
         public UserResponse UsersIdNamePatch(string id, UpdateNameRequest updateNameRequest = default)
         {
-            Tanks.ApiClient.Client.ApiResponse<UserResponse> localVarResponse = UsersIdNamePatchWithHttpInfo(id, updateNameRequest);
+            var localVarResponse = UsersIdNamePatchWithHttpInfo(id, updateNameRequest);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Update user name Update the name of a user
+        ///     Update user name Update the name of a user
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="updateNameRequest"> (optional)</param>
         /// <returns>ApiResponse of UserResponse</returns>
-        public Tanks.ApiClient.Client.ApiResponse<UserResponse> UsersIdNamePatchWithHttpInfo(string id, UpdateNameRequest updateNameRequest = default)
+        public ApiResponse<UserResponse> UsersIdNamePatchWithHttpInfo(string id, UpdateNameRequest updateNameRequest = default)
         {
             // verify the required parameter 'id' is set
             if (id == null)
-                throw new Tanks.ApiClient.Client.ApiException(400, "Missing required parameter 'id' when calling UsersApi->UsersIdNamePatch");
+                throw new ApiException(400, "Missing required parameter 'id' when calling UsersApi->UsersIdNamePatch");
 
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new[]
+            {
                 "application/json"
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
-            localVarRequestOptions.PathParameters.Add("id", Tanks.ApiClient.Client.ClientUtils.ParameterToString(id)); // path parameter
+            localVarRequestOptions.PathParameters.Add("id", ClientUtils.ParameterToString(id)); // path parameter
             localVarRequestOptions.Data = updateNameRequest;
 
             // authentication (Bearer) required
             // bearer authentication required
-            if (!string.IsNullOrEmpty(this.Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+            if (!string.IsNullOrEmpty(Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + this.Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
             }
 
             // make the HTTP request
-            var localVarResponse = this.Client.Patch<UserResponse>("/users/{id}/name", localVarRequestOptions, this.Configuration);
+            var localVarResponse = Client.Patch<UserResponse>("/users/{id}/name", localVarRequestOptions, Configuration);
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("UsersIdNamePatch", localVarResponse);
+                var _exception = ExceptionFactory("UsersIdNamePatch", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -563,80 +598,84 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Update user name Update the name of a user
+        ///     Update user name Update the name of a user
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="updateNameRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of UserResponse</returns>
-        public async System.Threading.Tasks.Task<UserResponse> UsersIdNamePatchAsync(string id, UpdateNameRequest updateNameRequest = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<UserResponse> UsersIdNamePatchAsync(string id, UpdateNameRequest updateNameRequest = default,
+            CancellationToken cancellationToken = default)
         {
             var task = UsersIdNamePatchWithHttpInfoAsync(id, updateNameRequest, cancellationToken);
-#if UNITY_EDITOR || !UNITY_WEBGL
-            Tanks.ApiClient.Client.ApiResponse<UserResponse> localVarResponse = await task.ConfigureAwait(false);
-#else
+            #if UNITY_EDITOR || !UNITY_WEBGL
+            var localVarResponse = await task.ConfigureAwait(false);
+            #else
             Tanks.ApiClient.Client.ApiResponse<UserResponse> localVarResponse = await task;
-#endif
+            #endif
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Update user name Update the name of a user
+        ///     Update user name Update the name of a user
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="id"></param>
         /// <param name="updateNameRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (UserResponse)</returns>
-        public async System.Threading.Tasks.Task<Tanks.ApiClient.Client.ApiResponse<UserResponse>> UsersIdNamePatchWithHttpInfoAsync(string id, UpdateNameRequest updateNameRequest = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<UserResponse>> UsersIdNamePatchWithHttpInfoAsync(string id, UpdateNameRequest updateNameRequest = default,
+            CancellationToken cancellationToken = default)
         {
             // verify the required parameter 'id' is set
             if (id == null)
-                throw new Tanks.ApiClient.Client.ApiException(400, "Missing required parameter 'id' when calling UsersApi->UsersIdNamePatch");
+                throw new ApiException(400, "Missing required parameter 'id' when calling UsersApi->UsersIdNamePatch");
 
 
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new[]
+            {
                 "application/json"
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
-            localVarRequestOptions.PathParameters.Add("id", Tanks.ApiClient.Client.ClientUtils.ParameterToString(id)); // path parameter
+            localVarRequestOptions.PathParameters.Add("id", ClientUtils.ParameterToString(id)); // path parameter
             localVarRequestOptions.Data = updateNameRequest;
 
             // authentication (Bearer) required
             // bearer authentication required
-            if (!string.IsNullOrEmpty(this.Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+            if (!string.IsNullOrEmpty(Configuration.AccessToken) && !localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + this.Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
             }
 
             // make the HTTP request
 
-            var task = this.AsynchronousClient.PatchAsync<UserResponse>("/users/{id}/name", localVarRequestOptions, this.Configuration, cancellationToken);
+            var task = AsynchronousClient.PatchAsync<UserResponse>("/users/{id}/name", localVarRequestOptions, Configuration, cancellationToken);
 
-#if UNITY_EDITOR || !UNITY_WEBGL
+            #if UNITY_EDITOR || !UNITY_WEBGL
             var localVarResponse = await task.ConfigureAwait(false);
-#else
+            #else
             var localVarResponse = await task;
-#endif
+            #endif
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("UsersIdNamePatch", localVarResponse);
+                var _exception = ExceptionFactory("UsersIdNamePatch", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -644,51 +683,53 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// User login Authenticate user with userId and refresh token
+        ///     User login Authenticate user with userId and refresh token
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="loginRequest"> (optional)</param>
         /// <returns>AuthResponse</returns>
         public AuthResponse UsersLoginPost(LoginRequest loginRequest = default)
         {
-            Tanks.ApiClient.Client.ApiResponse<AuthResponse> localVarResponse = UsersLoginPostWithHttpInfo(loginRequest);
+            var localVarResponse = UsersLoginPostWithHttpInfo(loginRequest);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// User login Authenticate user with userId and refresh token
+        ///     User login Authenticate user with userId and refresh token
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="loginRequest"> (optional)</param>
         /// <returns>ApiResponse of AuthResponse</returns>
-        public Tanks.ApiClient.Client.ApiResponse<AuthResponse> UsersLoginPostWithHttpInfo(LoginRequest loginRequest = default)
+        public ApiResponse<AuthResponse> UsersLoginPostWithHttpInfo(LoginRequest loginRequest = default)
         {
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new[]
+            {
                 "application/json"
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
             localVarRequestOptions.Data = loginRequest;
 
 
             // make the HTTP request
-            var localVarResponse = this.Client.Post<AuthResponse>("/users/login", localVarRequestOptions, this.Configuration);
+            var localVarResponse = Client.Post<AuthResponse>("/users/login", localVarRequestOptions, Configuration);
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("UsersLoginPost", localVarResponse);
+                var _exception = ExceptionFactory("UsersLoginPost", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -696,49 +737,52 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// User login Authenticate user with userId and refresh token
+        ///     User login Authenticate user with userId and refresh token
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="loginRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of AuthResponse</returns>
-        public async System.Threading.Tasks.Task<AuthResponse> UsersLoginPostAsync(LoginRequest loginRequest = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<AuthResponse> UsersLoginPostAsync(LoginRequest loginRequest = default, CancellationToken cancellationToken = default)
         {
             var task = UsersLoginPostWithHttpInfoAsync(loginRequest, cancellationToken);
-#if UNITY_EDITOR || !UNITY_WEBGL
-            Tanks.ApiClient.Client.ApiResponse<AuthResponse> localVarResponse = await task.ConfigureAwait(false);
-#else
+            #if UNITY_EDITOR || !UNITY_WEBGL
+            var localVarResponse = await task.ConfigureAwait(false);
+            #else
             Tanks.ApiClient.Client.ApiResponse<AuthResponse> localVarResponse = await task;
-#endif
+            #endif
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// User login Authenticate user with userId and refresh token
+        ///     User login Authenticate user with userId and refresh token
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="loginRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (AuthResponse)</returns>
-        public async System.Threading.Tasks.Task<Tanks.ApiClient.Client.ApiResponse<AuthResponse>> UsersLoginPostWithHttpInfoAsync(LoginRequest loginRequest = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<AuthResponse>> UsersLoginPostWithHttpInfoAsync(LoginRequest loginRequest = default,
+            CancellationToken cancellationToken = default)
         {
 
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new[]
+            {
                 "application/json"
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
             localVarRequestOptions.Data = loginRequest;
@@ -746,17 +790,17 @@ namespace Tanks.ApiClient.Api
 
             // make the HTTP request
 
-            var task = this.AsynchronousClient.PostAsync<AuthResponse>("/users/login", localVarRequestOptions, this.Configuration, cancellationToken);
+            var task = AsynchronousClient.PostAsync<AuthResponse>("/users/login", localVarRequestOptions, Configuration, cancellationToken);
 
-#if UNITY_EDITOR || !UNITY_WEBGL
+            #if UNITY_EDITOR || !UNITY_WEBGL
             var localVarResponse = await task.ConfigureAwait(false);
-#else
+            #else
             var localVarResponse = await task;
-#endif
+            #endif
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("UsersLoginPost", localVarResponse);
+                var _exception = ExceptionFactory("UsersLoginPost", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -764,51 +808,53 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Create new user Creates a new user and returns authentication tokens
+        ///     Create new user Creates a new user and returns authentication tokens
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="createUserRequest"> (optional)</param>
         /// <returns>AuthResponse</returns>
         public AuthResponse UsersPost(CreateUserRequest createUserRequest = default)
         {
-            Tanks.ApiClient.Client.ApiResponse<AuthResponse> localVarResponse = UsersPostWithHttpInfo(createUserRequest);
+            var localVarResponse = UsersPostWithHttpInfo(createUserRequest);
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Create new user Creates a new user and returns authentication tokens
+        ///     Create new user Creates a new user and returns authentication tokens
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="createUserRequest"> (optional)</param>
         /// <returns>ApiResponse of AuthResponse</returns>
-        public Tanks.ApiClient.Client.ApiResponse<AuthResponse> UsersPostWithHttpInfo(CreateUserRequest createUserRequest = default)
+        public ApiResponse<AuthResponse> UsersPostWithHttpInfo(CreateUserRequest createUserRequest = default)
         {
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new[]
+            {
                 "application/json"
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
             localVarRequestOptions.Data = createUserRequest;
 
 
             // make the HTTP request
-            var localVarResponse = this.Client.Post<AuthResponse>("/users", localVarRequestOptions, this.Configuration);
+            var localVarResponse = Client.Post<AuthResponse>("/users", localVarRequestOptions, Configuration);
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("UsersPost", localVarResponse);
+                var _exception = ExceptionFactory("UsersPost", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
@@ -816,49 +862,52 @@ namespace Tanks.ApiClient.Api
         }
 
         /// <summary>
-        /// Create new user Creates a new user and returns authentication tokens
+        ///     Create new user Creates a new user and returns authentication tokens
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="createUserRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of AuthResponse</returns>
-        public async System.Threading.Tasks.Task<AuthResponse> UsersPostAsync(CreateUserRequest createUserRequest = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<AuthResponse> UsersPostAsync(CreateUserRequest createUserRequest = default, CancellationToken cancellationToken = default)
         {
             var task = UsersPostWithHttpInfoAsync(createUserRequest, cancellationToken);
-#if UNITY_EDITOR || !UNITY_WEBGL
-            Tanks.ApiClient.Client.ApiResponse<AuthResponse> localVarResponse = await task.ConfigureAwait(false);
-#else
+            #if UNITY_EDITOR || !UNITY_WEBGL
+            var localVarResponse = await task.ConfigureAwait(false);
+            #else
             Tanks.ApiClient.Client.ApiResponse<AuthResponse> localVarResponse = await task;
-#endif
+            #endif
             return localVarResponse.Data;
         }
 
         /// <summary>
-        /// Create new user Creates a new user and returns authentication tokens
+        ///     Create new user Creates a new user and returns authentication tokens
         /// </summary>
         /// <exception cref="Tanks.ApiClient.Client.ApiException">Thrown when fails to make API call</exception>
         /// <param name="createUserRequest"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns>Task of ApiResponse (AuthResponse)</returns>
-        public async System.Threading.Tasks.Task<Tanks.ApiClient.Client.ApiResponse<AuthResponse>> UsersPostWithHttpInfoAsync(CreateUserRequest createUserRequest = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ApiResponse<AuthResponse>> UsersPostWithHttpInfoAsync(CreateUserRequest createUserRequest = default,
+            CancellationToken cancellationToken = default)
         {
 
-            Tanks.ApiClient.Client.RequestOptions localVarRequestOptions = new Tanks.ApiClient.Client.RequestOptions();
+            var localVarRequestOptions = new RequestOptions();
 
-            string[] _contentTypes = new string[] {
+            var _contentTypes = new[]
+            {
                 "application/json"
             };
 
             // to determine the Accept header
-            string[] _accepts = new string[] {
+            var _accepts = new[]
+            {
                 "application/json"
             };
 
 
-            var localVarContentType = Tanks.ApiClient.Client.ClientUtils.SelectHeaderContentType(_contentTypes);
+            var localVarContentType = ClientUtils.SelectHeaderContentType(_contentTypes);
             if (localVarContentType != null) localVarRequestOptions.HeaderParameters.Add("Content-Type", localVarContentType);
 
-            var localVarAccept = Tanks.ApiClient.Client.ClientUtils.SelectHeaderAccept(_accepts);
+            var localVarAccept = ClientUtils.SelectHeaderAccept(_accepts);
             if (localVarAccept != null) localVarRequestOptions.HeaderParameters.Add("Accept", localVarAccept);
 
             localVarRequestOptions.Data = createUserRequest;
@@ -866,22 +915,21 @@ namespace Tanks.ApiClient.Api
 
             // make the HTTP request
 
-            var task = this.AsynchronousClient.PostAsync<AuthResponse>("/users", localVarRequestOptions, this.Configuration, cancellationToken);
+            var task = AsynchronousClient.PostAsync<AuthResponse>("/users", localVarRequestOptions, Configuration, cancellationToken);
 
-#if UNITY_EDITOR || !UNITY_WEBGL
+            #if UNITY_EDITOR || !UNITY_WEBGL
             var localVarResponse = await task.ConfigureAwait(false);
-#else
+            #else
             var localVarResponse = await task;
-#endif
+            #endif
 
-            if (this.ExceptionFactory != null)
+            if (ExceptionFactory != null)
             {
-                Exception _exception = this.ExceptionFactory("UsersPost", localVarResponse);
+                var _exception = ExceptionFactory("UsersPost", localVarResponse);
                 if (_exception != null) throw _exception;
             }
 
             return localVarResponse;
         }
-
     }
 }

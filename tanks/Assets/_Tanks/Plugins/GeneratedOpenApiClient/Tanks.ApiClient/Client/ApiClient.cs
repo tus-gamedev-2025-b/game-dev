@@ -9,36 +9,29 @@
 
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters;
-using System.Text;
+using System.Net.Http;
 using System.Threading;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using UnityEngine.Networking;
+using Tanks.ApiClient.Model;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Tanks.ApiClient.Client
 {
     /// <summary>
-    /// To Serialize/Deserialize JSON using our custom logic, but only when ContentType is JSON.
+    ///     To Serialize/Deserialize JSON using our custom logic, but only when ContentType is JSON.
     /// </summary>
     internal class CustomJsonCodec
     {
+        private readonly static string _contentType = "application/json";
         private readonly IReadableConfiguration _configuration;
-        private static readonly string _contentType = "application/json";
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
         {
             // OpenAPI generated types generally hide default constructors.
@@ -63,32 +56,39 @@ namespace Tanks.ApiClient.Client
             _configuration = configuration;
         }
 
+        public string RootElement { get; set; }
+        public string Namespace { get; set; }
+        public string DateFormat { get; set; }
+
+        public string ContentType
+        {
+            get => _contentType;
+            set => throw new InvalidOperationException("Not allowed to set content type.");
+        }
+
         /// <summary>
-        /// Serialize the object into a JSON string.
+        ///     Serialize the object into a JSON string.
         /// </summary>
         /// <param name="obj">Object to be serialized.</param>
         /// <returns>A JSON string.</returns>
         public string Serialize(object obj)
         {
-            if (obj != null && obj is Tanks.ApiClient.Model.AbstractOpenAPISchema)
+            if (obj != null && obj is AbstractOpenAPISchema)
             {
                 // the object to be serialized is an oneOf/anyOf schema
-                return ((Tanks.ApiClient.Model.AbstractOpenAPISchema)obj).ToJson();
+                return ((AbstractOpenAPISchema)obj).ToJson();
             }
-            else
-            {
-                return JsonConvert.SerializeObject(obj, _serializerSettings);
-            }
+            return JsonConvert.SerializeObject(obj, _serializerSettings);
         }
 
         public T Deserialize<T>(UnityWebRequest request)
         {
-            var result = (T) Deserialize(request, typeof(T));
+            var result = (T)Deserialize(request, typeof(T));
             return result;
         }
 
         /// <summary>
-        /// Deserialize the JSON string into a proper object.
+        ///     Deserialize the JSON string into a proper object.
         /// </summary>
         /// <param name="response">The UnityWebRequest after it has a response.</param>
         /// <param name="type">Object type.</param>
@@ -110,7 +110,7 @@ namespace Tanks.ApiClient.Client
 
             if (type.Name.StartsWith("System.Nullable`1[[System.DateTime")) // return a datetime object
             {
-                return DateTime.Parse(request.downloadHandler.text, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                return DateTime.Parse(request.downloadHandler.text, null, DateTimeStyles.RoundtripKind);
             }
 
             if (type == typeof(string) || type.Name.StartsWith("System.Nullable")) // return primitive type
@@ -125,7 +125,7 @@ namespace Tanks.ApiClient.Client
                 var text = request.downloadHandler?.text;
 
                 // Generated APIs that don't expect a return value provide System.Object as the type
-                if (type == typeof(global::System.Object) && (string.IsNullOrEmpty(text) || text.Trim() == "null"))
+                if (type == typeof(object) && (string.IsNullOrEmpty(text) || text.Trim() == "null"))
                 {
                     return null;
                 }
@@ -142,13 +142,10 @@ namespace Tanks.ApiClient.Client
                         throw new UnexpectedResponseException(request, type, e.ToString());
                     }
                 }
-                else
-                {
-                    throw new ApiException((int)request.responseCode, request.error, text);
-                }
+                throw new ApiException((int)request.responseCode, request.error, text);
             }
-            
-            if (type != typeof(global::System.Object) && request.responseCode >= 200 && request.responseCode < 300)
+
+            if (type != typeof(object) && request.responseCode >= 200 && request.responseCode < 300)
             {
                 throw new UnexpectedResponseException(request, type);
             }
@@ -156,31 +153,42 @@ namespace Tanks.ApiClient.Client
             return null;
 
         }
-
-        public string RootElement { get; set; }
-        public string Namespace { get; set; }
-        public string DateFormat { get; set; }
-
-        public string ContentType
-        {
-            get { return _contentType; }
-            set { throw new InvalidOperationException("Not allowed to set content type."); }
-        }
     }
+
     /// <summary>
-    /// Provides a default implementation of an Api client (both synchronous and asynchronous implementations),
-    /// encapsulating general REST accessor use cases.
+    ///     Provides a default implementation of an Api client (both synchronous and asynchronous implementations),
+    ///     encapsulating general REST accessor use cases.
     /// </summary>
     /// <remarks>
-    /// The Dispose method will manage the HttpClient lifecycle when not passed by constructor.
+    ///     The Dispose method will manage the HttpClient lifecycle when not passed by constructor.
     /// </remarks>
     public partial class ApiClient : IDisposable, ISynchronousClient, IAsynchronousClient
     {
         private readonly string _baseUrl;
 
         /// <summary>
-        /// Specifies the settings on a <see cref="JsonSerializer" /> object.
-        /// These settings can be adjusted to accommodate custom serialization rules.
+        ///     Initializes a new instance of the <see cref="ApiClient" />, defaulting to the global configurations' base url.
+        /// </summary>
+        public ApiClient() :
+            this(GlobalConfiguration.Instance.BasePath)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ApiClient" />.
+        /// </summary>
+        /// <param name="basePath">The target service's base path in URL format.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public ApiClient(string basePath)
+        {
+            if (string.IsNullOrEmpty(basePath)) throw new ArgumentException("basePath cannot be empty");
+
+            _baseUrl = basePath;
+        }
+
+        /// <summary>
+        ///     Specifies the settings on a <see cref="JsonSerializer" /> object.
+        ///     These settings can be adjusted to accommodate custom serialization rules.
         /// </summary>
         public JsonSerializerSettings SerializerSettings { get; set; } = new JsonSerializerSettings
         {
@@ -196,42 +204,24 @@ namespace Tanks.ApiClient.Client
         };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApiClient" />, defaulting to the global configurations' base url.
-        /// </summary>
-        public ApiClient() :
-                 this(Tanks.ApiClient.Client.GlobalConfiguration.Instance.BasePath)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ApiClient" />.
-        /// </summary>
-        /// <param name="basePath">The target service's base path in URL format.</param>
-        /// <exception cref="ArgumentException"></exception>
-        public ApiClient(string basePath)
-        {
-            if (string.IsNullOrEmpty(basePath)) throw new ArgumentException("basePath cannot be empty");
-
-            _baseUrl = basePath;
-        }
-
-        /// <summary>
-        /// Disposes resources if they were created by us
+        ///     Disposes resources if they were created by us
         /// </summary>
         public void Dispose()
         {
         }
 
         /// <summary>
-        /// Provides all logic for constructing a new UnityWebRequest.
-        /// At this point, all information for querying the service is known. Here, it is simply
-        /// mapped into the UnityWebRequest.
+        ///     Provides all logic for constructing a new UnityWebRequest.
+        ///     At this point, all information for querying the service is known. Here, it is simply
+        ///     mapped into the UnityWebRequest.
         /// </summary>
         /// <param name="method">The http verb.</param>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <returns>[private] A new UnityWebRequest instance.</returns>
         /// <exception cref="ArgumentNullException"></exception>
         private UnityWebRequest NewRequest<T>(
@@ -244,7 +234,7 @@ namespace Tanks.ApiClient.Client
             if (options == null) throw new ArgumentNullException("options");
             if (configuration == null) throw new ArgumentNullException("configuration");
 
-            WebRequestPathBuilder builder = new WebRequestPathBuilder(_baseUrl, path);
+            var builder = new WebRequestPathBuilder(_baseUrl, path);
 
             builder.AddPathParameters(options.PathParameters);
 
@@ -284,7 +274,7 @@ namespace Tanks.ApiClient.Client
             }
             else if (contentType == "application/octet-stream")
             {
-                if(options.Data is Stream stream)
+                if (options.Data is Stream stream)
                 {
                     using (var binaryReader = new BinaryReader(stream))
                     {
@@ -315,17 +305,17 @@ namespace Tanks.ApiClient.Client
                 request = new UnityWebRequest(builder.GetFullUri(), method);
             }
 
-            if (request.downloadHandler == null && typeof(T) != typeof(global::System.Object))
+            if (request.downloadHandler == null && typeof(T) != typeof(object))
             {
                 request.downloadHandler = new DownloadHandlerBuffer();
             }
 
-#if UNITY_EDITOR || !UNITY_WEBGL
+            #if UNITY_EDITOR || !UNITY_WEBGL
             if (configuration.UserAgent != null)
             {
                 request.SetRequestHeader("User-Agent", configuration.UserAgent);
             }
-#endif
+            #endif
 
             if (configuration.DefaultHeaders != null)
             {
@@ -354,7 +344,7 @@ namespace Tanks.ApiClient.Client
                 #else
                 if (options.Cookies.Count != 1)
                 {
-                    UnityEngine.Debug.LogError("Only one cookie supported, ignoring others");
+                    Debug.LogError("Only one cookie supported, ignoring others");
                 }
 
                 request.SetRequestHeader("Cookie", options.Cookies[0].ToString());
@@ -370,7 +360,7 @@ namespace Tanks.ApiClient.Client
 
         private ApiResponse<T> ToApiResponse<T>(UnityWebRequest request, object responseData)
         {
-            T result = (T) responseData;
+            var result = (T)responseData;
 
             var transformed = new ApiResponse<T>((HttpStatusCode)request.responseCode, new Multimap<string, string>(), result, request.downloadHandler?.text ?? "")
             {
@@ -396,7 +386,7 @@ namespace Tanks.ApiClient.Client
             string path,
             RequestOptions options,
             IReadableConfiguration configuration,
-            System.Threading.CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default)
         {
             var deserializer = new CustomJsonCodec(SerializerSettings, configuration);
 
@@ -425,11 +415,11 @@ namespace Tanks.ApiClient.Client
 
                 InterceptRequest(request, path, options, configuration);
 
-        #if UNITY_2020_2_OR_NEWER
+                #if UNITY_2020_2_OR_NEWER
                 // For Unity 2020.2 and newer, use UnityWebRequest.Result.
                 var asyncOp = request.SendWebRequest();
-                TaskCompletionSource<UnityWebRequest.Result> tcs = new TaskCompletionSource<UnityWebRequest.Result>();
-                asyncOp.completed += (_) => tcs.TrySetResult(request.result);
+                var tcs = new TaskCompletionSource<UnityWebRequest.Result>();
+                asyncOp.completed += _ => tcs.TrySetResult(request.result);
                 using (var tokenRegistration = cancellationToken.Register(request.Abort, true))
                 {
                     await tcs.Task;
@@ -440,7 +430,7 @@ namespace Tanks.ApiClient.Client
                 {
                     throw new ConnectionException(request);
                 }
-        #else
+                #else
                 // For Unity 2019 and earlier, await the operation directly.
                 var asyncOp = request.SendWebRequest();
                 using (var tokenRegistration = cancellationToken.Register(request.Abort, true))
@@ -452,18 +442,18 @@ namespace Tanks.ApiClient.Client
                 {
                     throw new ConnectionException(request);
                 }
-        #endif
+                #endif
 
                 object responseData = deserializer.Deserialize<T>(request);
 
                 // if the response type is oneOf/anyOf, call FromJSON to deserialize the data
-                if (typeof(Tanks.ApiClient.Model.AbstractOpenAPISchema).IsAssignableFrom(typeof(T)))
+                if (typeof(AbstractOpenAPISchema).IsAssignableFrom(typeof(T)))
                 {
-                    responseData = (T) typeof(T).GetMethod("FromJson").Invoke(null, new object[] { new ByteArrayContent(request.downloadHandler.data) });
+                    responseData = (T)typeof(T).GetMethod("FromJson").Invoke(null, new object[] { new ByteArrayContent(request.downloadHandler.data) });
                 }
                 else if (typeof(T).Name == "Stream") // for binary response
                 {
-                    responseData = (T) (object) new MemoryStream(request.downloadHandler.data);
+                    responseData = (T)(object)new MemoryStream(request.downloadHandler.data);
                 }
 
                 InterceptResponse(request, path, options, configuration, ref responseData);
@@ -473,203 +463,243 @@ namespace Tanks.ApiClient.Client
         }
 
         #region IAsynchronousClient
+
         /// <summary>
-        /// Make a HTTP GET request (async).
+        ///     Make a HTTP GET request (async).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <param name="cancellationToken">Token that enables callers to cancel the request.</param>
         /// <returns>A Task containing ApiResponse</returns>
-        public Task<ApiResponse<T>> GetAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null, System.Threading.CancellationToken cancellationToken = default)
+        public Task<ApiResponse<T>> GetAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null,
+            CancellationToken cancellationToken = default)
         {
             var config = configuration ?? GlobalConfiguration.Instance;
             return ExecAsync<T>(NewRequest<T>("GET", path, options, config), path, options, config, cancellationToken);
         }
 
         /// <summary>
-        /// Make a HTTP POST request (async).
+        ///     Make a HTTP POST request (async).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <param name="cancellationToken">Token that enables callers to cancel the request.</param>
         /// <returns>A Task containing ApiResponse</returns>
-        public Task<ApiResponse<T>> PostAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null, System.Threading.CancellationToken cancellationToken = default)
+        public Task<ApiResponse<T>> PostAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null,
+            CancellationToken cancellationToken = default)
         {
             var config = configuration ?? GlobalConfiguration.Instance;
             return ExecAsync<T>(NewRequest<T>("POST", path, options, config), path, options, config, cancellationToken);
         }
 
         /// <summary>
-        /// Make a HTTP PUT request (async).
+        ///     Make a HTTP PUT request (async).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <param name="cancellationToken">Token that enables callers to cancel the request.</param>
         /// <returns>A Task containing ApiResponse</returns>
-        public Task<ApiResponse<T>> PutAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null, System.Threading.CancellationToken cancellationToken = default)
+        public Task<ApiResponse<T>> PutAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null,
+            CancellationToken cancellationToken = default)
         {
             var config = configuration ?? GlobalConfiguration.Instance;
             return ExecAsync<T>(NewRequest<T>("PUT", path, options, config), path, options, config, cancellationToken);
         }
 
         /// <summary>
-        /// Make a HTTP DELETE request (async).
+        ///     Make a HTTP DELETE request (async).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <param name="cancellationToken">Token that enables callers to cancel the request.</param>
         /// <returns>A Task containing ApiResponse</returns>
-        public Task<ApiResponse<T>> DeleteAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null, System.Threading.CancellationToken cancellationToken = default)
+        public Task<ApiResponse<T>> DeleteAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null,
+            CancellationToken cancellationToken = default)
         {
             var config = configuration ?? GlobalConfiguration.Instance;
             return ExecAsync<T>(NewRequest<T>("DELETE", path, options, config), path, options, config, cancellationToken);
         }
 
         /// <summary>
-        /// Make a HTTP HEAD request (async).
+        ///     Make a HTTP HEAD request (async).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <param name="cancellationToken">Token that enables callers to cancel the request.</param>
         /// <returns>A Task containing ApiResponse</returns>
-        public Task<ApiResponse<T>> HeadAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null, System.Threading.CancellationToken cancellationToken = default)
+        public Task<ApiResponse<T>> HeadAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null,
+            CancellationToken cancellationToken = default)
         {
             var config = configuration ?? GlobalConfiguration.Instance;
             return ExecAsync<T>(NewRequest<T>("HEAD", path, options, config), path, options, config, cancellationToken);
         }
 
         /// <summary>
-        /// Make a HTTP OPTION request (async).
+        ///     Make a HTTP OPTION request (async).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <param name="cancellationToken">Token that enables callers to cancel the request.</param>
         /// <returns>A Task containing ApiResponse</returns>
-        public Task<ApiResponse<T>> OptionsAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null, System.Threading.CancellationToken cancellationToken = default)
+        public Task<ApiResponse<T>> OptionsAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null,
+            CancellationToken cancellationToken = default)
         {
             var config = configuration ?? GlobalConfiguration.Instance;
             return ExecAsync<T>(NewRequest<T>("OPTIONS", path, options, config), path, options, config, cancellationToken);
         }
 
         /// <summary>
-        /// Make a HTTP PATCH request (async).
+        ///     Make a HTTP PATCH request (async).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <param name="cancellationToken">Token that enables callers to cancel the request.</param>
         /// <returns>A Task containing ApiResponse</returns>
-        public Task<ApiResponse<T>> PatchAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null, System.Threading.CancellationToken cancellationToken = default)
+        public Task<ApiResponse<T>> PatchAsync<T>(string path, RequestOptions options, IReadableConfiguration configuration = null,
+            CancellationToken cancellationToken = default)
         {
             var config = configuration ?? GlobalConfiguration.Instance;
             return ExecAsync<T>(NewRequest<T>("PATCH", path, options, config), path, options, config, cancellationToken);
         }
+
         #endregion IAsynchronousClient
 
         #region ISynchronousClient
+
         /// <summary>
-        /// Make a HTTP GET request (synchronous).
+        ///     Make a HTTP GET request (synchronous).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <returns>A Task containing ApiResponse</returns>
         public ApiResponse<T> Get<T>(string path, RequestOptions options, IReadableConfiguration configuration = null)
         {
-            throw new System.NotImplementedException("UnityWebRequest does not support synchronous operation");
+            throw new NotImplementedException("UnityWebRequest does not support synchronous operation");
         }
 
         /// <summary>
-        /// Make a HTTP POST request (synchronous).
+        ///     Make a HTTP POST request (synchronous).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <returns>A Task containing ApiResponse</returns>
         public ApiResponse<T> Post<T>(string path, RequestOptions options, IReadableConfiguration configuration = null)
         {
-            throw new System.NotImplementedException("UnityWebRequest does not support synchronous operation");
+            throw new NotImplementedException("UnityWebRequest does not support synchronous operation");
         }
 
         /// <summary>
-        /// Make a HTTP PUT request (synchronous).
+        ///     Make a HTTP PUT request (synchronous).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <returns>A Task containing ApiResponse</returns>
         public ApiResponse<T> Put<T>(string path, RequestOptions options, IReadableConfiguration configuration = null)
         {
-            throw new System.NotImplementedException("UnityWebRequest does not support synchronous operation");
+            throw new NotImplementedException("UnityWebRequest does not support synchronous operation");
         }
 
         /// <summary>
-        /// Make a HTTP DELETE request (synchronous).
+        ///     Make a HTTP DELETE request (synchronous).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <returns>A Task containing ApiResponse</returns>
         public ApiResponse<T> Delete<T>(string path, RequestOptions options, IReadableConfiguration configuration = null)
         {
-            throw new System.NotImplementedException("UnityWebRequest does not support synchronous operation");
+            throw new NotImplementedException("UnityWebRequest does not support synchronous operation");
         }
 
         /// <summary>
-        /// Make a HTTP HEAD request (synchronous).
+        ///     Make a HTTP HEAD request (synchronous).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <returns>A Task containing ApiResponse</returns>
         public ApiResponse<T> Head<T>(string path, RequestOptions options, IReadableConfiguration configuration = null)
         {
-            throw new System.NotImplementedException("UnityWebRequest does not support synchronous operation");
+            throw new NotImplementedException("UnityWebRequest does not support synchronous operation");
         }
 
         /// <summary>
-        /// Make a HTTP OPTION request (synchronous).
+        ///     Make a HTTP OPTION request (synchronous).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <returns>A Task containing ApiResponse</returns>
         public ApiResponse<T> Options<T>(string path, RequestOptions options, IReadableConfiguration configuration = null)
         {
-            throw new System.NotImplementedException("UnityWebRequest does not support synchronous operation");
+            throw new NotImplementedException("UnityWebRequest does not support synchronous operation");
         }
 
         /// <summary>
-        /// Make a HTTP PATCH request (synchronous).
+        ///     Make a HTTP PATCH request (synchronous).
         /// </summary>
         /// <param name="path">The target path (or resource).</param>
         /// <param name="options">The additional request options.</param>
-        /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
-        /// GlobalConfiguration has been done before calling this method.</param>
+        /// <param name="configuration">
+        ///     A per-request configuration object. It is assumed that any merge with
+        ///     GlobalConfiguration has been done before calling this method.
+        /// </param>
         /// <returns>A Task containing ApiResponse</returns>
         public ApiResponse<T> Patch<T>(string path, RequestOptions options, IReadableConfiguration configuration = null)
         {
-            throw new System.NotImplementedException("UnityWebRequest does not support synchronous operation");
+            throw new NotImplementedException("UnityWebRequest does not support synchronous operation");
         }
+
         #endregion ISynchronousClient
+
     }
 }

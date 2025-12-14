@@ -9,34 +9,28 @@
 
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// UserResponse
+    ///     UserResponse
     /// </summary>
     [DataContract(Name = "UserResponse")]
-    public partial class UserResponse
+    public class UserResponse
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserResponse" /> class.
+        ///     Initializes a new instance of the <see cref="UserResponse" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected UserResponse() { }
+        protected UserResponse()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserResponse" /> class.
+        ///     Initializes a new instance of the <see cref="UserResponse" /> class.
         /// </summary>
         /// <param name="user">user (required).</param>
         public UserResponse(AuthResponseUser user = default)
@@ -46,22 +40,22 @@ namespace Tanks.ApiClient.Model
             {
                 throw new ArgumentNullException("user is a required property for UserResponse and cannot be null");
             }
-            this.User = user;
+            User = user;
         }
 
         /// <summary>
-        /// Gets or Sets User
+        ///     Gets or Sets User
         /// </summary>
         [DataMember(Name = "user", IsRequired = true, EmitDefaultValue = true)]
         public AuthResponseUser User { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class UserResponse {\n");
             sb.Append("  User: ").Append(User).Append("\n");
             sb.Append("}\n");
@@ -69,14 +63,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }

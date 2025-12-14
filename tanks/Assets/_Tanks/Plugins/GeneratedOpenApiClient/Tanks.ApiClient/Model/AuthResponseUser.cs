@@ -9,34 +9,28 @@
 
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// AuthResponseUser
+    ///     AuthResponseUser
     /// </summary>
     [DataContract(Name = "AuthResponse_user")]
-    public partial class AuthResponseUser
+    public class AuthResponseUser
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthResponseUser" /> class.
+        ///     Initializes a new instance of the <see cref="AuthResponseUser" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected AuthResponseUser() { }
+        protected AuthResponseUser()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthResponseUser" /> class.
+        ///     Initializes a new instance of the <see cref="AuthResponseUser" /> class.
         /// </summary>
         /// <param name="id">id (required).</param>
         /// <param name="name">name (required).</param>
@@ -44,74 +38,75 @@ namespace Tanks.ApiClient.Model
         /// <param name="losses">losses (required).</param>
         /// <param name="createdAt">createdAt (required).</param>
         /// <param name="updatedAt">updatedAt (required).</param>
-        public AuthResponseUser(decimal id = default, string name = default, decimal wins = default, decimal losses = default, string createdAt = default, string updatedAt = default)
+        public AuthResponseUser(decimal id = default, string name = default, decimal wins = default, decimal losses = default, string createdAt = default,
+            string updatedAt = default)
         {
-            this.Id = id;
+            Id = id;
             // to ensure "name" is required (not null)
             if (name == null)
             {
                 throw new ArgumentNullException("name is a required property for AuthResponseUser and cannot be null");
             }
-            this.Name = name;
-            this.Wins = wins;
-            this.Losses = losses;
+            Name = name;
+            Wins = wins;
+            Losses = losses;
             // to ensure "createdAt" is required (not null)
             if (createdAt == null)
             {
                 throw new ArgumentNullException("createdAt is a required property for AuthResponseUser and cannot be null");
             }
-            this.CreatedAt = createdAt;
+            CreatedAt = createdAt;
             // to ensure "updatedAt" is required (not null)
             if (updatedAt == null)
             {
                 throw new ArgumentNullException("updatedAt is a required property for AuthResponseUser and cannot be null");
             }
-            this.UpdatedAt = updatedAt;
+            UpdatedAt = updatedAt;
         }
 
         /// <summary>
-        /// Gets or Sets Id
+        ///     Gets or Sets Id
         /// </summary>
         [DataMember(Name = "id", IsRequired = true, EmitDefaultValue = true)]
         public decimal Id { get; set; }
 
         /// <summary>
-        /// Gets or Sets Name
+        ///     Gets or Sets Name
         /// </summary>
         [DataMember(Name = "name", IsRequired = true, EmitDefaultValue = true)]
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or Sets Wins
+        ///     Gets or Sets Wins
         /// </summary>
         [DataMember(Name = "wins", IsRequired = true, EmitDefaultValue = true)]
         public decimal Wins { get; set; }
 
         /// <summary>
-        /// Gets or Sets Losses
+        ///     Gets or Sets Losses
         /// </summary>
         [DataMember(Name = "losses", IsRequired = true, EmitDefaultValue = true)]
         public decimal Losses { get; set; }
 
         /// <summary>
-        /// Gets or Sets CreatedAt
+        ///     Gets or Sets CreatedAt
         /// </summary>
         [DataMember(Name = "createdAt", IsRequired = true, EmitDefaultValue = true)]
         public string CreatedAt { get; set; }
 
         /// <summary>
-        /// Gets or Sets UpdatedAt
+        ///     Gets or Sets UpdatedAt
         /// </summary>
         [DataMember(Name = "updatedAt", IsRequired = true, EmitDefaultValue = true)]
         public string UpdatedAt { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class AuthResponseUser {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
             sb.Append("  Name: ").Append(Name).Append("\n");
@@ -124,14 +119,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }

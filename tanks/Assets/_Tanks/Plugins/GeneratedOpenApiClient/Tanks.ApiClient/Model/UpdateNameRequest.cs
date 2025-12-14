@@ -9,34 +9,28 @@
 
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// UpdateNameRequest
+    ///     UpdateNameRequest
     /// </summary>
     [DataContract(Name = "UpdateNameRequest")]
-    public partial class UpdateNameRequest
+    public class UpdateNameRequest
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateNameRequest" /> class.
+        ///     Initializes a new instance of the <see cref="UpdateNameRequest" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected UpdateNameRequest() { }
+        protected UpdateNameRequest()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateNameRequest" /> class.
+        ///     Initializes a new instance of the <see cref="UpdateNameRequest" /> class.
         /// </summary>
         /// <param name="name">name (required).</param>
         public UpdateNameRequest(string name = default)
@@ -46,22 +40,22 @@ namespace Tanks.ApiClient.Model
             {
                 throw new ArgumentNullException("name is a required property for UpdateNameRequest and cannot be null");
             }
-            this.Name = name;
+            Name = name;
         }
 
         /// <summary>
-        /// Gets or Sets Name
+        ///     Gets or Sets Name
         /// </summary>
         [DataMember(Name = "name", IsRequired = true, EmitDefaultValue = true)]
         public string Name { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class UpdateNameRequest {\n");
             sb.Append("  Name: ").Append(Name).Append("\n");
             sb.Append("}\n");
@@ -69,14 +63,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }

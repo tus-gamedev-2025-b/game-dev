@@ -5,17 +5,16 @@ using Tanks.ApiClient.Client;
 using Tanks.ApiClient.Model;
 using Tanks.Complete.Persistence.Models;
 using Tanks.Complete.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using TMPro;
-using Tanks.Complete.Persistence;
-using Tanks.Complete.Utils;
+using Random = UnityEngine.Random;
 
 namespace Tanks.Complete
 {
     /// <summary>
-    /// Handles title screen login flow.
+    ///     Handles title screen login flow.
     /// </summary>
     public class TitleSceneUI : MonoBehaviour
     {
@@ -28,7 +27,7 @@ namespace Tanks.Complete
 
         [Header("Config")]
         [SerializeField] private string defaultDisplayNamePrefix = "Tanker";
-        [SerializeField] private bool autoStartOnAwake = false;
+        [SerializeField] private bool autoStartOnAwake;
 
         private CancellationTokenSource _cts;
 
@@ -85,7 +84,7 @@ namespace Tanks.Complete
                 }
                 else
                 {
-                    var displayName = $"{defaultDisplayNamePrefix}{UnityEngine.Random.Range(1000, 9999)}";
+                    var displayName = $"{defaultDisplayNamePrefix}{Random.Range(1000, 9999)}";
                     statusText?.SetText("Creating a new user...");
                     result = await manager.CreateAndLoginUserAsync(displayName, token);
                 }

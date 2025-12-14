@@ -9,34 +9,28 @@
 
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// ErrorResponseError
+    ///     ErrorResponseError
     /// </summary>
     [DataContract(Name = "ErrorResponse_error")]
-    public partial class ErrorResponseError
+    public class ErrorResponseError
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorResponseError" /> class.
+        ///     Initializes a new instance of the <see cref="ErrorResponseError" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected ErrorResponseError() { }
+        protected ErrorResponseError()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="ErrorResponseError" /> class.
+        ///     Initializes a new instance of the <see cref="ErrorResponseError" /> class.
         /// </summary>
         /// <param name="code">code (required).</param>
         /// <param name="message">message (required).</param>
@@ -47,34 +41,34 @@ namespace Tanks.ApiClient.Model
             {
                 throw new ArgumentNullException("code is a required property for ErrorResponseError and cannot be null");
             }
-            this.Code = code;
+            Code = code;
             // to ensure "message" is required (not null)
             if (message == null)
             {
                 throw new ArgumentNullException("message is a required property for ErrorResponseError and cannot be null");
             }
-            this.Message = message;
+            Message = message;
         }
 
         /// <summary>
-        /// Gets or Sets Code
+        ///     Gets or Sets Code
         /// </summary>
         [DataMember(Name = "code", IsRequired = true, EmitDefaultValue = true)]
         public string Code { get; set; }
 
         /// <summary>
-        /// Gets or Sets Message
+        ///     Gets or Sets Message
         /// </summary>
         [DataMember(Name = "message", IsRequired = true, EmitDefaultValue = true)]
         public string Message { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class ErrorResponseError {\n");
             sb.Append("  Code: ").Append(Code).Append("\n");
             sb.Append("  Message: ").Append(Message).Append("\n");
@@ -83,14 +77,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }

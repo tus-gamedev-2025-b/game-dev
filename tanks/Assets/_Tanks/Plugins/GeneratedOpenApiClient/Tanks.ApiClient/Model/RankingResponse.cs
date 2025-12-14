@@ -9,34 +9,29 @@
 
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// RankingResponse
+    ///     RankingResponse
     /// </summary>
     [DataContract(Name = "RankingResponse")]
-    public partial class RankingResponse
+    public class RankingResponse
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RankingResponse" /> class.
+        ///     Initializes a new instance of the <see cref="RankingResponse" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected RankingResponse() { }
+        protected RankingResponse()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="RankingResponse" /> class.
+        ///     Initializes a new instance of the <see cref="RankingResponse" /> class.
         /// </summary>
         /// <param name="rankings">rankings (required).</param>
         /// <param name="currentUser">currentUser (required).</param>
@@ -47,34 +42,34 @@ namespace Tanks.ApiClient.Model
             {
                 throw new ArgumentNullException("rankings is a required property for RankingResponse and cannot be null");
             }
-            this.Rankings = rankings;
+            Rankings = rankings;
             // to ensure "currentUser" is required (not null)
             if (currentUser == null)
             {
                 throw new ArgumentNullException("currentUser is a required property for RankingResponse and cannot be null");
             }
-            this.CurrentUser = currentUser;
+            CurrentUser = currentUser;
         }
 
         /// <summary>
-        /// Gets or Sets Rankings
+        ///     Gets or Sets Rankings
         /// </summary>
         [DataMember(Name = "rankings", IsRequired = true, EmitDefaultValue = true)]
         public List<RankingResponseRankingsInner> Rankings { get; set; }
 
         /// <summary>
-        /// Gets or Sets CurrentUser
+        ///     Gets or Sets CurrentUser
         /// </summary>
         [DataMember(Name = "currentUser", IsRequired = true, EmitDefaultValue = true)]
         public RankingResponseRankingsInner CurrentUser { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class RankingResponse {\n");
             sb.Append("  Rankings: ").Append(Rankings).Append("\n");
             sb.Append("  CurrentUser: ").Append(CurrentUser).Append("\n");
@@ -83,14 +78,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }

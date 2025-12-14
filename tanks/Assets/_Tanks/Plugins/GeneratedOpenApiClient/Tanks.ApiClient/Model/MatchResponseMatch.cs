@@ -9,34 +9,28 @@
 
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// MatchResponseMatch
+    ///     MatchResponseMatch
     /// </summary>
     [DataContract(Name = "MatchResponse_match")]
-    public partial class MatchResponseMatch
+    public class MatchResponseMatch
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchResponseMatch" /> class.
+        ///     Initializes a new instance of the <see cref="MatchResponseMatch" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected MatchResponseMatch() { }
+        protected MatchResponseMatch()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchResponseMatch" /> class.
+        ///     Initializes a new instance of the <see cref="MatchResponseMatch" /> class.
         /// </summary>
         /// <param name="id">id (required).</param>
         /// <param name="winnerId">winnerId (required).</param>
@@ -44,48 +38,48 @@ namespace Tanks.ApiClient.Model
         /// <param name="playedAt">playedAt (required).</param>
         public MatchResponseMatch(decimal id = default, decimal winnerId = default, decimal loserId = default, string playedAt = default)
         {
-            this.Id = id;
-            this.WinnerId = winnerId;
-            this.LoserId = loserId;
+            Id = id;
+            WinnerId = winnerId;
+            LoserId = loserId;
             // to ensure "playedAt" is required (not null)
             if (playedAt == null)
             {
                 throw new ArgumentNullException("playedAt is a required property for MatchResponseMatch and cannot be null");
             }
-            this.PlayedAt = playedAt;
+            PlayedAt = playedAt;
         }
 
         /// <summary>
-        /// Gets or Sets Id
+        ///     Gets or Sets Id
         /// </summary>
         [DataMember(Name = "id", IsRequired = true, EmitDefaultValue = true)]
         public decimal Id { get; set; }
 
         /// <summary>
-        /// Gets or Sets WinnerId
+        ///     Gets or Sets WinnerId
         /// </summary>
         [DataMember(Name = "winnerId", IsRequired = true, EmitDefaultValue = true)]
         public decimal WinnerId { get; set; }
 
         /// <summary>
-        /// Gets or Sets LoserId
+        ///     Gets or Sets LoserId
         /// </summary>
         [DataMember(Name = "loserId", IsRequired = true, EmitDefaultValue = true)]
         public decimal LoserId { get; set; }
 
         /// <summary>
-        /// Gets or Sets PlayedAt
+        ///     Gets or Sets PlayedAt
         /// </summary>
         [DataMember(Name = "playedAt", IsRequired = true, EmitDefaultValue = true)]
         public string PlayedAt { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class MatchResponseMatch {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
             sb.Append("  WinnerId: ").Append(WinnerId).Append("\n");
@@ -96,14 +90,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }

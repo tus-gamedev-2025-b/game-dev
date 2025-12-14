@@ -16,6 +16,10 @@ namespace Tanks.Complete.Persistence.Models
 
         public bool IsValid => UserId > 0 && !string.IsNullOrEmpty(UserName);
 
+        public DateTimeOffset CreatedAt => TryParse(CreatedAtIso);
+
+        public DateTimeOffset UpdatedAt => TryParse(UpdatedAtIso);
+
         public static UserData FromAuthResponse(AuthResponse response)
         {
             return response == null ? null : FromAuthResponseUser(response.User);
@@ -39,11 +43,10 @@ namespace Tanks.Complete.Persistence.Models
             };
         }
 
-        public DateTimeOffset CreatedAt => TryParse(CreatedAtIso);
-
-        public DateTimeOffset UpdatedAt => TryParse(UpdatedAtIso);
-
-        public string ToJson() => JsonUtility.ToJson(this);
+        public string ToJson()
+        {
+            return JsonUtility.ToJson(this);
+        }
 
         public static UserData FromJson(string json)
         {

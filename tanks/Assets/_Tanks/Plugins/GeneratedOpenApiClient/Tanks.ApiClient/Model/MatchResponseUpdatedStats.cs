@@ -8,71 +8,64 @@
  */
 
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using OpenAPIDateConverter = Tanks.ApiClient.Client.OpenAPIDateConverter;
 
 namespace Tanks.ApiClient.Model
 {
     /// <summary>
-    /// MatchResponseUpdatedStats
+    ///     MatchResponseUpdatedStats
     /// </summary>
     [DataContract(Name = "MatchResponse_updatedStats")]
-    public partial class MatchResponseUpdatedStats
+    public class MatchResponseUpdatedStats
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchResponseUpdatedStats" /> class.
+        ///     Initializes a new instance of the <see cref="MatchResponseUpdatedStats" /> class.
         /// </summary>
         [JsonConstructorAttribute]
-        protected MatchResponseUpdatedStats() { }
+        protected MatchResponseUpdatedStats()
+        {
+        }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="MatchResponseUpdatedStats" /> class.
+        ///     Initializes a new instance of the <see cref="MatchResponseUpdatedStats" /> class.
         /// </summary>
         /// <param name="wins">wins (required).</param>
         /// <param name="losses">losses (required).</param>
         /// <param name="totalMatches">totalMatches (required).</param>
         public MatchResponseUpdatedStats(decimal wins = default, decimal losses = default, decimal totalMatches = default)
         {
-            this.Wins = wins;
-            this.Losses = losses;
-            this.TotalMatches = totalMatches;
+            Wins = wins;
+            Losses = losses;
+            TotalMatches = totalMatches;
         }
 
         /// <summary>
-        /// Gets or Sets Wins
+        ///     Gets or Sets Wins
         /// </summary>
         [DataMember(Name = "wins", IsRequired = true, EmitDefaultValue = true)]
         public decimal Wins { get; set; }
 
         /// <summary>
-        /// Gets or Sets Losses
+        ///     Gets or Sets Losses
         /// </summary>
         [DataMember(Name = "losses", IsRequired = true, EmitDefaultValue = true)]
         public decimal Losses { get; set; }
 
         /// <summary>
-        /// Gets or Sets TotalMatches
+        ///     Gets or Sets TotalMatches
         /// </summary>
         [DataMember(Name = "totalMatches", IsRequired = true, EmitDefaultValue = true)]
         public decimal TotalMatches { get; set; }
 
         /// <summary>
-        /// Returns the string presentation of the object
+        ///     Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("class MatchResponseUpdatedStats {\n");
             sb.Append("  Wins: ").Append(Wins).Append("\n");
             sb.Append("  Losses: ").Append(Losses).Append("\n");
@@ -82,14 +75,13 @@ namespace Tanks.ApiClient.Model
         }
 
         /// <summary>
-        /// Returns the JSON string presentation of the object
+        ///     Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
         public virtual string ToJson()
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
-
     }
 
 }
