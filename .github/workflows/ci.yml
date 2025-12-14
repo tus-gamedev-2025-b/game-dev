@@ -83,6 +83,15 @@ jobs:
       - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
+      - name: Setup tools
+        uses: jdx/mise-action@be3be2260bc02bc3fbf94c5e2fed8b7964baf074 # v3.4.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check code formatting
+        run: pnpm run generate:openapi
+
       - name: Cleanup code with ReSharper
         run: |
           jb cleanupcode ./tanks/tanks.sln \
