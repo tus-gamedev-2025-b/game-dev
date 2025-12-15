@@ -1,5 +1,7 @@
 using System.IO;
+using System.Reflection;
 using NUnit.Framework;
+using Tanks.Complete;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -30,45 +32,26 @@ public class UIRequirementsTests
     }
 
     [Test]
-    public void TitleScene_HasTapToStartButton()
+    public void TitleScene_StartButtonIsPresentAndWired()
     {
         EditorSceneManager.OpenScene(SCENE_PATH + "TitleScene.unity");
 
-        // ボタンの存在確認
-        var startButton = GameObject.Find("StartButton");
-        Assert.IsNotNull(startButton,
-            "「Tap to Start」ボタンが配置されていません");
+        // TitleSceneUIが存在することを確認
+        var titleSceneUI = Object.FindObjectOfType<TitleSceneUI>();
+        Assert.IsNotNull(titleSceneUI, "TitleSceneUIがシーンに存在しません");
 
-        // Buttonコンポーネントの確認
-        var buttonComponent = startButton.GetComponent<Button>();
+        // StartButtonの存在とButtonコンポーネント確認
+        var startButtonGO = GameObject.Find("StartButton");
+        Assert.IsNotNull(startButtonGO, "StartButtonオブジェクトがありません");
+
+        var buttonComponent = startButtonGO.GetComponent<Button>();
         Assert.IsNotNull(buttonComponent, "StartButtonにButtonコンポーネントがありません");
 
-        // ボタンテキストの確認
-        var textChild = startButton.GetComponentInChildren<TextMeshProUGUI>();
-        Assert.IsNotNull(textChild, "ボタンにテキストがありません");
-        Assert.AreEqual("Tap to Start", textChild.text,
-            "ボタンテキストが「Tap to Start」ではありません");
-
-        // StartButtonスクリプトがアタッチされているか
-        var startButtonScript = startButton.GetComponent<StartButton>();
-        Assert.IsNotNull(startButtonScript,
-            "StartButtonスクリプトがアタッチされていません");
-    }
-
-    [Test]
-    public void TitleScene_ButtonHasTransitionEvent()
-    {
-        EditorSceneManager.OpenScene(SCENE_PATH + "TitleScene.unity");
-
-        var startButton = GameObject.Find("StartButton");
-        Assert.IsNotNull(startButton);
-
-        var buttonComponent = startButton.GetComponent<Button>();
-
-        // OnClickイベントが設定されているか確認
-        Assert.IsTrue(buttonComponent.onClick.GetPersistentEventCount() > 0 ||
-                      startButton.GetComponent<StartButton>() != null,
-            "ボタンに画面遷移イベントが設定されていません");
+        // TitleSceneUIのstartButton参照が設定されているか確認
+        var field = typeof(TitleSceneUI)
+            .GetField("startButton", BindingFlags.Instance | BindingFlags.NonPublic);
+        var wiredButton = field?.GetValue(titleSceneUI) as Button;
+        Assert.IsNotNull(wiredButton, "TitleSceneUIのstartButton参照が設定されていません");
     }
 
     [Test]

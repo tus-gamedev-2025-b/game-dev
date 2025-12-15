@@ -9,9 +9,11 @@
   "type": "module",
   "scripts": {
     "format:check": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --check .",
-    "format:write": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --write ."
+    "format:write": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --write .",
+    "generate:openapi": "openapi-generator-cli generate -i ./backend/docs/openapi.json -g csharp -c ./openapi-generator.config.json -o ./tanks/Assets/_Tanks/Plugins/GeneratedOpenApiClient --global-property modelTests=false,apiTests=false,modelDocs=false,apiDocs=false"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.25.2",
     "prettier": "^3.6.2"
   },
   "packageManager": "pnpm@10.20.0"
