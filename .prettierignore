@@ -6,3 +6,7 @@
 /tanks/Assets
 /tanks/Packages
 /tanks/ProjectSettings
+
+/backend/**/*.js
+/backend/**/*.ts
+/backend/**/*.json
