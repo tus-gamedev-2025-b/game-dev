@@ -20,10 +20,10 @@ public class HUDManager : MonoBehaviour
 
     // HPのキャッシュ
     private float lastP1HP = 1f;
-    private float lastP2HP = 1f;
 
     // 勝利数のキャッシュ
     private int lastP1Wins;
+    private float lastP2HP = 1f;
     private int lastP2Wins;
 
     private void Start()
@@ -92,11 +92,11 @@ public class HUDManager : MonoBehaviour
     private bool DoesP2Exist()
     {
         return m_GameManager.m_Players?.Any(tank => tank.ControlIndex == 2) ?? false;
-    }    
+    }
 
     private void HandleGameLoopStateChanged(GameManager.GameLoopState state)
     {
-        bool playing = (state == GameManager.GameLoopState.RoundPlaying);
+        var playing = state == GameManager.GameLoopState.RoundPlaying;
 
         if (playing)
         {
@@ -191,8 +191,8 @@ public class HUDManager : MonoBehaviour
         {
             // 購読
             tm.OnWeaponStockChanged += HandleWeaponStockChanged;
-            tm.OnHealthChanged      += HandleHealthChanged;
-            tm.OnWinCountChanged    += HandleWinCountChanged;
+            tm.OnHealthChanged += HandleHealthChanged;
+            tm.OnWinCountChanged += HandleWinCountChanged;
 
             // 購読直後に「現在値」を読み取って UIへ即反映
             var health = tm.m_Instance ? tm.m_Instance.GetComponent<TankHealth>() : null;
@@ -217,8 +217,8 @@ public class HUDManager : MonoBehaviour
         foreach (var tm in m_GameManager.m_Players)
         {
             tm.OnWeaponStockChanged -= HandleWeaponStockChanged;
-            tm.OnHealthChanged      -= HandleHealthChanged;
-            tm.OnWinCountChanged    -= HandleWinCountChanged;
+            tm.OnHealthChanged -= HandleHealthChanged;
+            tm.OnWinCountChanged -= HandleWinCountChanged;
         }
     }
 }

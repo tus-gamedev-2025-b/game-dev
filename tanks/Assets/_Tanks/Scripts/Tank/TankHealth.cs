@@ -153,7 +153,7 @@ namespace Tanks.Complete
 
         public float GetNormalizedHealth()
         {
-            return (m_StartingHealth <= 0f) ? 0f : m_CurrentHealth / m_StartingHealth;
+            return m_StartingHealth <= 0f ? 0f : m_CurrentHealth / m_StartingHealth;
         }
     }
 }
