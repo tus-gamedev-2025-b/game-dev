@@ -109,9 +109,10 @@ namespace Tanks.Complete
             catch (ApiException apiEx)
             {
                 var details = $"API error ({apiEx.ErrorCode}): {apiEx.Message}";
-                if (!string.IsNullOrEmpty(apiEx.ErrorContent))
+                var errorContent = apiEx.ErrorContent?.ToString();
+                if (!string.IsNullOrEmpty(errorContent))
                 {
-                    details += $" | Content: {apiEx.ErrorContent}";
+                    details += $" | Content: {errorContent}";
                 }
 
                 HandleError(details);
@@ -148,7 +149,7 @@ namespace Tanks.Complete
                 return;
             }
 
-            var existing = FindObjectOfType<UserDataManager>();
+            var existing = FindFirstObjectByType<UserDataManager>();
             if (existing != null)
             {
                 return;
