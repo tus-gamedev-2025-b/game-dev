@@ -13,6 +13,8 @@ namespace Tanks.Complete
 {
     public class UserDataManager : MonoBehaviour
     {
+        private const string InvalidRefreshTokenMessage = "Stored refresh token is invalid.";
+
         private string _basePath;
 
         private Configuration _configuration;
@@ -57,10 +59,15 @@ namespace Tanks.Complete
                 throw new InvalidOperationException("No persisted session available.");
             }
 
-            if (!Guid.TryParse(CurrentTokens.RefreshToken, out var refreshGuid))
+            Guid refreshGuid;
+            try
+            {
+                refreshGuid = GetValidatedRefreshGuid();
+            }
+            catch (InvalidRefreshTokenException)
             {
                 ClearSession();
-                throw new InvalidOperationException("Stored refresh token is invalid.");
+                throw;
             }
 
             var api = new UsersApi(ApiConfig.CreateConfiguration(null, _basePath));
@@ -77,10 +84,15 @@ namespace Tanks.Complete
                 throw new InvalidOperationException("No tokens available to refresh.");
             }
 
-            if (!Guid.TryParse(CurrentTokens.RefreshToken, out var refreshGuid))
+            Guid refreshGuid;
+            try
+            {
+                refreshGuid = GetValidatedRefreshGuid();
+            }
+            catch (InvalidRefreshTokenException)
             {
                 ClearSession();
-                throw new InvalidOperationException("Stored refresh token is invalid.");
+                throw;
             }
 
             var api = new AuthApi(ApiConfig.CreateConfiguration(null, _basePath));
@@ -152,13 +164,17 @@ namespace Tanks.Complete
                 throw new ArgumentNullException(nameof(response));
             }
 
-            CurrentUserData = UserData.FromAuthResponse(response);
-            CurrentTokens = AuthTokens.FromAuthResponse(response);
-
-            if (CurrentUserData == null || CurrentTokens == null)
+            try
+            {
+                CurrentUserData = UserData.FromAuthResponse(response) ??
+                                  throw new InvalidOperationException("Failed to parse authentication response.");
+                CurrentTokens = AuthTokens.FromAuthResponse(response) ??
+                                throw new InvalidOperationException("Failed to parse authentication response.");
+            }
+            catch (InvalidOperationException)
             {
                 ClearSession();
-                throw new InvalidOperationException("Failed to parse authentication response.");
+                throw;
             }
 
             EnsureConfiguration().AccessToken = CurrentTokens.AccessToken;
@@ -195,6 +211,23 @@ namespace Tanks.Complete
             EncryptedPrefs.SetString(StorageKeys.UserData, CurrentUserData.ToJson());
             EncryptedPrefs.SetString(StorageKeys.AuthTokens, CurrentTokens.ToJson());
             EncryptedPrefs.Save();
+        }
+
+        private Guid GetValidatedRefreshGuid()
+        {
+            if (!Guid.TryParse(CurrentTokens.RefreshToken, out var refreshGuid))
+            {
+                throw new InvalidRefreshTokenException(InvalidRefreshTokenMessage);
+            }
+
+            return refreshGuid;
+        }
+
+        private sealed class InvalidRefreshTokenException : InvalidOperationException
+        {
+            public InvalidRefreshTokenException(string message) : base(message)
+            {
+            }
         }
     }
 }

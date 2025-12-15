@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tanks.ApiClient.Client;
-using Tanks.ApiClient.Model;
 using Tanks.Complete.Persistence.Models;
 using Tanks.Complete.UI;
 using TMPro;
@@ -26,8 +25,8 @@ namespace Tanks.Complete
         [SerializeField] private ErrorDialog errorDialog;
 
         [Header("Config")]
-        [SerializeField] private string defaultDisplayNamePrefix = "Tanker";
         [SerializeField] private bool autoStartOnAwake;
+        private const string DefaultDisplayNamePrefix = "Tanker";
 
         private CancellationTokenSource _cts;
 
@@ -53,12 +52,21 @@ namespace Tanks.Complete
             _cts?.Dispose();
         }
 
-        private void OnStartButtonPressed()
+        private async void OnStartButtonPressed()
         {
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = new CancellationTokenSource();
-            _ = RunLoginFlowAsync(_cts.Token);
+
+            try
+            {
+                await RunLoginFlowAsync(_cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                HandleError($"Sign-in failed: {ex.Message}");
+            }
         }
 
         private async Task RunLoginFlowAsync(CancellationToken token)
@@ -70,23 +78,22 @@ namespace Tanks.Complete
                 return;
             }
 
-            SetInteractable(false);
-            loadingOverlay?.Show("Connecting to server...");
-            statusText?.SetText("Starting authentication...");
-
             try
             {
-                AuthResponse result;
+                SetInteractable(false);
+                loadingOverlay?.Show("Connecting to server...");
+                statusText?.SetText("Starting authentication...");
+
                 if (manager.HasSession)
                 {
                     statusText?.SetText("Signing in with saved session...");
-                    result = await manager.LoginWithStoredRefreshTokenAsync(token);
+                    await manager.LoginWithStoredRefreshTokenAsync(token);
                 }
                 else
                 {
-                    var displayName = $"{defaultDisplayNamePrefix}{Random.Range(1000, 9999)}";
+                    var displayName = $"{DefaultDisplayNamePrefix}{Random.Range(1000, 9999)}";
                     statusText?.SetText("Creating a new user...");
-                    result = await manager.CreateAndLoginUserAsync(displayName, token);
+                    await manager.CreateAndLoginUserAsync(displayName, token);
                 }
 
                 UpdateUserIdLabel(manager.CurrentUserData);
@@ -101,7 +108,13 @@ namespace Tanks.Complete
             }
             catch (ApiException apiEx)
             {
-                HandleError($"API error: {apiEx.Message}");
+                var details = $"API error ({apiEx.ErrorCode}): {apiEx.Message}";
+                if (!string.IsNullOrEmpty(apiEx.ErrorContent))
+                {
+                    details += $" | Content: {apiEx.ErrorContent}";
+                }
+
+                HandleError(details);
             }
             catch (Exception ex)
             {
@@ -152,14 +165,9 @@ namespace Tanks.Complete
                 return;
             }
 
-            if (user != null && user.IsValid)
-            {
-                userIdText.text = $"User ID: {user.UserId}";
-            }
-            else
-            {
-                userIdText.text = "User ID: -";
-            }
+            userIdText.text = user != null && user.IsValid
+                ? $"User ID: {user.UserId}"
+                : "User ID: -";
         }
     }
 }
