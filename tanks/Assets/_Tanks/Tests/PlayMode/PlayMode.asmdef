@@ -4,7 +4,8 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "Tanks"
+        "Tanks",
+        "Tanks.ApiClient"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

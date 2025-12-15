@@ -1,0 +1,561 @@
+openapi: 3.1.0
+info:
+  description: "Unity game backend API for user management, authentication, matches,\
+    \ and rankings"
+  title: Game API
+  version: 1.0.0
+servers:
+- description: API server
+  url: /api
+tags:
+- description: User management endpoints
+  name: Users
+- description: Authentication endpoints
+  name: Auth
+- description: Match recording endpoints
+  name: Matches
+- description: Ranking endpoints
+  name: Rankings
+paths:
+  /users:
+    post:
+      description: Creates a new user and returns authentication tokens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+        required: false
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+          description: User created successfully
+      summary: Create new user
+      tags:
+      - Users
+  /users/login:
+    post:
+      description: Authenticate user with userId and refresh token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+          description: Login successful
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Invalid refresh token
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: User not found
+      summary: User login
+      tags:
+      - Users
+  /users/{id}:
+    get:
+      description: Retrieve user information by user ID
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: "1"
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+          description: User information retrieved successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Validation error
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: User not found
+      security:
+      - Bearer: []
+      summary: Get user information
+      tags:
+      - Users
+  /users/{id}/name:
+    patch:
+      description: Update the name of a user
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          example: "1"
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNameRequest"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+          description: User name updated successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Validation error or invalid name
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Forbidden - cannot update other user's name
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: User not found
+      security:
+      - Bearer: []
+      summary: Update user name
+      tags:
+      - Users
+  /auth/refresh:
+    post:
+      description: Exchange a refresh token for new access and refresh tokens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+          description: Tokens refreshed successfully
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Invalid or expired refresh token
+      summary: Refresh access token
+      tags:
+      - Auth
+  /matches:
+    post:
+      description: Record the result of a match and update player statistics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecordMatchRequest"
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchResponse"
+          description: Match recorded successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Validation error or self-match not allowed
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Visitor user not found
+      security:
+      - Bearer: []
+      summary: Record match result
+      tags:
+      - Matches
+  /rankings:
+    get:
+      description: Retrieve TOP10 rankings and current user's rank
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RankingResponse"
+          description: Rankings retrieved successfully
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+          description: User not found
+      security:
+      - Bearer: []
+      summary: Get rankings
+      tags:
+      - Rankings
+components:
+  parameters: {}
+  schemas:
+    AuthResponse:
+      example:
+        refreshTokenExpiresAt: refreshTokenExpiresAt
+        accessTokenExpiresAt: accessTokenExpiresAt
+        accessToken: accessToken
+        user:
+          wins: 6.027456183070403
+          createdAt: createdAt
+          name: name
+          id: 0.8008281904610115
+          losses: 1.4658129805029452
+          updatedAt: updatedAt
+        refreshToken: refreshToken
+      properties:
+        user:
+          $ref: "#/components/schemas/AuthResponse_user"
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        accessTokenExpiresAt:
+          type: string
+        refreshTokenExpiresAt:
+          type: string
+      required:
+      - accessToken
+      - accessTokenExpiresAt
+      - refreshToken
+      - refreshTokenExpiresAt
+      - user
+    CreateUserRequest:
+      example:
+        name: name
+      properties:
+        name:
+          maxLength: 15
+          minLength: 3
+          pattern: "^[\\p{Script=Hiragana}\\p{Script=Katakana}\\p{Script=Han}a-zA-Z0-9\\\
+            uFF21-\\uFF3A\\uFF41-\\uFF5A\\uFF10-\\uFF19\\s\\u3000\\u30FC\\u30FB]+$/u"
+          type: string
+    ErrorResponse:
+      example:
+        error:
+          code: code
+          message: message
+      properties:
+        error:
+          $ref: "#/components/schemas/ErrorResponse_error"
+      required:
+      - error
+    LoginRequest:
+      example:
+        userId: 0
+        refreshToken: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        userId:
+          type: integer
+        refreshToken:
+          format: uuid
+          type: string
+      required:
+      - refreshToken
+      - userId
+    UserResponse:
+      example:
+        user:
+          wins: 6.027456183070403
+          createdAt: createdAt
+          name: name
+          id: 0.8008281904610115
+          losses: 1.4658129805029452
+          updatedAt: updatedAt
+      properties:
+        user:
+          $ref: "#/components/schemas/AuthResponse_user"
+      required:
+      - user
+    UpdateNameRequest:
+      example:
+        name: name
+      properties:
+        name:
+          maxLength: 15
+          minLength: 3
+          pattern: "^[\\p{Script=Hiragana}\\p{Script=Katakana}\\p{Script=Han}a-zA-Z0-9\\\
+            uFF21-\\uFF3A\\uFF41-\\uFF5A\\uFF10-\\uFF19\\s\\u3000\\u30FC\\u30FB]+$/u"
+          type: string
+      required:
+      - name
+    TokenResponse:
+      example:
+        refreshTokenExpiresAt: refreshTokenExpiresAt
+        accessTokenExpiresAt: accessTokenExpiresAt
+        accessToken: accessToken
+        refreshToken: refreshToken
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        accessTokenExpiresAt:
+          type: string
+        refreshTokenExpiresAt:
+          type: string
+      required:
+      - accessToken
+      - accessTokenExpiresAt
+      - refreshToken
+      - refreshTokenExpiresAt
+    RefreshTokenRequest:
+      example:
+        refreshToken: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        refreshToken:
+          format: uuid
+          type: string
+      required:
+      - refreshToken
+    MatchResponse:
+      example:
+        updatedStats:
+          wins: 5.962133916683182
+          losses: 5.637376656633329
+          totalMatches: 2.3021358869347655
+        match:
+          playedAt: playedAt
+          winnerId: 6.027456183070403
+          loserId: 1.4658129805029452
+          id: 0.8008281904610115
+      properties:
+        match:
+          $ref: "#/components/schemas/MatchResponse_match"
+        updatedStats:
+          $ref: "#/components/schemas/MatchResponse_updatedStats"
+      required:
+      - match
+      - updatedStats
+    RecordMatchRequest:
+      example:
+        homeScore: 0
+        visitorScore: 0
+        visitorId: 0
+      properties:
+        visitorId:
+          type: integer
+        visitorScore:
+          minimum: 0
+          type: integer
+        homeScore:
+          minimum: 0
+          type: integer
+      required:
+      - homeScore
+      - visitorId
+      - visitorScore
+    RankingResponse:
+      example:
+        rankings:
+        - wins: 5.962133916683182
+          rank: 0.8008281904610115
+          winRate: 1.4658129805029452
+          userName: userName
+          losses: 5.637376656633329
+          totalMatches: 2.3021358869347655
+          userId: 6.027456183070403
+        - wins: 5.962133916683182
+          rank: 0.8008281904610115
+          winRate: 1.4658129805029452
+          userName: userName
+          losses: 5.637376656633329
+          totalMatches: 2.3021358869347655
+          userId: 6.027456183070403
+        currentUser:
+          wins: 5.962133916683182
+          rank: 0.8008281904610115
+          winRate: 1.4658129805029452
+          userName: userName
+          losses: 5.637376656633329
+          totalMatches: 2.3021358869347655
+          userId: 6.027456183070403
+      properties:
+        rankings:
+          items:
+            $ref: "#/components/schemas/RankingResponse_rankings_inner"
+          type: array
+        currentUser:
+          $ref: "#/components/schemas/RankingResponse_rankings_inner"
+      required:
+      - currentUser
+      - rankings
+    AuthResponse_user:
+      example:
+        wins: 6.027456183070403
+        createdAt: createdAt
+        name: name
+        id: 0.8008281904610115
+        losses: 1.4658129805029452
+        updatedAt: updatedAt
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        wins:
+          type: number
+        losses:
+          type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+      - createdAt
+      - id
+      - losses
+      - name
+      - updatedAt
+      - wins
+    ErrorResponse_error:
+      example:
+        code: code
+        message: message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+    MatchResponse_match:
+      example:
+        playedAt: playedAt
+        winnerId: 6.027456183070403
+        loserId: 1.4658129805029452
+        id: 0.8008281904610115
+      properties:
+        id:
+          type: number
+        winnerId:
+          type: number
+        loserId:
+          type: number
+        playedAt:
+          type: string
+      required:
+      - id
+      - loserId
+      - playedAt
+      - winnerId
+    MatchResponse_updatedStats:
+      example:
+        wins: 5.962133916683182
+        losses: 5.637376656633329
+        totalMatches: 2.3021358869347655
+      properties:
+        wins:
+          type: number
+        losses:
+          type: number
+        totalMatches:
+          type: number
+      required:
+      - losses
+      - totalMatches
+      - wins
+    RankingResponse_rankings_inner:
+      example:
+        wins: 5.962133916683182
+        rank: 0.8008281904610115
+        winRate: 1.4658129805029452
+        userName: userName
+        losses: 5.637376656633329
+        totalMatches: 2.3021358869347655
+        userId: 6.027456183070403
+      properties:
+        rank:
+          nullable: true
+          type: number
+        userId:
+          type: number
+        userName:
+          type: string
+        winRate:
+          type: number
+        wins:
+          type: number
+        losses:
+          type: number
+        totalMatches:
+          type: number
+      required:
+      - losses
+      - rank
+      - totalMatches
+      - userId
+      - userName
+      - winRate
+      - wins
+  securitySchemes:
+    Bearer:
+      bearerFormat: UUID
+      description: Access token obtained from POST /users or POST /users/login
+      scheme: bearer
+      type: http
+
