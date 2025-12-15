@@ -5,7 +5,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Tanks",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Tanks.ApiClient"
     ],
     "includePlatforms": [
         "Editor"

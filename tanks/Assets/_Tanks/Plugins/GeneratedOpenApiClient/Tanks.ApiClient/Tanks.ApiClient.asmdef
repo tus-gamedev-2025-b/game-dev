@@ -1,0 +1,7 @@
+{
+    "name": "Tanks.ApiClient",
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ]
+}

@@ -1,0 +1,9 @@
+﻿{
+  "library": "unityWebRequest",
+  "packageName": "Tanks.ApiClient",
+  "targetFramework": "netstandard2.1",
+  "optionalProjectFile": false,
+  "optionalAssemblyInfo": false,
+  "validatable": false,
+  "sourceFolder": ""
+}
