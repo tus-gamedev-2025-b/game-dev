@@ -104,6 +104,37 @@ namespace Tanks.Complete
             return response;
         }
 
+        public async Task<UserData> UpdateUserNameAsync(string newUserName, CancellationToken cancellationToken = default)
+        {
+            if (!HasSession)
+            {
+                throw new InvalidOperationException("No active session available.");
+            }
+
+            if (!UsernameValidator.TryValidate(newUserName, out var error))
+            {
+                throw new ArgumentException(error, nameof(newUserName));
+            }
+
+            var normalized = UsernameValidator.Normalize(newUserName);
+            await EnsureAccessTokenAsync(cancellationToken);
+
+            var api = new UsersApi(EnsureConfiguration());
+            var response = await api.UsersIdNamePatchAsync(CurrentUserData.UserId.ToString(),
+                new UpdateNameRequest(normalized), cancellationToken);
+
+            var updated = UserData.FromAuthResponseUser(response?.User);
+            if (updated == null)
+            {
+                throw new InvalidOperationException("Failed to parse updated user response.");
+            }
+
+            CurrentUserData = updated;
+            PersistSession();
+            OnUserDataChanged?.Invoke(CurrentUserData);
+            return CurrentUserData;
+        }
+
         public bool RestoreSessionFromStorage()
         {
             var userJson = EncryptedPrefs.GetString(StorageKeys.UserData, string.Empty);
