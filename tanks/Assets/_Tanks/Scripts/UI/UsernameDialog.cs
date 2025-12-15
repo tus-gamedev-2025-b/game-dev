@@ -17,9 +17,6 @@ namespace Tanks.Complete.UI
         [SerializeField] private Button confirmButton;
         [SerializeField] private Button cancelButton;
 
-        public event Action<string> OnSubmit;
-        public event Action OnCancel;
-
         private void Awake()
         {
             if (confirmButton != null)
@@ -32,6 +29,9 @@ namespace Tanks.Complete.UI
                 cancelButton.onClick.AddListener(HandleCancel);
             }
         }
+
+        public event Action<string> OnSubmit;
+        public event Action OnCancel;
 
         public void Open(string currentName)
         {

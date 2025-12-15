@@ -1,5 +1,5 @@
-using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Tanks.Complete.Utils
 {
@@ -12,7 +12,7 @@ namespace Tanks.Complete.Utils
         public const int MaxLength = 15;
 
         // Allow: letters, digits, spaces (half/full width), prolonged sound mark, katakana middle dot.
-        private static readonly Regex AllowedCharacters =
+        private readonly static Regex AllowedCharacters =
             new Regex(@"^[\p{L}\p{Nd}\p{Zs}ー・]+$", RegexOptions.Compiled);
 
         public static bool TryValidate(string username, out string errorMessage)
