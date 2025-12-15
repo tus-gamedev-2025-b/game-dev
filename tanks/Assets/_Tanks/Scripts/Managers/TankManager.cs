@@ -30,9 +30,6 @@ namespace Tanks.Complete
         [HideInInspector] public int m_Wins;                 // The number of wins this player has so far.
         [HideInInspector] public bool m_ComputerControlled;  // Is that tank computer controlled
 
-        private float lastP1HP = 1f;
-        private float lastP2HP = 1f;
-
         private TankAI m_AI;                   // The Tank AI script that let a tank be a bot controlled by the computer
         private GameObject m_CanvasGameObject; // Used to disable the world space UI during the Starting and Ending phases of each round.
 
