@@ -1,7 +1,12 @@
-/**
- * @type {import("prettier").Config}
- */
-export default {
-  semi: false,
-  endOfLine: "lf",
-}
+/tanks/Library
+/tanks/Logs
+/tanks/obj
+/tanks/UserSettings
+
+/tanks/Assets
+/tanks/Packages
+/tanks/ProjectSettings
+
+/backend/**/*.js
+/backend/**/*.ts
+/backend/**/*.json
