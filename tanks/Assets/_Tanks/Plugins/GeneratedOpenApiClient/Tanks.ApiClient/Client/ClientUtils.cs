@@ -171,9 +171,11 @@ namespace Tanks.ApiClient.Client
             if (contentTypes.Length == 0)
                 return null;
 
-            var jsonContentType = contentTypes.FirstOrDefault(IsJsonMime);
-            if (jsonContentType != null)
-                return jsonContentType;
+            foreach (var contentType in contentTypes)
+            {
+                if (IsJsonMime(contentType))
+                    return contentType;
+            }
 
             return contentTypes[0]; // use the first content type specified in 'consumes'
         }

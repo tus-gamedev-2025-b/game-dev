@@ -17,6 +17,7 @@ namespace Tanks.Complete
     /// </summary>
     public class TitleSceneUI : MonoBehaviour
     {
+        private const string DefaultDisplayNamePrefix = "Tanker";
         [Header("UI References")]
         [SerializeField] private Button startButton;
         [SerializeField] private TextMeshProUGUI statusText;
@@ -26,7 +27,6 @@ namespace Tanks.Complete
 
         [Header("Config")]
         [SerializeField] private bool autoStartOnAwake;
-        private const string DefaultDisplayNamePrefix = "Tanker";
 
         private CancellationTokenSource _cts;
 
