@@ -21,7 +21,6 @@ https://tus.box.com/s/qpiwd60veuwvr83g47x2bo50xg9l18um
 ## 応用課題の実装 / ログイン機能の実装（フロントエンド）
 
 - 工夫した点：
-
   - バックエンドはOpenAPIで定義されているため、
     それからOpenAPI Generatorでクライアントを自動生成することで、
     安全なAPI呼び出しを実現した
