@@ -1,4 +1,5 @@
 using Tanks.Complete;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,9 @@ public class PlayerStock : MonoBehaviour
     [Header("Mine Stock")]
     [Tooltip("地雷アイコンのImage配列（Mine1, Mine2, Mine3）")]
     [SerializeField] private Image[] mineImages;
+
+    [Header("Win Count")]
+    [SerializeField] private TMP_Text winCountText;
 
     private bool initialized;
     private Transform m_ShellImagesContainer;
@@ -131,5 +135,10 @@ public class PlayerStock : MonoBehaviour
                 mineImages[i].gameObject.SetActive(i < stock);
             }
         }
+    }
+
+    public void UpdateWinCount(int wins)
+    {
+        winCountText.text = wins.ToString();
     }
 }
