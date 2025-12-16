@@ -30,6 +30,9 @@ namespace Tanks.Complete
         [HideInInspector] public int m_Wins;                 // The number of wins this player has so far.
         [HideInInspector] public bool m_ComputerControlled;  // Is that tank computer controlled
 
+        private float lastP1HP = 1f;
+        private float lastP2HP = 1f;
+
         private TankAI m_AI;                   // The Tank AI script that let a tank be a bot controlled by the computer
         private GameObject m_CanvasGameObject; // Used to disable the world space UI during the Starting and Ending phases of each round.
 
@@ -55,6 +58,9 @@ namespace Tanks.Complete
         // Parameters: (int controlIndex, int newStock)
         [Obsolete("Use OnWeaponStockChanged with WeaponStockData instead")]
         public event Action<int, int> OnShellStockChanged;
+        public event Action<int, float> OnHealthChanged;
+
+        public event Action<int, int> OnWinCountChanged;
 
         public void Setup(GameManager manager)
         {
@@ -63,6 +69,12 @@ namespace Tanks.Complete
             m_Shooting = m_Instance.GetComponent<TankShooting>();
             m_AI = m_Instance.GetComponent<TankAI>();
             m_CanvasGameObject = m_Instance.GetComponentInChildren<Canvas>().gameObject;
+
+            var health = m_Instance.GetComponent<TankHealth>();
+            health.OnHealthChanged += value => OnHealthChanged?.Invoke(m_PlayerNumber, value);
+
+            // 購読直後に現在HPを一度通知（RoundStartの取りこぼし対策）
+            OnHealthChanged?.Invoke(m_PlayerNumber, health.GetNormalizedHealth());
 
             // コルーチン実行用のMonoBehaviourを取得
             m_CoroutineRunner = manager;
@@ -115,6 +127,13 @@ namespace Tanks.Complete
                     }
                 }
             }
+
+            // Receive the Round Victory Count Update Event from GameManager and display it on the HUD
+            manager.OnRoundWinnerChanged += (playerNum, wins) =>
+            {
+                if (playerNum == m_PlayerNumber)
+                    OnWinCountChanged?.Invoke(ControlIndex, wins);
+            };
         }
 
         /// <summary>

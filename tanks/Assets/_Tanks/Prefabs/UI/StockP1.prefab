@@ -5809,6 +5809,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StockP1
       objectReference: {fileID: 0}
+    - target: {fileID: 6357281590949221802, guid: 3365a4b0b74cfde4eb9366179ca24239, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     - target: {fileID: 6495140264286327562, guid: 3365a4b0b74cfde4eb9366179ca24239, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
