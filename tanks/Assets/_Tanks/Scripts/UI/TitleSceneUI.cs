@@ -8,7 +8,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 namespace Tanks.Complete
 {
@@ -17,7 +16,7 @@ namespace Tanks.Complete
     /// </summary>
     public class TitleSceneUI : MonoBehaviour
     {
-        private const string DefaultDisplayNamePrefix = "Tanker";
+        private const string DefaultDisplayName = "NoName";
         [Header("UI References")]
         [SerializeField] private Button startButton;
         [SerializeField] private TextMeshProUGUI statusText;
@@ -91,7 +90,7 @@ namespace Tanks.Complete
                 }
                 else
                 {
-                    var displayName = $"{DefaultDisplayNamePrefix}{Random.Range(1000, 9999)}";
+                    var displayName = DefaultDisplayName;
                     statusText?.SetText("Creating a new user...");
                     await manager.CreateAndLoginUserAsync(displayName, token);
                 }
