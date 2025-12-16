@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Tanks.Complete
@@ -54,6 +55,8 @@ namespace Tanks.Complete
             if (m_ExplosionParticles != null)
                 Destroy(m_ExplosionParticles.gameObject);
         }
+
+        public event Action<float> OnHealthChanged;
 
 
         public void TakeDamage(float amount)
@@ -124,6 +127,8 @@ namespace Tanks.Complete
 
             // Interpolate the color of the bar between the choosen colours based on the current percentage of the starting health.
             m_FillImage.color = Color.Lerp(m_ZeroHealthColor, m_FullHealthColor, m_CurrentHealth / m_StartingHealth);
+
+            OnHealthChanged?.Invoke(m_CurrentHealth / m_StartingHealth);
         }
 
 
@@ -144,6 +149,11 @@ namespace Tanks.Complete
 
             // Turn the tank off.
             gameObject.SetActive(false);
+        }
+
+        public float GetNormalizedHealth()
+        {
+            return m_StartingHealth <= 0f ? 0f : m_CurrentHealth / m_StartingHealth;
         }
     }
 }
